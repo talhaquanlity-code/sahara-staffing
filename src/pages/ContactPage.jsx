@@ -23,6 +23,19 @@ const DISCIPLINES = [
   'Product & Full-Stack',
 ];
 
+const APPS_SCRIPT_URL =
+  import.meta.env.VITE_APPS_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycbzf-FZC3jNUTH2QG2mqfonILI3W0o0rfsYPIdfkkWye8fuQXKDG5FE2iLP72H6jEEQ/exec';
+
+const convertFileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
+
 export default function ContactPage() {
   const { settings } = useCMS();
 
@@ -199,42 +212,55 @@ export default function ContactPage() {
     setSubmitError(null);
 
     try {
-      // 1. Dispatch form data + resume attachment to GoDaddy PHP endpoint
-      const payload = new FormData();
-      payload.append('fullName', formData.fullName);
-      payload.append('email', formData.email);
-      payload.append('phone', formData.phone || '');
-      payload.append('targetDiscipline', formData.targetDiscipline);
-      payload.append('linkedinUrl', formData.linkedinUrl || '');
-      payload.append('careerSummary', formData.careerSummary || '');
+      // 1. Convert attached resume file to base64
+      let base64String = '';
       if (resumeFile) {
-        payload.append('resume', resumeFile);
-      }
-      if (resumeDataUrl) {
-        payload.append('resumeDataUrl', resumeDataUrl);
+        base64String = await convertFileToBase64(resumeFile);
       }
 
+      // 2. Construct JSON payload for Google Apps Script Web App
+      const payload = {
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone || '',
+        discipline: formData.targetDiscipline,
+        linkedin: formData.linkedinUrl || '',
+        summary: formData.careerSummary || '',
+        fileName: resumeFile ? resumeFile.name : '',
+        fileType: resumeFile ? resumeFile.type : '',
+        fileData: base64String,
+      };
+
       let trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
-      try {
-        let response = await fetch('/api/submit-form.php', {
-          method: 'POST',
-          body: payload,
-        });
-        if (!response.ok) {
-          response = await fetch('/data/submit-form.php', {
-            method: 'POST',
-            body: payload,
-          });
-        }
-        if (response.ok) {
-          const resData = await response.json();
-          if (resData?.tracking_id) {
-            trackingId = resData.tracking_id;
-          }
-        }
-      } catch (networkErr) {
-        console.info('Local dev note: backend simulation active:', networkErr);
+
+      // 3. Dispatch POST request with text/plain to prevent CORS preflight failures
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data && (data.status === 'success' || data.success || data.tracking_id || data.trackingId)) {
+        trackingId = data.tracking_id || data.trackingId || trackingId;
+      } else if (data && data.status === 'error') {
+        throw new Error(data.message || 'Submission could not be recorded by the server.');
       }
+
+      // Dual sync with local PHP endpoints if available
+      try {
+        const phpPayload = new FormData();
+        phpPayload.append('fullName', formData.fullName);
+        phpPayload.append('email', formData.email);
+        phpPayload.append('phone', formData.phone || '');
+        phpPayload.append('targetDiscipline', formData.targetDiscipline);
+        phpPayload.append('linkedinUrl', formData.linkedinUrl || '');
+        phpPayload.append('careerSummary', formData.careerSummary || '');
+        phpPayload.append('trackingId', trackingId);
+        if (resumeFile) phpPayload.append('resume', resumeFile);
+        fetch('/api/submit-form.php', { method: 'POST', body: phpPayload }).catch(() => {});
+      } catch {}
 
       const record = {
         tracking_id: trackingId,
@@ -244,7 +270,7 @@ export default function ContactPage() {
         created_at: new Date().toISOString(),
       };
 
-      // 2. Render verified success screen
+      // 4. Render verified success screen
       setSubmittedCandidate(record);
     } catch (err) {
       console.error('Submission failed:', err);
@@ -679,11 +705,14 @@ export default function ContactPage() {
                 >
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
-                      Profile Submitted Successfully.
+                      Submission Received.
                     </h2>
-                    <p className="text-sm text-[#475569] mt-1.5 leading-relaxed">
-                      Your profile has been received by Sahara Staffing Inc. Our recruitment leads
-                      will review your Profile against active enterprise searches.
+                    <p className="text-sm text-[#475569] mt-2 leading-relaxed">
+                      Submission Received. Tracking ID:{' '}
+                      <span className="font-mono font-bold text-[#B87314]">
+                        {submittedCandidate.tracking_id}
+                      </span>
+                      . Our talent acquisition lead will contact you shortly.
                     </p>
                   </div>
 

@@ -221,9 +221,8 @@ const SECTION_PILLS = {
     { id: 'about-block-01', num: '01', label: 'About Hero', anchor: '#about-hero' },
     { id: 'about-block-02', num: '02', label: 'Benchmarks', anchor: '#about-benchmarks' },
     { id: 'about-block-03', num: '03', label: 'Discipline Matrix', anchor: '#about-mindset' },
-    { id: 'about-block-04', num: '04', label: 'Leadership', anchor: '#about-leadership' },
-    { id: 'about-block-05', num: '05', label: 'Scale Stats', anchor: '#about-stats' },
-    { id: 'about-block-06', num: '06', label: 'Final CTA', anchor: '#about-final-cta' },
+    { id: 'about-block-04', num: '04', label: 'Scale Stats', anchor: '#about-stats' },
+    { id: 'about-block-05', num: '05', label: 'Final CTA', anchor: '#about-final-cta' },
   ],
   services: [
     { id: 'services-block-01', num: '01', label: 'Services Hero', anchor: '#services-hero' },
@@ -349,7 +348,6 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
           'about-block-03',
           'about-block-04',
           'about-block-05',
-          'about-block-06',
         ];
       case 'services':
         return [
@@ -458,9 +456,8 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       case 'about-block-01': return 'Block 01: About Hero Section';
       case 'about-block-02': return 'Block 02: Operating Benchmarks';
       case 'about-block-03': return 'Block 03: Discipline Matrix';
-      case 'about-block-04': return 'Block 04: Leadership Council';
-      case 'about-block-05': return 'Block 05: Hard Scale Stats';
-      case 'about-block-06': return 'Block 06: Final CTA';
+      case 'about-block-04': return 'Block 04: Hard Scale Stats';
+      case 'about-block-05': return 'Block 05: Final CTA';
       case 'services-block-01': return 'Block 01: Services Hero Section';
       case 'services-block-02': return 'Block 02: Service Capabilities Grid';
       case 'services-block-03': return 'Block 03: Vetting Process';
@@ -2208,11 +2205,11 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 04: LEADERSHIP COUNCIL */}
+              {/* BLOCK 04: HARD SCALE STATS */}
               <div id="editor-about-block-04" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
                 <button
                   type="button"
-                  onClick={() => handleBlockToggle('about-block-04', '#about-leadership')}
+                  onClick={() => handleBlockToggle('about-block-04', '#about-stats')}
                   className="w-full flex items-center justify-between text-left cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-3">
@@ -2220,85 +2217,14 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       04
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Leadership Council</h3>
-                      <p className="text-[11px] text-[#64748B]">Executive profiles and headshot uploaders</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Hard Scale Stats</h3>
+                      <p className="text-[11px] text-[#64748B]">Enterprise proof points and placement volume</p>
                     </div>
                   </div>
                   {isBlockExpanded('about-block-04') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
                 {isBlockExpanded('about-block-04') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3.5 text-xs">
-                    {(draftContent.about?.leadership || []).map((lead, idx) => (
-                      <div key={idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="text"
-                            value={lead.name}
-                            onChange={(e) => {
-                              const list = [...(draftContent.about?.leadership || [])];
-                              list[idx] = { ...list[idx], name: e.target.value };
-                              updateDraft('about.leadership', list);
-                            }}
-                            className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white font-bold"
-                          />
-                          <input
-                            type="text"
-                            value={lead.title}
-                            onChange={(e) => {
-                              const list = [...(draftContent.about?.leadership || [])];
-                              list[idx] = { ...list[idx], title: e.target.value };
-                              updateDraft('about.leadership', list);
-                            }}
-                            className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B]"
-                          />
-                        </div>
-                        <textarea
-                          rows={2}
-                          value={lead.bio}
-                          onChange={(e) => {
-                            const list = [...(draftContent.about?.leadership || [])];
-                            list[idx] = { ...list[idx], bio: e.target.value };
-                            updateDraft('about.leadership', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
-                        />
-                        {renderImageDropzone({
-                          title: `${lead.name} Headshot Portrait`,
-                          currentValue: lead.image,
-                          fieldKey: `lead-about-${idx}`,
-                          onUpdate: (newUrl) => {
-                            const list = [...(draftContent.about?.leadership || [])];
-                            list[idx] = { ...list[idx], image: newUrl };
-                            updateDraft('about.leadership', list);
-                          },
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* BLOCK 05: HARD SCALE STATS */}
-              <div id="editor-about-block-05" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
-                <button
-                  type="button"
-                  onClick={() => handleBlockToggle('about-block-05', '#about-stats')}
-                  className="w-full flex items-center justify-between text-left cursor-pointer select-none"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-lg bg-[#E69D2B]/15 flex items-center justify-center font-mono text-xs font-bold text-[#E69D2B]">
-                      05
-                    </span>
-                    <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 05: Hard Scale Stats</h3>
-                      <p className="text-[11px] text-[#64748B]">Enterprise proof points and placement volume</p>
-                    </div>
-                  </div>
-                  {isBlockExpanded('about-block-05') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
-                </button>
-
-                {isBlockExpanded('about-block-05') && (
                   <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3 text-xs">
                     {(draftContent.about?.stats || []).map((s, idx) => (
                       <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B] space-y-1">
@@ -2328,26 +2254,26 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 06: FINAL CTA */}
-              <div id="editor-about-block-06" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
+              {/* BLOCK 05: FINAL CTA */}
+              <div id="editor-about-block-05" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
                 <button
                   type="button"
-                  onClick={() => handleBlockToggle('about-block-06', '#about-final-cta')}
+                  onClick={() => handleBlockToggle('about-block-05', '#about-final-cta')}
                   className="w-full flex items-center justify-between text-left cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-3">
                     <span className="w-7 h-7 rounded-lg bg-[#E69D2B]/15 flex items-center justify-center font-mono text-xs font-bold text-[#E69D2B]">
-                      06
+                      05
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 06: Final CTA</h3>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 05: Final CTA</h3>
                       <p className="text-[11px] text-[#64748B]">About Page closing banner and actions</p>
                     </div>
                   </div>
-                  {isBlockExpanded('about-block-06') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
+                  {isBlockExpanded('about-block-05') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
-                {isBlockExpanded('about-block-06') && (
+                {isBlockExpanded('about-block-05') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
                     <div>
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Closing Headline</label>

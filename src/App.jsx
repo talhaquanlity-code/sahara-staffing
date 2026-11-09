@@ -178,6 +178,82 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Quick keyboard shortcut to access Admin Portal:
+  // Supports TAB + SH (or Tab + S + H, or Tab + Shift + H)
+  useEffect(() => {
+    let isTabDown = false;
+    let lastTabTime = 0;
+    let sequence = '';
+    let sequenceTimer = null;
+
+    const triggerAdminAccess = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sequence = '';
+      navigate('admin');
+    };
+
+    const handleKeyDown = (e) => {
+      // Don't intercept while typing in an input field or textarea
+      const targetTag = e.target?.tagName?.toLowerCase();
+      const isInput =
+        targetTag === 'input' || targetTag === 'textarea' || e.target?.isContentEditable;
+      if (isInput) return;
+
+      const key = e.key;
+
+      if (key === 'Tab') {
+        isTabDown = true;
+        lastTabTime = Date.now();
+        sequence = '';
+        return;
+      }
+
+      const keyLower = key ? key.toLowerCase() : '';
+
+      // Check if Tab is currently held down or was pressed recently (within 2.5s)
+      const isTabActive = isTabDown || Date.now() - lastTabTime < 2500;
+
+      if (isTabActive) {
+        // Direct support for Tab + Shift + H
+        if (e.shiftKey && keyLower === 'h' && sequence === '') {
+          triggerAdminAccess(e);
+          return;
+        }
+
+        // Sequential support for Tab + 'S' + 'H'
+        if (keyLower === 's') {
+          sequence = 's';
+          clearTimeout(sequenceTimer);
+          sequenceTimer = setTimeout(() => {
+            sequence = '';
+          }, 1800);
+          return;
+        }
+
+        if (keyLower === 'h' && sequence === 's') {
+          // 'sh' completed while Tab was active!
+          triggerAdminAccess(e);
+          return;
+        }
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      if (e.key === 'Tab') {
+        isTabDown = false;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown, true);
+    window.addEventListener('keyup', handleKeyUp, true);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown, true);
+      window.removeEventListener('keyup', handleKeyUp, true);
+      if (sequenceTimer) clearTimeout(sequenceTimer);
+    };
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-[#EBE7DE] text-obsidian selection:bg-saharaGold selection:text-obsidian">
       {/* Global Interactive Modal & Toast & Floating Progress Control */}
