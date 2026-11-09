@@ -1,6 +1,6 @@
 import { localDB } from './supabase';
 
-export const DEFAULT_NOTIFICATION_EMAIL = 'talhaquanlity@gmail.com';
+export const DEFAULT_NOTIFICATION_EMAIL = 'contact@sahara-staffing.com';
 
 /**
  * Format standard HTML Email for Sahara Staffing Admin Alerts

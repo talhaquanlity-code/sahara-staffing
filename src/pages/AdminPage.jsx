@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
-  Users,
   LayoutGrid,
   Settings,
   LogOut,
@@ -18,25 +17,26 @@ import {
 } from 'lucide-react';
 import logoImg from '../assets/sahara-logo.png';
 import markImg from '../assets/sahara-mark.png';
-import { isSupabaseConfigured, supabase, CandidateService } from '../lib/supabase';
-import ATSWorkspace from '../components/admin/ATSWorkspace';
 import CMSWorkspace from '../components/admin/CMSWorkspace';
 import SettingsWorkspace from '../components/admin/SettingsWorkspace';
 
-const SESSION_KEY = 'sahara_admin_session_v1';
+const SESSION_KEY = 'sahara_admin_session_v2';
 
 export default function AdminPage({ onNavigateHome }) {
-  // Always begin at the Login Gate. Never automatically bypass the login screen.
-  const [session, setSession] = useState(null);
+  // Session initialization from sessionStorage (closed with browser tab)
+  const [session, setSession] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem(SESSION_KEY);
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
-  // Active Workspace: 'ats' | 'cms' | 'settings'
-  const [activeWorkspace, setActiveWorkspace] = useState('ats');
+  // Active Workspace: 'cms' (default) | 'settings'
+  const [activeWorkspace, setActiveWorkspace] = useState('cms');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
-  // Candidates Dataset State
-  const [candidates, setCandidates] = useState([]);
-  const [isLoadingCandidates, setIsLoadingCandidates] = useState(false);
 
   // Login Form State
   const [email, setEmail] = useState('');
@@ -45,29 +45,11 @@ export default function AdminPage({ onNavigateHome }) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authError, setAuthError] = useState(null);
 
-  // Load Candidates
-  const loadCandidates = async () => {
-    setIsLoadingCandidates(true);
-    try {
-      const data = await CandidateService.getAll();
-      setCandidates(data || []);
-    } catch (err) {
-      console.error('Failed to load candidate Profiles:', err);
-    } finally {
-      setIsLoadingCandidates(false);
-    }
-  };
-
-  useEffect(() => {
-    if (session) {
-      loadCandidates();
-    }
-  }, [session]);
-
-  // Handle Login
+  // Handle Login with Hardened Credentials
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !password) {
       setAuthError('Please enter both your administrator email and password.');
       return;
     }
@@ -75,65 +57,26 @@ export default function AdminPage({ onNavigateHome }) {
     setIsAuthenticating(true);
     setAuthError(null);
 
-    try {
-      if (isSupabaseConfigured && supabase) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: email.trim().toLowerCase(),
-          password,
-        });
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
-        if (error) throw error;
-
-        const newSession = {
-          user: data.user,
-          email: data.user.email,
-          role: 'administrator',
-          mode: 'supabase_production',
-          timestamp: new Date().toISOString(),
-        };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
-        setSession(newSession);
-      } else {
-        await new Promise((resolve) => setTimeout(resolve, 350));
-        const newSession = {
-          email: email.trim().toLowerCase(),
-          role: 'administrator',
-          mode: 'local_development',
-          timestamp: new Date().toISOString(),
-        };
-        localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
-        setSession(newSession);
-      }
-    } catch (err) {
-      console.error('Authentication failed:', err);
-      setAuthError(err.message || 'Invalid administrator credentials. Access denied.');
-    } finally {
-      setIsAuthenticating(false);
+    if (cleanEmail === 'contact@sahara-staffing.com' && password === 'GO-Sahara01') {
+      const newSession = {
+        email: 'contact@sahara-staffing.com',
+        role: 'administrator',
+        mode: 'production_cms',
+        timestamp: new Date().toISOString(),
+      };
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+      setSession(newSession);
+    } else {
+      setAuthError('Invalid administrator credentials. Access denied.');
     }
-  };
-
-  // Quick Demo Login for instant verification
-  const handleQuickDemoLogin = () => {
-    const demoSession = {
-      email: 'admin@saharastaffing.example',
-      role: 'administrator',
-      mode: 'development_demo',
-      timestamp: new Date().toISOString(),
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(demoSession));
-    setSession(demoSession);
+    setIsAuthenticating(false);
   };
 
   // Handle Logout
-  const handleLogout = async () => {
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.auth.signOut();
-      } catch (err) {
-        console.warn('Supabase signOut error:', err);
-      }
-    }
-    localStorage.removeItem(SESSION_KEY);
+  const handleLogout = () => {
+    sessionStorage.removeItem(SESSION_KEY);
     setSession(null);
     setEmail('');
     setPassword('');
@@ -202,7 +145,7 @@ export default function AdminPage({ onNavigateHome }) {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="admin@saharastaffing.com"
+                    placeholder="contact@sahara-staffing.com"
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-lg bg-[#131926] border border-[#1E293B] text-white text-xs sm:text-sm placeholder-[#64748B] focus:border-[#E69D2B] focus:outline-none transition-colors"
                   />
                 </div>
@@ -249,27 +192,12 @@ export default function AdminPage({ onNavigateHome }) {
                 </button>
               </div>
             </form>
-
-            {/* Development Quick-Access Button */}
-            <div className="pt-3 border-t border-[#1E293B]/60 text-center space-y-2">
-              <button
-                type="button"
-                onClick={handleQuickDemoLogin}
-                className="w-full py-2 text-[#E69D2B] hover:text-[#F2A51A] text-xs font-medium transition-colors cursor-pointer"
-              >
-                Instant Development Sign In (Demo Mode)
-              </button>
-              <div className="text-[10px] text-[#64748B] flex items-center justify-center gap-1.5 font-mono">
-                <span>Shortcut:</span>
-                <span className="text-[#94A3B8]">Tab + SH</span>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Bottom Note */}
         <div className="w-full max-w-md mx-auto text-center text-[10.5px] text-[#64748B] py-2">
-          &copy; 2026 Sahara Staffing Inc. Candidate Data Governance
+          &copy; 2026 Sahara Staffing Inc. Secure Admin Authentication
         </div>
       </div>
     );
@@ -340,55 +268,31 @@ export default function AdminPage({ onNavigateHome }) {
             </div>
           )}
 
-          {/* Item 1: ATS */}
-          <button
-            type="button"
-            onClick={() => {
-              setActiveWorkspace('ats');
-              setMobileSidebarOpen(false);
-            }}
-            title="Applicant Talent Portal"
-            className={`relative w-full ${
-              sidebarCollapsed ? 'px-0 justify-center h-10' : 'px-3.5 py-2.5'
-            } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-lg ${
-              activeWorkspace === 'ats'
-                ? 'text-white font-medium bg-[#E69D2B]/15 text-[#E69D2B]'
-                : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.02]'
-            }`}
-          >
-            <Users
-              className={`w-4 h-4 flex-shrink-0 ${
-                activeWorkspace === 'ats' ? 'text-[#E69D2B]' : ''
-              }`}
-            />
-            {!sidebarCollapsed && <span className="truncate">Applicant Talent Portal</span>}
-          </button>
-
-          {/* Item 2: CMS */}
+          {/* Item 1: CMS */}
           <button
             type="button"
             onClick={() => {
               setActiveWorkspace('cms');
               setMobileSidebarOpen(false);
             }}
-            title="Site Content CMS & Live Editor"
+            title="Site Content CMS & Live Customizer"
             className={`relative w-full ${
               sidebarCollapsed ? 'px-0 justify-center h-10' : 'px-3.5 py-2.5'
-            } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-lg ${
+            } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-r-lg ${
               activeWorkspace === 'cms'
-                ? 'text-white font-medium bg-[#E69D2B]/15 text-[#E69D2B]'
+                ? 'text-white font-medium bg-[#131926] border-l-4 border-[#E69D2B]'
                 : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.02]'
             }`}
           >
             <LayoutGrid
               className={`w-4 h-4 flex-shrink-0 ${
-                activeWorkspace === 'cms' ? 'text-[#E69D2B]' : ''
+                activeWorkspace === 'cms' ? 'text-white' : 'text-[#94A3B8]'
               }`}
             />
             {!sidebarCollapsed && <span className="truncate">Site Content CMS</span>}
           </button>
 
-          {/* Item 3: Settings */}
+          {/* Item 2: Settings */}
           <button
             type="button"
             onClick={() => {
@@ -398,15 +302,15 @@ export default function AdminPage({ onNavigateHome }) {
             title="Brand & Notifications"
             className={`relative w-full ${
               sidebarCollapsed ? 'px-0 justify-center h-10' : 'px-3.5 py-2.5'
-            } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-lg ${
+            } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-r-lg ${
               activeWorkspace === 'settings'
-                ? 'text-white font-medium bg-[#E69D2B]/15 text-[#E69D2B]'
+                ? 'text-white font-medium bg-[#131926] border-l-4 border-[#E69D2B]'
                 : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.02]'
             }`}
           >
             <Settings
               className={`w-4 h-4 flex-shrink-0 ${
-                activeWorkspace === 'settings' ? 'text-[#E69D2B]' : ''
+                activeWorkspace === 'settings' ? 'text-white' : 'text-[#94A3B8]'
               }`}
             />
             {!sidebarCollapsed && <span className="truncate">Brand &amp; Notifications</span>}
@@ -422,7 +326,7 @@ export default function AdminPage({ onNavigateHome }) {
                   Administrator
                 </div>
                 <div className="text-[#CBD5E1] font-mono text-xs truncate mt-0.5">
-                  {session.email || 'administrator'}
+                  {session.email || 'contact@sahara-staffing.com'}
                 </div>
               </div>
 
@@ -503,7 +407,7 @@ export default function AdminPage({ onNavigateHome }) {
             {/* Top Bar Right: Text Status Indicator & Quiet Logout */}
             <div className="flex items-center gap-6">
               <span className="text-[10.5px] font-mono tracking-widest text-[#64748B] uppercase">
-                {isSupabaseConfigured ? 'SUPABASE LIVE' : 'LOCAL MODE'}
+                GODADDY CMS SYNC
               </span>
 
               <button
@@ -526,11 +430,12 @@ export default function AdminPage({ onNavigateHome }) {
               : 'p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar'
           }`}
         >
-          {activeWorkspace === 'ats' && (
-            <ATSWorkspace candidates={candidates} onRefreshCandidates={loadCandidates} />
+          {activeWorkspace === 'cms' && (
+            <CMSWorkspace
+              onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+              sidebarCollapsed={sidebarCollapsed}
+            />
           )}
-
-          {activeWorkspace === 'cms' && <CMSWorkspace onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)} sidebarCollapsed={sidebarCollapsed} />}
 
           {activeWorkspace === 'settings' && <SettingsWorkspace />}
         </main>

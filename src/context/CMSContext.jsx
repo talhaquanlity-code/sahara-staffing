@@ -150,9 +150,15 @@ export const INITIAL_CMS_CONTENT = {
     footer: {
       headline: 'Speak to our staffing experts',
       subtitle: 'Our team is here to answer your questions, review your business needs, and guide you toward the right staffing solution so you can move forward with confidence.',
-      contactEmail: 'admin@saharastaffing.com',
-      contactPhone: '+1 (800) 555-SAHARA',
+      contactEmail: 'contact@sahara-staffing.com',
       copyright: '© 2026 Sahara Staffing Inc. All rights reserved.',
+      socialLinks: [
+        { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+        { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+        { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+        { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+        { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+      ],
       buttons: [
         {
           id: 'btn-foot-1',
@@ -363,14 +369,12 @@ export const INITIAL_CMS_CONTENT = {
       subtitle: 'Whether you are looking to hire executive leadership or specialized technical contributors, our team responds within 2 hours.',
     },
     details: {
-      office: 'New York, NY & San Francisco, CA',
-      email: 'talhaquanlity@gmail.com',
-      phone: '+1 (800) 555-SAHARA',
+      email: 'contact@sahara-staffing.com',
       responseTime: 'Within 2 hours (Business Hours)',
     },
     intakeSettings: {
       allowDemoSubmissions: true,
-      emailRouting: 'resend_smtp',
+      emailRouting: 'php_godaddy',
       confirmationMessage: 'Thank you for submitting your profile. A senior talent partner will review your credentials within 2 hours.',
     },
   },
@@ -536,9 +540,16 @@ export const INITIAL_SETTINGS = {
   backToTopIcon: 'arrow', // 'arrow' | 'sparkle'
   enableCustomCursor: false,
   primaryAccent: '#E69D2B',
-  recipientEmail: 'talhaquanlity@gmail.com',
+  recipientEmail: 'contact@sahara-staffing.com',
   companyName: 'Sahara Staffing Inc.',
   allowDemoSubmissions: true,
+  footerSocials: [
+    { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+    { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+    { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+    { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+    { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+  ],
 };
 
 const CMSContext = createContext(null);
@@ -612,6 +623,33 @@ export function CMSProvider({ children }) {
   const [publishStatus, setPublishStatus] = useState('idle'); // 'idle' | 'saving' | 'published' | 'error'
   const [publishMessage, setPublishMessage] = useState('');
 
+  // Live remote sync from /data/content.json on mount (GoDaddy Flat-File Engine)
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRemoteContent = async () => {
+      try {
+        const res = await fetch(`/data/content.json?v=${Date.now()}`);
+        if (res.ok) {
+          const remoteData = await res.json();
+          if (!isMounted) return;
+          if (remoteData?.content) {
+            setPublishedContent((prev) => mergeDeep(prev, remoteData.content));
+            setDraftContent((prev) => (hasUnsavedChanges ? prev : mergeDeep(prev, remoteData.content)));
+          }
+          if (remoteData?.settings) {
+            setSettings((prev) => ({ ...prev, ...remoteData.settings }));
+          }
+        }
+      } catch (e) {
+        // Flat file sync fallback silently to local defaults
+      }
+    };
+    fetchRemoteContent();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Update working draft
   const updateDraft = (section, data) => {
     setDraftContent((prev) => {
@@ -672,13 +710,20 @@ export function CMSProvider({ children }) {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
       setPublishedContent(payload);
 
-      // Dispatch POST to /data/save-content.php (GoDaddy flat-file storage)
+      // Dispatch POST to /api/save-content.php with /data/save-content.php fallback (GoDaddy flat-file storage)
       try {
-        const response = await fetch('/data/save-content.php', {
+        let response = await fetch('/api/save-content.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content: payload, settings }),
         });
+        if (!response.ok) {
+          response = await fetch('/data/save-content.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: payload, settings }),
+          });
+        }
         if (response.ok) {
           const resData = await response.json();
           setPublishMessage(resData.message || 'Site Content & Global Settings Published Live!');

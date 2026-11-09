@@ -1,10 +1,49 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useInView, animate } from 'framer-motion';
 import { ArrowRight, Linkedin, Mail } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
 import saharaMarkImg from '../assets/sahara-mark.png';
 import KineticTalentPipeline from '../components/KineticTalentPipeline';
+
+// ============================================================================
+// COMPONENT: ANIMATED STAT COUNTER (500+, 98%, 14 Days, $250M+)
+// ============================================================================
+function AnimatedStatCounter({ value }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-40px' });
+  const [displayVal, setDisplayVal] = useState(value);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    const strVal = String(value || '');
+    const match = strVal.match(/^([^0-9]*)([0-9]+)(.*)$/);
+    if (!match) {
+      setDisplayVal(strVal);
+      return;
+    }
+
+    const prefix = match[1] || '';
+    const targetNum = parseInt(match[2], 10);
+    const suffix = match[3] || '';
+
+    const controls = animate(0, targetNum, {
+      duration: 1.8,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (latest) => {
+        setDisplayVal(`${prefix}${Math.floor(latest)}${suffix}`);
+      },
+      onComplete: () => {
+        setDisplayVal(strVal);
+      },
+    });
+
+    return () => controls.stop();
+  }, [isInView, value]);
+
+  return <span ref={ref}>{displayVal}</span>;
+}
 
 // ============================================================================
 // DATA: SECTION FOUR — THE PRINCIPLES THAT DEFINE SAHARA
@@ -466,66 +505,7 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
       </section>
 
       {/* ===================================================================== */}
-      {/* 04. SECTION TWO — A LARGE EDITORIAL BRAND STATEMENT (WARM CREAM)       */}
-      {/* Oversized typography, asymmetrical layout, and generous whitespace    */}
-      {/* ===================================================================== */}
-      <section
-        id="about-philosophy"
-        ref={perspectiveRef}
-        className="relative w-full bg-[#FAF9F6] text-[#080B12] py-20 sm:py-28 lg:py-32 px-6 sm:px-10 lg:px-16 border-b border-[#E7E3D9] overflow-hidden"
-      >
-        <div className="max-w-[1360px] mx-auto">
-          {/* Eyebrow */}
-          <motion.div
-            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="flex items-center gap-3 mb-6 sm:mb-8"
-          >
-            <span className="w-6 h-[1.5px] bg-[#F5A623]" />
-            <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
-              OUR PERSPECTIVE
-            </span>
-          </motion.div>
-
-          {/* Asymmetrical Editorial Composition with Parallax Columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
-            {/* Oversized Statement (8 Cols) */}
-            <motion.div
-              style={{ y: perspectiveLeftY }}
-              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 22 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-8 will-change-transform"
-            >
-              <h2 className="text-3xl sm:text-5xl lg:text-[64px] font-extrabold text-[#080B12] tracking-[-0.035em] leading-[1.18] font-sans">
-                Hiring is about people, <br className="hidden sm:block" />
-                <span className="text-[#B87314]">not just positions.</span>
-              </h2>
-            </motion.div>
-
-            {/* Dedicated Reading Column with Counter-Parallax (4 Cols) */}
-            <motion.div
-              style={{ y: perspectiveRightY }}
-              initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-              className="lg:col-span-4 lg:pt-3 space-y-5 will-change-transform"
-            >
-              <p className="text-slate-700 text-base sm:text-lg leading-relaxed font-normal font-sans">
-                Behind every search is a business objective and a professional’s career. We align both with clarity, precision, and purpose.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================================================================== */}
-      {/* 05. SECTION THREE — CINEMATIC HUMAN MOMENT (FULL-BLEED PARALLAX)      */}
-      {/* Collaborative team photograph, 140% bleed buffer, optical 3D depth    */}
+      {/* 04. STREAMLINED CINEMATIC EDITORIAL STATEMENT                         */}
       {/* ===================================================================== */}
       <section
         ref={humanMomentRef}
@@ -568,19 +548,18 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
               <div className="flex items-center gap-2.5">
                 <span className="w-5 h-[1.5px] bg-[#F5A623]" />
                 <span className="text-[11px] font-sans font-bold tracking-[0.24em] text-[#F5A623] uppercase block">
-                  THE HUMAN SIDE OF HIRING
+                  OUR PERSPECTIVE
                 </span>
               </div>
 
               {/* Headline */}
-              <h2 className="text-2xl sm:text-4xl lg:text-[42px] font-extrabold text-white tracking-[-0.03em] leading-[1.12] font-sans">
-                Every connection starts with understanding.
+              <h2 className="text-2xl sm:text-4xl lg:text-[44px] font-extrabold text-white tracking-[-0.03em] leading-[1.12] font-sans">
+                Hiring is about people, not just positions.
               </h2>
 
               {/* Supporting Text */}
               <p className="text-slate-200 text-sm sm:text-base lg:text-lg leading-relaxed font-sans max-w-xl font-normal pt-1">
-                Recognizing the needs of a business and the potential of people is an important
-                part of building meaningful professional connections.
+                Behind every search is a business objective and a professional’s career. We align both with clarity, precision, and enduring team velocity.
               </p>
             </motion.div>
           </div>
@@ -715,14 +694,13 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
                 key={leader.id || idx}
                 className="group rounded-3xl bg-[#131926]/80 border border-white/10 p-6 space-y-5 hover:border-[#F5A623]/40 transition-all duration-300 shadow-xl"
               >
-                <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#0B0F17]">
+                <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-[#0B0F17] ring-1 ring-white/10 shadow-lg">
                   <img
                     src={leader.image}
                     onError={(e) => { e.currentTarget.src = '/assets/card1-staffing.jpg'; }}
                     alt={leader.name}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter contrast-[1.05]"
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 filter contrast-[1.03]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/90 via-transparent to-transparent pointer-events-none" />
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -747,7 +725,7 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
       </section>
 
       {/* ===================================================================== */}
-      {/* 09. SECTION SEVEN — HARD SCALE STATS                                  */}
+      {/* 09. SECTION SEVEN — HARD SCALE STATS (ANIMATED VELOCITY COUNTERS)     */}
       {/* ===================================================================== */}
       <section id="about-stats" className="relative w-full bg-[#FAF9F6] text-[#080B12] py-20 sm:py-28 px-6 sm:px-10 lg:px-16 border-b border-[#E7E3D9]">
         <div className="max-w-[1360px] mx-auto space-y-12">
@@ -772,7 +750,7 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
             ]).map((stat, idx) => (
               <div key={idx} className="p-6 rounded-2xl bg-white border border-[#E7E3D9] shadow-sm space-y-2">
                 <span className="text-3xl sm:text-5xl font-extrabold text-[#B87314] tracking-tight font-sans block">
-                  {stat.value}
+                  <AnimatedStatCounter value={stat.value} />
                 </span>
                 <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-wide font-sans block">
                   {stat.label}

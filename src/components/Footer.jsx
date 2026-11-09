@@ -1,33 +1,46 @@
 import React from 'react';
-import { Linkedin, Twitter, Instagram, Mail, ArrowRight } from 'lucide-react';
+import { Linkedin, Twitter, Instagram, Mail, Github, ArrowRight } from 'lucide-react';
 import { useUI } from '../context/UIContext';
+import { useCMS } from '../context/CMSContext';
 import logoImg from '../assets/sahara-logo.png';
 
 export default function Footer({ onNavigate }) {
   const { openModal, showToast } = useUI();
+  const cms = useCMS();
+  const content = cms?.content;
+  const settings = cms?.settings;
 
-  const socialLinks = [
-    {
-      name: 'LinkedIn',
-      icon: Linkedin,
-      action: () => showToast('Opening Sahara Staffing on LinkedIn'),
-    },
-    {
-      name: 'Twitter',
-      icon: Twitter,
-      action: () => showToast('Opening Sahara Staffing on X (Twitter)'),
-    },
-    {
-      name: 'Instagram',
-      icon: Instagram,
-      action: () => showToast('Opening Sahara Staffing on Instagram'),
-    },
-    {
-      name: 'Mail',
-      icon: Mail,
-      action: () => (window.location.href = 'mailto:hello@saharastaffing.example'),
-    },
-  ];
+  // Dynamic social links from CMS content or settings, fallback to LinkedIn + Email
+  const rawSocials =
+    content?.home?.footer?.socialLinks ||
+    content?.footer?.socialLinks ||
+    settings?.footerSocials || [
+      { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+      { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+      { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+      { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+      { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+    ];
+
+  const activeSocials = rawSocials.filter((s) => s.enabled !== false);
+
+  const getPlatformIcon = (platform) => {
+    switch ((platform || '').toLowerCase()) {
+      case 'linkedin':
+        return Linkedin;
+      case 'twitter':
+      case 'x':
+        return Twitter;
+      case 'instagram':
+        return Instagram;
+      case 'github':
+        return Github;
+      case 'email':
+      case 'mail':
+      default:
+        return Mail;
+    }
+  };
 
   const navLinks = [
     {
@@ -47,6 +60,12 @@ export default function Footer({ onNavigate }) {
       onClick: () => (onNavigate ? onNavigate('contact') : (window.location.hash = 'contact')),
     },
   ];
+
+  const contactEmail =
+    content?.home?.footer?.contactEmail ||
+    content?.footer?.contactEmail ||
+    settings?.recipientEmail ||
+    'contact@sahara-staffing.com';
 
   return (
     <footer className="w-full">
@@ -120,19 +139,22 @@ export default function Footer({ onNavigate }) {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 pt-6 sm:pt-9 border-t border-white/[0.07] items-start">
           {/* Left Column: Social Media Row & Copyright String */}
           <div className="md:col-span-4 space-y-3 sm:space-y-3.5">
-            {/* Horizontal Flex Row of Round Icon Buttons */}
+            {/* Horizontal Flex Row of Round Dynamic Icon Buttons */}
             <div className="flex items-center gap-2">
-              {socialLinks.map((social) => {
-                const IconComponent = social.icon;
+              {activeSocials.map((social) => {
+                const IconComponent = getPlatformIcon(social.platform);
                 return (
-                  <button
-                    key={social.name}
-                    onClick={social.action}
-                    aria-label={social.name}
+                  <a
+                    key={social.id || social.platform}
+                    href={social.url}
+                    target={social.url?.startsWith('http') ? '_blank' : undefined}
+                    rel={social.url?.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    aria-label={social.label || social.platform}
+                    title={social.label || social.platform}
                     className="w-[32px] h-[32px] sm:w-[34px] sm:h-[34px] rounded-full bg-white/[0.05] hover:bg-[#E69D2B] text-white/85 hover:text-[#0B0F17] flex items-center justify-center transition-all duration-200 active:scale-95 border border-white/[0.08] hover:border-[#E69D2B] cursor-pointer"
                   >
                     <IconComponent className="w-3.5 h-3.5" />
-                  </button>
+                  </a>
                 );
               })}
             </div>
@@ -143,54 +165,48 @@ export default function Footer({ onNavigate }) {
                 type="button"
                 onClick={() => {
                   try {
-                    localStorage.removeItem('sahara_admin_session_v1');
-                    sessionStorage.removeItem('sahara_admin_session_v1');
+                    sessionStorage.removeItem('sahara_admin_session_v2');
                   } catch {}
                   if (onNavigate) onNavigate('admin');
                   else window.location.hash = 'admin';
                 }}
-                title="Staff Portal (Shortcut: Tab + SH)"
+                title="Staff Portal"
                 className="text-[#64748B]/50 hover:text-[#E69D2B] transition-colors p-0.5 cursor-pointer"
-                aria-label="Staff Access Portal (Shortcut: Tab + SH)"
+                aria-label="Staff Access Portal"
               >
                 &bull;
               </button>
             </div>
           </div>
 
-          {/* Middle Column: Contact Us & Primary Location */}
+          {/* Middle Column: Direct Inquiries & Response SLA */}
           <div className="md:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
             <div>
               <div className="text-[10.5px] font-semibold text-white/90 tracking-[0.08em] uppercase mb-1 sm:mb-1.5">
-                Contact Us
+                Executive Inquiries
               </div>
               <div className="space-y-0.5 text-[11.5px] sm:text-[12px] text-[#94A3B8]/75 leading-relaxed">
                 <div>
                   <a
-                    href="mailto:contact@saharastaffing.com"
-                    className="hover:text-[#E69D2B] transition-colors"
+                    href={`mailto:${contactEmail}`}
+                    className="hover:text-[#E69D2B] transition-colors font-mono"
                   >
-                    contact@saharastaffing.com
+                    {contactEmail}
                   </a>
                 </div>
-                <div>
-                  <a
-                    href="tel:+18005550199"
-                    className="hover:text-[#E69D2B] transition-colors"
-                  >
-                    +1 (800) 555-0199
-                  </a>
+                <div className="text-[#64748B] text-[11px]">
+                  Confidential talent search &amp; intake
                 </div>
               </div>
             </div>
 
             <div>
               <div className="text-[10.5px] font-semibold text-white/90 tracking-[0.08em] uppercase mb-1 sm:mb-1.5">
-                Primary Location
+                Service Level Agreement
               </div>
               <div className="text-[11.5px] sm:text-[12px] text-[#94A3B8]/75 leading-relaxed">
-                <div>100 Park Avenue, Suite 1600</div>
-                <div>New York, NY 10017</div>
+                <div>Rapid 2-Hour Response Window</div>
+                <div className="text-[#64748B] text-[11px]">Direct Senior Partner Oversight</div>
               </div>
             </div>
           </div>

@@ -1,0 +1,144 @@
+{
+  "_last_published_at": "2026-11-10T00:00:00Z",
+  "_published_by": "contact@sahara-staffing.com",
+  "content": {
+    "home": {
+      "hero": {
+        "kicker": "Pre-Vetted Tech & Executive Recruitment",
+        "headline": "Connecting Elite Talent with High-Growth Enterprises",
+        "highlightWord": "Elite Talent",
+        "subtitle": "A premium end-to-end staffing partner placing pre-vetted specialists across technology, finance, and executive leadership in record time.",
+        "buttons": [
+          {
+            "id": "btn-1",
+            "enabled": true,
+            "label": "Get Staffed Now",
+            "destination": "/contact",
+            "variant": "primary"
+          },
+          {
+            "id": "btn-2",
+            "enabled": true,
+            "label": "Explore All Services",
+            "destination": "/services",
+            "variant": "secondary"
+          }
+        ]
+      },
+      "footer": {
+        "headline": "Speak to our staffing experts",
+        "subtitle": "Our team is here to answer your questions, review your business needs, and guide you toward the right staffing solution so you can move forward with confidence.",
+        "contactEmail": "contact@sahara-staffing.com",
+        "copyright": "© 2026 Sahara Staffing Inc. All rights reserved.",
+        "socialLinks": [
+          { "id": "soc-1", "platform": "linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com", "enabled": true },
+          { "id": "soc-2", "platform": "email", "label": "Email", "url": "mailto:contact@sahara-staffing.com", "enabled": true },
+          { "id": "soc-3", "platform": "twitter", "label": "X (Twitter)", "url": "https://x.com", "enabled": false },
+          { "id": "soc-4", "platform": "instagram", "label": "Instagram", "url": "https://instagram.com", "enabled": false },
+          { "id": "soc-5", "platform": "github", "label": "GitHub", "url": "https://github.com", "enabled": false }
+        ],
+        "buttons": [
+          {
+            "id": "btn-foot-1",
+            "enabled": true,
+            "label": "Talk to staffing →",
+            "destination": "/contact",
+            "variant": "primary"
+          }
+        ]
+      }
+    },
+    "about": {
+      "hero": {
+        "kicker": "SAHARA STAFFING INC. / WHO WE ARE",
+        "headline": "A Modern Search Firm Built on Precision and Relationships.",
+        "subtitle": "We connect exceptional ventures with specialized engineering, executive, and technical leadership who make an immediate, lasting impact."
+      },
+      "benchmarks": [
+        {
+          "num": "01",
+          "title": "People first",
+          "desc": "We consider the people behind every role and the teams they become part of."
+        },
+        {
+          "num": "02",
+          "title": "Clarity before assumptions",
+          "desc": "Understanding the business needs is an important starting point for the staffing conversation."
+        },
+        {
+          "num": "03",
+          "title": "Meaningful connections",
+          "desc": "We focus on relevant professional connections and alignment between people and roles."
+        }
+      ],
+      "chaptersLayout": "sticky",
+      "leadership": [
+        {
+          "id": "lead-1",
+          "name": "Elena Vance",
+          "title": "VP of Systems Engineering",
+          "bio": "14 years leading infrastructure architecture and distributed platform scaling.",
+          "image": "/assets/female-executive-beige.jpg"
+        },
+        {
+          "id": "lead-2",
+          "name": "David Reynolds",
+          "title": "Managing Partner, Executive Search",
+          "bio": "Specialized in discreet board-level C-Suite and VP appointments.",
+          "image": "/assets/card2-talent.jpg"
+        },
+        {
+          "id": "lead-3",
+          "name": "Marcus Chen",
+          "title": "Head of Technical Diligence",
+          "bio": "Pioneered peer-level technical assessments for top 2% engineering talent.",
+          "image": "/assets/card1-staffing.jpg"
+        }
+      ],
+      "stats": [
+        { "value": "500+", "label": "Placements Delivered" },
+        { "value": "98%", "label": "Retention SLA" },
+        { "value": "14 Days", "label": "Average Time-to-Fill" },
+        { "value": "$250M+", "label": "Enterprise Value Backed" }
+      ],
+      "finalCta": {
+        "headline": "Let’s find the right people for your team.",
+        "subtitle": "From exploratory conversations to immediate mission-critical hires, Sahara is your retained search partner."
+      }
+    },
+    "servicesPage": {
+      "hero": {
+        "kicker": "SPECIALIZED RECRUITMENT SOLUTIONS",
+        "headline": "Exceptional Talent. Built Around Your Business.",
+        "subtitle": "Connect with pre-vetted professionals and build stronger teams through recruitment solutions designed around your business."
+      }
+    },
+    "contactPage": {
+      "hero": {
+        "kicker": "EXECUTIVE TALENT INTAKE",
+        "headline": "Let’s Discuss Your Talent Objectives.",
+        "subtitle": "Whether you are looking to hire executive leadership or specialized technical contributors, our team responds within 2 hours."
+      },
+      "details": {
+        "email": "contact@sahara-staffing.com",
+        "responseTime": "Within 2 hours (Business Hours)"
+      }
+    }
+  },
+  "settings": {
+    "stickyNavbar": false,
+    "enableBackToTop": true,
+    "backToTopIcon": "arrow",
+    "enableCustomCursor": false,
+    "primaryAccent": "#E69D2B",
+    "recipientEmail": "contact@sahara-staffing.com",
+    "companyName": "Sahara Staffing Inc.",
+    "footerSocials": [
+      { "id": "soc-1", "platform": "linkedin", "label": "LinkedIn", "url": "https://www.linkedin.com", "enabled": true },
+      { "id": "soc-2", "platform": "email", "label": "Email", "url": "mailto:contact@sahara-staffing.com", "enabled": true },
+      { "id": "soc-3", "platform": "twitter", "label": "X (Twitter)", "url": "https://x.com", "enabled": false },
+      { "id": "soc-4", "platform": "instagram", "label": "Instagram", "url": "https://instagram.com", "enabled": false },
+      { "id": "soc-5", "platform": "github", "label": "GitHub", "url": "https://github.com", "enabled": false }
+    ]
+  }
+}

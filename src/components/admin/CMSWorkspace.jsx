@@ -1010,10 +1010,10 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       </AnimatePresence>
 
       {/* ===================================================================== */}
-      {/* 1. FLOATING TOP CONTROL BAR (FIXED OVERLAY AT TOP CENTER)              */}
+      {/* 1. TOP PAGE TAB NAVIGATION STRIP (Matches Image 3)                    */}
       {/* ===================================================================== */}
-      <header className="sticky top-3 z-40 mx-auto w-[calc(100%-2rem)] max-w-6xl px-4 py-2.5 bg-[#0E131F]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.6)] flex items-center justify-between gap-3 shrink-0">
-        {/* Left: Sidebar Toggle + Page Route Tabs */}
+      <header className="sticky top-0 z-40 w-full px-4 sm:px-6 py-2.5 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-4 shrink-0 select-none shadow-md">
+        {/* Left: Sidebar Toggle + Minimal Animated Page Route Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
           {onToggleSidebar && (
             <button
@@ -1028,10 +1028,10 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
           {/* Minimal Animated Page Route Tabs */}
           {[
-            { id: 'home', label: 'Home', icon: Home },
-            { id: 'about', label: 'About', icon: Info },
-            { id: 'services', label: 'Services', icon: Briefcase },
-            { id: 'contact', label: 'Contact', icon: PhoneCall },
+            { id: 'home', label: 'Home Page', icon: Home },
+            { id: 'about', label: 'About Page', icon: Info },
+            { id: 'services', label: 'Services Page', icon: Briefcase },
+            { id: 'contact', label: 'Contact Page', icon: PhoneCall },
             { id: 'settings', label: 'Global Settings', icon: SettingsIcon },
           ].map((tab) => {
             const Icon = tab.icon;
@@ -1044,10 +1044,9 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                   setActivePageTab(tab.id);
                   if (tab.id === 'settings') {
                     setActiveBlock('global-settings');
-                    setIsDrawerOpen(true);
                   }
                 }}
-                className={`relative px-3.5 py-1.5 rounded-xl font-sans text-xs font-bold transition-colors cursor-pointer select-none flex items-center gap-1.5 shrink-0 ${
+                className={`relative px-4 py-2 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer select-none flex items-center gap-2 shrink-0 ${
                   isActive ? 'text-[#0B0F17]' : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -1065,53 +1064,23 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
           })}
         </div>
 
-        {/* Center / Right: Viewport Mode + Drawer Trigger + Save & Publish */}
+        {/* Right: Expand/Collapse Blocks + Save & Publish CTA */}
         <div className="flex items-center gap-2.5 shrink-0">
-          {/* Device Viewport Switcher */}
-          <div className="flex items-center gap-1 bg-[#131926] p-1 rounded-xl border border-white/5">
-            <button
-              type="button"
-              onClick={() => setViewportMode('desktop')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewportMode === 'desktop'
-                  ? 'bg-[#E69D2B] text-[#0B0F17] shadow-sm font-bold'
-                  : 'text-[#94A3B8] hover:text-white'
-              }`}
-              title="Desktop True 100% Dimensions"
-            >
-              <Monitor className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Desktop</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setViewportMode('mobile')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewportMode === 'mobile'
-                  ? 'bg-[#E69D2B] text-[#0B0F17] shadow-sm font-bold'
-                  : 'text-[#94A3B8] hover:text-white'
-              }`}
-              title="Mobile 375px Chassis"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Mobile (375px)</span>
-            </button>
-          </div>
-
-          {/* Quick Edit Drawer Trigger */}
           <button
             type="button"
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
-              isDrawerOpen
-                ? 'bg-[#E69D2B]/20 text-[#E69D2B] border-[#E69D2B]/40'
-                : 'bg-[#131926] text-white border-white/10 hover:border-[#E69D2B]/40'
-            }`}
+            onClick={expandAllBlocks}
+            className="hidden sm:inline-flex px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-[#94A3B8] hover:text-white transition-colors cursor-pointer font-medium"
+            title="Expand all section blocks"
           >
-            <Edit3 className="w-3.5 h-3.5 text-[#E69D2B]" />
-            <span className="hidden md:inline">
-              {isDrawerOpen ? 'Close Drawer' : 'Edit Block'}
-            </span>
+            Expand All
+          </button>
+          <button
+            type="button"
+            onClick={collapseAllBlocks}
+            className="hidden sm:inline-flex px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-[#94A3B8] hover:text-white transition-colors cursor-pointer font-medium"
+            title="Collapse all section blocks"
+          >
+            Collapse All
           </button>
 
           {/* Save & Publish Changes Gold CTA */}
@@ -1119,7 +1088,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
             type="button"
             onClick={publishChanges}
             disabled={publishStatus === 'saving' || !hasUnsavedChanges}
-            className="bg-[#E69D2B] text-[#0B0F17] font-bold px-4 py-1.5 rounded-xl text-xs hover:bg-amber-400 transition-all shadow-lg flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-95"
+            className="bg-[#E69D2B] text-[#0B0F17] font-bold px-4 py-2 rounded-xl text-xs hover:bg-[#F2A51A] transition-all shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-95"
           >
             {publishStatus === 'saving' ? (
               <>
@@ -1134,7 +1103,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
             ) : (
               <>
                 <Sparkles className="w-3.5 h-3.5 text-[#0B0F17]" />
-                <span className="hidden sm:inline">Save &amp; Publish</span>
+                <span>Save &amp; Publish Changes</span>
               </>
             )}
           </button>
@@ -1142,258 +1111,21 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       </header>
 
       {/* ===================================================================== */}
-      {/* 2. MAIN 4-ZONE STAGE: ZONE B (CENTER STAGE) + ZONE C (RIGHT DRAWER)   */}
+      {/* 2. MASTER SPLIT-SCREEN WORKSPACE (MATCHING IMAGE 3 EXACTLY)          */}
       {/* ===================================================================== */}
-      <div className="flex-1 min-h-0 w-full flex overflow-hidden relative">
+      <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row overflow-hidden relative p-3 sm:p-4 gap-3 bg-[#080B12]">
         {/* =================================================================== */}
-        {/* ZONE B: CENTER STAGE (SCALED TRUE-DESKTOP PREVIEW CANVAS)            */}
+        {/* ZONE A: LEFT SECTION BLOCK ACCORDIONS LIST                         */}
         {/* =================================================================== */}
         <div
-          ref={stageRef}
-          className="flex-1 h-full min-h-0 flex flex-col relative overflow-hidden bg-[#070A10]"
+          data-lenis-prevent
+          className="w-full lg:w-[460px] xl:w-[490px] 2xl:w-[520px] shrink-0 h-full flex flex-col bg-[#0B0F17] rounded-2xl border border-white/5 overflow-hidden shadow-xl"
         >
-          {/* Top Browser Chrome Bar */}
-          <div className="h-10 px-4 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-3 shrink-0 select-none">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/80 inline-block" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/80 inline-block" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80 inline-block" />
-              </div>
-              <div className="h-4 w-[1px] bg-white/10 mx-1" />
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#131926] border border-white/5 text-[11px] font-mono text-[#94A3B8]">
-                <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
-                <span className="text-white/60">saharastaffing.com</span>
-                <span className="text-[#E69D2B] font-semibold">
-                  {activePageTab === 'home' ? '/preview' : `/preview/${activePageTab}`}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsRefreshing(true);
-                  setPreviewKey((k) => k + 1);
-                  setTimeout(() => setIsRefreshing(false), 400);
-                }}
-                className="p-1 rounded hover:bg-white/5 text-[#94A3B8] hover:text-white transition-colors cursor-pointer"
-                title="Reload Preview Canvas"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#E69D2B]' : ''}`} />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono font-semibold text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>SYNCHRONIZED</span>
-              </div>
-              <span className="text-[10px] font-mono text-white/40 hidden md:inline">
-                {viewportMode === 'desktop'
-                  ? `Scale: ${Math.round(desktopScale * 100)}% (1440px True Canvas)`
-                  : '375px Mobile Frame'}
-              </span>
-            </div>
-          </div>
-
-          {/* Independent Vertical Scroll Viewport */}
+          {/* Scrollable Block Accordions */}
           <div
-            ref={previewScrollRef}
-            data-lenis-prevent
-            className="flex-1 h-full overflow-y-auto overflow-x-hidden overscroll-contain relative custom-scrollbar p-3 sm:p-5"
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3.5 custom-scrollbar"
             style={{ scrollbarWidth: 'thin', scrollbarColor: '#E69D2B #131926' }}
           >
-            <CMSPreviewProvider content={draftContent} settings={settings} key={previewKey}>
-              {viewportMode === 'desktop' ? (
-                /* SCALED TRUE-DESKTOP PREVIEW (1440px True Dimensions) */
-                <div
-                  className="mx-auto relative"
-                  style={{
-                    width: `${1440 * desktopScale}px`,
-                    height: contentHeight > 0 ? `${contentHeight * desktopScale + 80}px` : 'auto',
-                    minHeight: '100%',
-                  }}
-                >
-                  <div
-                    ref={contentRef}
-                    style={{
-                      width: '1440px',
-                      transform: `scale(${desktopScale})`,
-                      transformOrigin: 'top left',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      boxShadow: '0 25px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)',
-                      borderRadius: '16px',
-                      overflow: 'hidden',
-                      backgroundColor: '#0B0F17',
-                    }}
-                  >
-                    {renderPreviewContent()}
-                  </div>
-                </div>
-              ) : (
-                /* AUTHENTIC 375PX MOBILE PHONE CHASSIS */
-                <div className="py-6 px-4 flex justify-center items-start min-h-full">
-                  <div className="w-[390px] h-[812px] max-h-[calc(100vh-170px)] mx-auto rounded-[48px] border-[10px] border-[#1E293B] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.1)] bg-[#0B0F17] relative flex flex-col overflow-hidden">
-                    <div className="absolute top-2.5 inset-x-0 z-30 flex justify-center pointer-events-none">
-                      <div className="w-24 h-4 bg-[#0B0F17] border border-white/10 rounded-full flex items-center justify-center gap-1.5 shadow-md">
-                        <div className="w-2 h-2 rounded-full bg-[#1E293B]" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#131926] border border-white/5" />
-                      </div>
-                    </div>
-                    <div className="w-full h-full flex-1 pt-1 pb-1">
-                      <MobilePreviewIframe>
-                        <CMSPreviewProvider content={draftContent} settings={settings}>
-                          {renderPreviewContent()}
-                        </CMSPreviewProvider>
-                      </MobilePreviewIframe>
-                    </div>
-                    <div className="absolute bottom-1.5 inset-x-0 z-30 flex justify-center pointer-events-none">
-                      <div className="w-32 h-1 bg-white/30 rounded-full" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CMSPreviewProvider>
-          </div>
-
-          {/* ================================================================= */}
-          {/* ZONE D: BOTTOM FLOATING SECTION PILLS BAR                          */}
-          {/* ================================================================= */}
-          <div className="absolute bottom-4 inset-x-0 z-30 flex justify-center pointer-events-none px-4">
-            <div className="pointer-events-auto bg-[#0E131F]/90 backdrop-blur-xl border border-white/15 rounded-full px-3 py-1.5 shadow-2xl flex items-center gap-1.5 max-w-[95vw] overflow-x-auto no-scrollbar">
-              {(SECTION_PILLS[activePageTab] || []).map((pill) => {
-                const isCurrent = activeBlock === pill.id;
-                return (
-                  <button
-                    key={pill.id}
-                    type="button"
-                    onClick={() => handlePillClick(pill)}
-                    className={`px-3 py-1 rounded-full text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                      isCurrent
-                        ? 'bg-[#E69D2B] text-[#0B0F17] font-bold shadow-md'
-                        : 'text-[#94A3B8] hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <span className={`text-[10px] ${isCurrent ? 'text-[#0B0F17]' : 'text-[#E69D2B]'}`}>
-                      {pill.num}
-                    </span>
-                    <span>{pill.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* =================================================================== */}
-        {/* ZONE C: DOCKED RIGHT SECTION BLOCK EDITOR DRAWER                    */}
-        {/* =================================================================== */}
-        <aside
-          data-lenis-prevent
-          className={`${
-            isDrawerOpen ? 'w-full sm:w-[380px] lg:w-[410px]' : 'w-0 hidden'
-          } shrink-0 h-full bg-[#0B0F17] border-l border-white/10 flex flex-col z-20 transition-all duration-300 relative`}
-        >
-          {/* Drawer Header */}
-          <div className="p-3.5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#0E131F]/90">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#E69D2B] animate-pulse" />
-              <div>
-                <span className="text-[10px] font-mono text-[#E69D2B] uppercase tracking-wider font-semibold block">
-                  Section Block Editor
-                </span>
-                <h2 className="text-xs font-bold text-white font-sans capitalize">
-                  {activePageTab} Page ({getBlocksForPage(activePageTab).length} Blocks)
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={expandAllBlocks}
-                className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-[10px] text-[#94A3B8] hover:text-white transition-colors cursor-pointer font-mono"
-                title="Expand all section blocks"
-              >
-                Expand
-              </button>
-              <button
-                type="button"
-                onClick={collapseAllBlocks}
-                className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-[10px] text-[#94A3B8] hover:text-white transition-colors cursor-pointer font-mono"
-                title="Collapse all section blocks"
-              >
-                Collapse
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsDrawerOpen(false)}
-                className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-                title="Hide Editor Panel"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Drawer Quick Section Switcher */}
-          <div className="px-5 pt-3 pb-2 border-b border-white/5 bg-[#0B0F17]/60 shrink-0">
-            <label className="text-[9.5px] font-mono text-[#64748B] uppercase tracking-wider mb-1 block">
-                  Quick Switch Block:
-                </label>
-                <select
-                  value={activeBlock}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setActiveBlock(val);
-                    setExpandedBlocks((prev) => new Set(prev).add(val));
-                    if (val.startsWith('home-')) setActivePageTab('home');
-                    else if (val.startsWith('about-')) setActivePageTab('about');
-                    else if (val.startsWith('services-')) setActivePageTab('services');
-                    else if (val.startsWith('contact-')) setActivePageTab('contact');
-                    else if (val === 'global-settings') setActivePageTab('settings');
-                  }}
-                  className="w-full px-3 py-1.5 rounded-lg bg-[#131926] border border-white/10 text-white text-xs font-sans focus:border-[#E69D2B] focus:outline-none cursor-pointer"
-                >
-                  <optgroup label="Home Page">
-                    <option value="home-block-01">Block 01: Hero Section</option>
-                    <option value="home-block-02">Block 02: Partners &amp; Metrics Strip</option>
-                    <option value="home-block-03">Block 03: Bento Solutions Grid</option>
-                    <option value="home-block-04">Block 04: Kinetic Vetting Pipeline</option>
-                    <option value="home-block-05">Block 05: Executive Hiring Estimator</option>
-                    <option value="home-block-06">Block 06: Testimonials Carousel</option>
-                    <option value="home-block-07">Block 07: Frequently Asked Questions</option>
-                    <option value="home-block-08">Block 08: Bottom CTA &amp; Footer</option>
-                  </optgroup>
-                  <optgroup label="About Page">
-                    <option value="about-block-01">Block 01: About Hero Section</option>
-                    <option value="about-block-02">Block 02: Operating Benchmarks</option>
-                    <option value="about-block-03">Block 03: Discipline Matrix</option>
-                    <option value="about-block-04">Block 04: Leadership Council</option>
-                    <option value="about-block-05">Block 05: Hard Scale Stats</option>
-                    <option value="about-block-06">Block 06: Final CTA</option>
-                  </optgroup>
-                  <optgroup label="Services Page">
-                    <option value="services-block-01">Block 01: Services Hero Section</option>
-                    <option value="services-block-02">Block 02: Service Capabilities Grid</option>
-                    <option value="services-block-03">Block 03: Vetting Process</option>
-                    <option value="services-block-04">Block 04: Engagement Models</option>
-                    <option value="services-block-05">Block 05: SLA Guarantee</option>
-                  </optgroup>
-                  <optgroup label="Contact Page">
-                    <option value="contact-block-01">Block 01: Contact Form &amp; Intake</option>
-                  </optgroup>
-                  <optgroup label="Global Settings">
-                    <option value="global-settings">Global Site Utilities &amp; Cursor</option>
-                  </optgroup>
-                </select>
-              </div>
-
-              {/* Drawer Body: Form Inputs for all blocks */}
-              <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar text-xs">
-
-
           {/* ================================================================= */}
           {/* TAB A: HOME PAGE (8 SECTION BLOCKS)                               */}
           {/* ================================================================= */}
@@ -2202,29 +1934,16 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
-                          Contact Email
-                        </label>
-                        <input
-                          type="text"
-                          value={draftContent.home?.footer?.contactEmail || 'admin@saharastaffing.com'}
-                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, contactEmail: e.target.value })}
-                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
-                          Direct Phone
-                        </label>
-                        <input
-                          type="text"
-                          value={draftContent.home?.footer?.contactPhone || '+1 (800) 555-SAHARA'}
-                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, contactPhone: e.target.value })}
-                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-mono"
-                        />
-                      </div>
+                    <div>
+                      <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                        Official Contact Email
+                      </label>
+                      <input
+                        type="text"
+                        value={draftContent.home?.footer?.contactEmail || 'contact@sahara-staffing.com'}
+                        onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, contactEmail: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-mono"
+                      />
                     </div>
 
                     {renderStrictButtonManager({
@@ -2970,7 +2689,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Routing Email</label>
                         <input
                           type="email"
-                          value={draftContent.contactPage?.details?.email || 'talhaquanlity@gmail.com'}
+                          value={draftContent.contactPage?.details?.email || 'contact@sahara-staffing.com'}
                           onChange={(e) => updateDraft('contactPage.details', { ...draftContent.contactPage?.details, email: e.target.value })}
                           className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B] font-mono"
                         />
@@ -3086,37 +2805,234 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                   )}
                 </button>
               </div>
+
+              {/* Dynamic Footer Social Links Manager */}
+              <div className="p-4 rounded-xl bg-[#0B0F17]/80 border border-white/5 space-y-4">
+                <div className="border-b border-white/5 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <LinkIcon className="w-4 h-4 text-[#E69D2B]" />
+                    <span className="text-xs font-bold text-white font-sans">
+                      Footer Social Links Manager
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#94A3B8] leading-relaxed mt-0.5">
+                    Toggle visibility and edit URLs for public footer icons. LinkedIn &amp; Email active by default.
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  {(draftContent.home?.footer?.socialLinks || [
+                    { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+                    { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+                    { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+                    { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+                    { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+                  ]).map((soc, idx) => (
+                    <div
+                      key={soc.id || idx}
+                      className="p-3 rounded-lg bg-[#131926] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
+                    >
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentSocials = [
+                              ...(draftContent.home?.footer?.socialLinks || [
+                                { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+                                { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+                                { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+                                { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+                                { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+                              ]),
+                            ];
+                            currentSocials[idx] = { ...currentSocials[idx], enabled: !currentSocials[idx].enabled };
+                            const updatedFooter = { ...draftContent.home?.footer, socialLinks: currentSocials };
+                            updateDraft('home.footer', updatedFooter);
+                            updateSettings({ footerSocials: currentSocials });
+                          }}
+                          className="cursor-pointer text-[#E69D2B] shrink-0"
+                          title={`Toggle ${soc.label}`}
+                        >
+                          {soc.enabled ? (
+                            <ToggleRight className="w-6 h-6 text-emerald-400" />
+                          ) : (
+                            <ToggleLeft className="w-6 h-6 text-[#64748B]" />
+                          )}
+                        </button>
+                        <div>
+                          <span className="font-bold text-white text-xs">{soc.label}</span>
+                          <span className="text-[10px] text-[#64748B] block font-mono">
+                            {soc.enabled ? 'Active on Footer' : 'Hidden'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 max-w-sm">
+                        <input
+                          type="text"
+                          value={soc.url || ''}
+                          onChange={(e) => {
+                            const currentSocials = [
+                              ...(draftContent.home?.footer?.socialLinks || [
+                                { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+                                { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
+                                { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
+                                { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
+                                { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
+                              ]),
+                            ];
+                            currentSocials[idx] = { ...currentSocials[idx], url: e.target.value };
+                            const updatedFooter = { ...draftContent.home?.footer, socialLinks: currentSocials };
+                            updateDraft('home.footer', updatedFooter);
+                            updateSettings({ footerSocials: currentSocials });
+                          }}
+                          placeholder="https://..."
+                          className="w-full px-2.5 py-1.5 rounded bg-[#0B0F17] border border-[#1E293B] text-white font-mono text-[11px] focus:border-[#E69D2B] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
-              </div>
-
-          {/* Drawer Footer Actions */}
-          <div className="p-3.5 border-t border-white/10 bg-[#0E131F]/90 shrink-0 flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setIsDrawerOpen(false)}
-              className="text-xs text-[#94A3B8] hover:text-white py-1.5 px-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
-            >
-              Hide Panel
-            </button>
-            <button
-              type="button"
-              onClick={publishChanges}
-              disabled={publishStatus === 'saving' || !hasUnsavedChanges}
-              className="bg-[#E69D2B] text-[#0B0F17] font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-400 transition-all shadow-md disabled:opacity-50 cursor-pointer select-none active:scale-95 flex items-center gap-1.5"
-            >
-              {publishStatus === 'saving' ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <span>Save &amp; Publish Changes</span>
-              )}
-            </button>
           </div>
-        </aside>
+        </div>
+
+        {/* =================================================================== */}
+        {/* AMBER VERTICAL DIVIDER / SCROLL INDICATOR TRACK (MATCHING IMAGE 3)  */}
+        {/* =================================================================== */}
+        <div className="hidden lg:flex flex-col items-center justify-between py-4 w-3 shrink-0 text-[#E69D2B] select-none opacity-80">
+          <span className="text-[10px] leading-none font-bold">▲</span>
+          <div className="w-[2px] flex-1 my-1.5 bg-[#E69D2B] rounded-full shadow-[0_0_8px_rgba(230,157,43,0.4)]" />
+          <span className="text-[10px] leading-none font-bold">▼</span>
+        </div>
+
+        {/* =================================================================== */}
+        {/* ZONE B: RIGHT STICKY LIVE PREVIEW VIEWPORT (MATCHING IMAGE 3)       */}
+        {/* =================================================================== */}
+        <div
+          ref={stageRef}
+          className="flex-1 h-full min-h-0 flex flex-col relative overflow-hidden bg-[#070A10] border border-white/10 rounded-2xl shadow-2xl"
+        >
+          {/* Top Browser Chrome Bar */}
+          <div className="h-12 px-4 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-3 shrink-0 select-none">
+            {/* Left: Lock + URL + Reload */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#131926] border border-white/5 text-xs font-mono text-[#94A3B8]">
+                <Lock className="w-3.5 h-3.5 text-[#E69D2B] shrink-0" />
+                <span className="text-white/80">saharastaffing.com</span>
+                <span className="text-[#E69D2B] font-semibold">
+                  {activePageTab === 'home' ? '/preview' : `/preview/${activePageTab}`}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRefreshing(true);
+                    setPreviewKey((k) => k + 1);
+                    setTimeout(() => setIsRefreshing(false), 400);
+                  }}
+                  className="p-0.5 rounded hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] transition-colors cursor-pointer ml-1"
+                  title="Reload Preview Canvas"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#E69D2B]' : ''}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Device Switcher (Desktop / Mobile) - Matches Image 3! */}
+            <div className="flex items-center gap-2 bg-[#131926] p-1 rounded-xl border border-white/5">
+              <button
+                type="button"
+                onClick={() => setViewportMode('desktop')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  viewportMode === 'desktop'
+                    ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
+                    : 'text-[#94A3B8] hover:text-white'
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5" />
+                <span>Desktop</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewportMode('mobile')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  viewportMode === 'mobile'
+                    ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
+                    : 'text-[#94A3B8] hover:text-white'
+                }`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+                <span>Mobile</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Independent Vertical Scroll Viewport */}
+          <div
+            ref={previewScrollRef}
+            data-lenis-prevent
+            className="flex-1 h-full overflow-y-auto overflow-x-hidden overscroll-contain relative custom-scrollbar p-3 sm:p-5"
+            style={{ scrollbarWidth: 'thin', scrollbarColor: '#E69D2B #131926' }}
+          >
+            <CMSPreviewProvider content={draftContent} settings={settings} key={previewKey}>
+              {viewportMode === 'desktop' ? (
+                /* SCALED TRUE-DESKTOP PREVIEW (1440px True Dimensions) */
+                <div
+                  className="mx-auto relative"
+                  style={{
+                    width: `${1440 * desktopScale}px`,
+                    height: contentHeight > 0 ? `${contentHeight * desktopScale + 80}px` : 'auto',
+                    minHeight: '100%',
+                  }}
+                >
+                  <div
+                    ref={contentRef}
+                    style={{
+                      width: '1440px',
+                      transform: `scale(${desktopScale})`,
+                      transformOrigin: 'top left',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      boxShadow: '0 25px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      backgroundColor: '#0B0F17',
+                    }}
+                  >
+                    {renderPreviewContent()}
+                  </div>
+                </div>
+              ) : (
+                /* AUTHENTIC 375PX MOBILE PHONE CHASSIS */
+                <div className="py-6 px-4 flex justify-center items-start min-h-full">
+                  <div className="w-[390px] h-[812px] max-h-[calc(100vh-170px)] mx-auto rounded-[48px] border-[10px] border-[#1E293B] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.1)] bg-[#0B0F17] relative flex flex-col overflow-hidden">
+                    <div className="absolute top-2.5 inset-x-0 z-30 flex justify-center pointer-events-none">
+                      <div className="w-24 h-4 bg-[#0B0F17] border border-white/10 rounded-full flex items-center justify-center gap-1.5 shadow-md">
+                        <div className="w-2 h-2 rounded-full bg-[#1E293B]" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#131926] border border-white/5" />
+                      </div>
+                    </div>
+                    <div className="w-full h-full flex-1 pt-1 pb-1">
+                      <MobilePreviewIframe>
+                        <CMSPreviewProvider content={draftContent} settings={settings}>
+                          {renderPreviewContent()}
+                        </CMSPreviewProvider>
+                      </MobilePreviewIframe>
+                    </div>
+                    <div className="absolute bottom-1.5 inset-x-0 z-30 flex justify-center pointer-events-none">
+                      <div className="w-32 h-1 bg-white/30 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CMSPreviewProvider>
+          </div>
+        </div>
       </div>
     </div>
   );

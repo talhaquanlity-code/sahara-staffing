@@ -105,11 +105,11 @@ export default function SettingsWorkspace() {
               type="email"
               value={recipientEmail}
               onChange={(e) => setRecipientEmail(e.target.value)}
-              placeholder="talhaquanlity@gmail.com"
+              placeholder="contact@sahara-staffing.com"
               className="w-full px-3.5 py-2.5 rounded-lg bg-[#131926] border border-[#1E293B] text-white focus:border-[#E69D2B] focus:outline-none"
             />
             <p className="text-[11px] text-[#64748B]">
-              Default destination: <span className="font-mono text-[#E69D2B]">talhaquanlity@gmail.com</span>
+              Default destination: <span className="font-mono text-[#E69D2B]">contact@sahara-staffing.com</span>
             </p>
           </div>
 
@@ -228,39 +228,39 @@ export default function SettingsWorkspace() {
       <div className="space-y-4">
         <div className="border-b border-[#1E293B]/60 pb-2 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-white">System Architecture &amp; Storage</h2>
+            <h2 className="text-sm font-semibold text-white">Zero-DB Architecture &amp; Flat Storage</h2>
             <p className="text-xs text-[#64748B] mt-0.5">
-              Supabase database connector and private Profile vault status
+              GoDaddy cPanel flat-file JSON content engine and native PHP email dispatch
             </p>
           </div>
-          <span className="text-[10.5px] font-mono tracking-wider text-[#94A3B8] uppercase">
-            {isSupabaseConfigured ? 'SUPABASE LIVE' : 'LOCAL MODE ACTIVE'}
+          <span className="text-[10.5px] font-mono tracking-wider text-emerald-400 uppercase">
+            GODADDY FLAT-FILE ACTIVE
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           <div>
             <div className="text-[10px] uppercase font-semibold text-[#64748B] tracking-wider">
-              Private Storage Bucket
+              Flat Content Storage
             </div>
-            <div className="font-mono font-bold text-white text-xs mt-1">candidate-resumes</div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5">Private Authorization Enforced</div>
+            <div className="font-mono font-bold text-white text-xs mt-1">/data/content.json</div>
+            <div className="text-[11px] text-[#94A3B8] mt-0.5">Instant Atomic File Locking</div>
           </div>
 
           <div>
             <div className="text-[10px] uppercase font-semibold text-[#64748B] tracking-wider">
-              Row-Level Security
+              Email Dispatch Engine
             </div>
-            <div className="font-mono font-bold text-white text-xs mt-1">Active</div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5">Isolated Staff Access Policies</div>
+            <div className="font-mono font-bold text-emerald-400 text-xs mt-1">/api/submit-form.php</div>
+            <div className="text-[11px] text-[#94A3B8] mt-0.5">Native Multipart MIME Attachments</div>
           </div>
 
           <div>
             <div className="text-[10px] uppercase font-semibold text-[#64748B] tracking-wider">
               Tracking Sequence
             </div>
-            <div className="font-mono font-bold text-[#E69D2B] text-xs mt-1">#SAH-1046+</div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5">Collision-Checked &amp; Unique</div>
+            <div className="font-mono font-bold text-[#E69D2B] text-xs mt-1">#SAH-xxxx</div>
+            <div className="text-[11px] text-[#94A3B8] mt-0.5">Unique 4-Digit Collision Checked</div>
           </div>
         </div>
       </div>
