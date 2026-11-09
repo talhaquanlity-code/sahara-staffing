@@ -233,14 +233,39 @@ export default function ContactPage() {
 
       let trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
 
-      // 3. Dispatch POST request with text/plain to prevent CORS preflight failures
-      const response = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
-      });
+      // 3. Dispatch POST request with text/plain & redirect: "follow" to prevent CORS preflight failures and handle Apps Script redirects
+      let response;
+      try {
+        response = await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+        });
+      } catch (fetchErr) {
+        console.warn('Google Apps Script direct fetch error:', fetchErr);
+        // Fallback: If network / adblocker / CORS blocks direct Apps Script fetch, notify user cleanly
+        throw new Error(
+          'Network connection to the submission endpoint could not be established. Please check your connection or contact contact@sahara-staffing.com directly.'
+        );
+      }
 
-      const data = await response.json();
+      // Safe JSON / text parsing for Google Apps Script responses
+      let data = null;
+      try {
+        const rawText = await response.text();
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          data = { status: response.ok ? 'success' : 'error', raw: rawText };
+        }
+      } catch (parseErr) {
+        console.warn('Response parsing error:', parseErr);
+        if (!response.ok) {
+          throw new Error('Server returned an unexpected response. Please try again or email us.');
+        }
+      }
 
       if (data && (data.status === 'success' || data.success || data.tracking_id || data.trackingId)) {
         trackingId = data.tracking_id || data.trackingId || trackingId;
