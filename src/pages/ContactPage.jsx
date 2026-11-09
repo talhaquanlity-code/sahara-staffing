@@ -224,19 +224,21 @@ export default function ContactPage() {
         }
       }
 
-      // 2. Construct JSON payload with frontend-generated tracking ID
+      // 2. Extract values with resilient fallback key mapping
       const payload = {
         trackingId: trackingId,
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone || '',
-        discipline: formData.targetDiscipline,
-        linkedin: formData.linkedinUrl || '',
-        summary: formData.careerSummary || '',
+        name: formData.name || formData.fullName || formData.full_name || '',
+        email: formData.email || formData.emailAddress || '',
+        phone: formData.phone || formData.phoneNumber || '',
+        discipline: formData.discipline || formData.targetDiscipline || '',
+        linkedin: formData.linkedin || formData.linkedinUrl || '',
+        summary: formData.summary || formData.careerSummary || formData.message || formData.notes || '',
         fileName: resumeFile ? resumeFile.name : '',
         fileType: resumeFile ? resumeFile.type : '',
         fileData: base64String,
       };
+
+      console.log('Dispatching candidate payload to Apps Script:', payload);
 
       // 3. CRITICAL: mode: 'no-cors' bypasses Google Workspace enterprise CORS restrictions
       await fetch(APPS_SCRIPT_URL, {
@@ -251,12 +253,12 @@ export default function ContactPage() {
       // Dual sync with local PHP endpoints if available
       try {
         const phpPayload = new FormData();
-        phpPayload.append('fullName', formData.fullName);
-        phpPayload.append('email', formData.email);
-        phpPayload.append('phone', formData.phone || '');
-        phpPayload.append('targetDiscipline', formData.targetDiscipline);
-        phpPayload.append('linkedinUrl', formData.linkedinUrl || '');
-        phpPayload.append('careerSummary', formData.careerSummary || '');
+        phpPayload.append('fullName', payload.name);
+        phpPayload.append('email', payload.email);
+        phpPayload.append('phone', payload.phone);
+        phpPayload.append('targetDiscipline', payload.discipline);
+        phpPayload.append('linkedinUrl', payload.linkedin);
+        phpPayload.append('careerSummary', payload.summary);
         phpPayload.append('trackingId', trackingId);
         if (resumeFile) phpPayload.append('resume', resumeFile);
         fetch('/api/submit-form.php', { method: 'POST', body: phpPayload }).catch(() => {});
@@ -264,9 +266,9 @@ export default function ContactPage() {
 
       const record = {
         tracking_id: trackingId,
-        full_name: formData.fullName,
-        email: formData.email,
-        target_discipline: formData.targetDiscipline,
+        full_name: payload.name,
+        email: payload.email,
+        target_discipline: payload.discipline,
         created_at: new Date().toISOString(),
       };
 

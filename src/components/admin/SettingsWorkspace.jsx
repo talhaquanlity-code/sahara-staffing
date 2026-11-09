@@ -65,20 +65,19 @@ export default function SettingsWorkspace() {
     setIsSendingTest(true);
     setTestResult(null);
 
-    const trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
-
     const testPayload = {
-      trackingId: trackingId,
-      name: 'System Administrator (Test)',
-      email: recipientEmail.trim().toLowerCase() || 'contact@sahara-staffing.com',
-      phone: 'System Verification',
-      discipline: 'Admin System Check',
-      linkedin: 'https://sahara-staffing.com',
-      summary:
-        'This is an automated test email sent from the Admin Panel Notification Engine to verify Gmail integration.',
+      trackingId: '#SAH-TEST',
+      name: 'Abdul Wahab (Admin Check)',
+      email: 'contact@sahara-staffing.com',
+      phone: '+1 (800) 555-0199',
+      discipline: 'Executive Leadership',
+      linkedin: 'https://linkedin.com',
+      summary: 'System verification test from Executive Admin Dashboard.',
     };
 
     try {
+      console.log('Dispatching test notification payload to Apps Script:', testPayload);
+
       // CRITICAL: mode: 'no-cors' bypasses Google Workspace enterprise CORS restrictions
       await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
@@ -92,7 +91,7 @@ export default function SettingsWorkspace() {
       // In no-cors mode, completion guarantees transmission to Google Apps Script
       setTestResult({
         success: true,
-        message: `Test notification successfully dispatched to ${testPayload.email}! (Tracking: ${trackingId})`,
+        message: `Test notification successfully dispatched to ${testPayload.email}! (Tracking: ${testPayload.trackingId})`,
       });
 
       localDB.addNotificationLog({

@@ -155,17 +155,14 @@ const APPS_SCRIPT_URL =
 export async function sendTestNotification(recipientEmail) {
   const recipient = recipientEmail || DEFAULT_NOTIFICATION_EMAIL;
 
-  const trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
-
   const testPayload = {
-    trackingId: trackingId,
-    name: 'System Administrator (Test)',
-    email: recipient,
-    phone: 'System Verification',
-    discipline: 'Admin System Check',
-    linkedin: 'https://sahara-staffing.com',
-    summary:
-      'This is an automated test email sent from the Admin Panel Notification Engine to verify Gmail integration.',
+    trackingId: '#SAH-TEST',
+    name: 'Abdul Wahab (Admin Check)',
+    email: 'contact@sahara-staffing.com',
+    phone: '+1 (800) 555-0199',
+    discipline: 'Executive Leadership',
+    linkedin: 'https://linkedin.com',
+    summary: 'System verification test from Executive Admin Dashboard.',
   };
 
   let result = { success: false, simulated: false, message: '' };
