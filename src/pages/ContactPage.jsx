@@ -707,37 +707,33 @@ export default function ContactPage() {
                 /* Success State */
                 <motion.div
                   key="intake-success"
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-6"
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
+                  className="max-w-xl mx-auto space-y-6 py-4"
                 >
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
+                  <div className="space-y-2">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
                       Submission Received.
-                    </h2>
-                    <p className="text-sm text-[#475569] mt-2 leading-relaxed">
-                      Submission Received. Tracking ID:{' '}
-                      <span className="font-mono font-bold text-[#B87314]">
-                        {submittedCandidate.tracking_id}
-                      </span>
-                      . Our talent acquisition lead will contact you shortly.
+                    </h1>
+                    <p className="text-sm text-[#475569] leading-relaxed">
+                      Our executive talent acquisition team will review your profile and contact you shortly.
                     </p>
                   </div>
 
-                  {/* Plain Editorial Tracking ID Display */}
-                  <div className="p-6 rounded-xl bg-[#0B0F17] text-white space-y-3">
+                  {/* Tracking Card */}
+                  <div className="p-6 rounded-2xl bg-[#0B0F17] text-white space-y-4 border border-white/10 shadow-xl">
                     <div className="text-[10.5px] font-semibold uppercase tracking-wider text-[#94A3B8]">
                       Application Tracking Identifier
                     </div>
                     <div className="flex items-center justify-between gap-4">
-                      <span className="font-mono text-2xl font-bold text-[#E69D2B] tracking-wider">
-                        {submittedCandidate.tracking_id}
+                      <span className="font-mono text-2xl sm:text-3xl font-bold text-[#E69D2B] tracking-wider select-all">
+                        {String(submittedCandidate.tracking_id || '').replace(/\s+/g, '')}
                       </span>
                       <button
                         type="button"
                         onClick={handleCopyId}
-                        className="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-white flex items-center gap-1.5 transition-colors cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs text-white flex items-center gap-2 transition-all cursor-pointer font-medium active:scale-95"
                       >
                         {copiedTrackingId ? (
                           <>
@@ -746,47 +742,29 @@ export default function ContactPage() {
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3.5 h-3.5" />
+                            <Copy className="w-3.5 h-3.5 text-[#E69D2B]" />
                             <span>Copy ID</span>
                           </>
                         )}
                       </button>
                     </div>
-                    <p className="text-xs text-[#94A3B8] pt-2 border-t border-white/10 leading-relaxed">
-                      Please retain this tracking ID for reference in all correspondence with Sahara
-                      Staffing Inc.
+                    <p className="text-xs text-[#94A3B8] pt-3 border-t border-white/10 leading-relaxed">
+                      Please retain this tracking reference for any future correspondence with Sahara Staffing Inc.
                     </p>
                   </div>
 
-                  {/* Submission Summary Recap */}
-                  <div className="space-y-2 text-xs text-[#475569] border-t border-[#E5E0D5] pt-4">
-                    <div className="flex justify-between">
-                      <span className="text-[#64748B]">Candidate:</span>
-                      <span className="font-semibold text-[#0B0F17]">{submittedCandidate.full_name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#64748B]">Target Discipline:</span>
-                      <span className="font-semibold text-[#0B0F17]">{submittedCandidate.target_discipline}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#64748B]">Attached Resume:</span>
-                      <span className="font-semibold text-[#0B0F17]">{submittedCandidate.resume_name}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-2 flex items-center gap-4 text-xs">
+                  {/* Centered Horizontal Action Bar */}
+                  <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="font-semibold text-[#0B0F17] hover:text-[#B87314] transition-colors cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0B0F17] hover:bg-[#E69D2B] text-white hover:text-[#0B0F17] font-semibold transition-all duration-200 cursor-pointer shadow-sm text-center"
                     >
                       &larr; Submit another application
                     </button>
-                    <span className="text-[#D4CEBF]">&bull;</span>
                     <a
                       href="#home"
-                      className="text-[#64748B] hover:text-[#0B0F17] transition-colors"
+                      className="text-[#64748B] hover:text-[#0B0F17] font-medium transition-colors text-center py-1"
                     >
                       Return to Homepage
                     </a>
