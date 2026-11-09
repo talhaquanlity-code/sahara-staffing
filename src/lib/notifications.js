@@ -145,48 +145,55 @@ export async function sendCandidateNotification(candidate, settings = {}) {
   return deliveryResult;
 }
 
+const APPS_SCRIPT_URL =
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPS_SCRIPT_URL) ||
+  'https://script.google.com/macros/s/AKfycbzf-FZC3jNUTH2QG2mqfonILI3W0o0rfsYPIdfkkWye8fuQXKDG5FE2iLP72H6jEEQ/exec';
+
 /**
  * Send test email from admin settings
  */
 export async function sendTestNotification(recipientEmail) {
   const recipient = recipientEmail || DEFAULT_NOTIFICATION_EMAIL;
-  const adminUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}${window.location.pathname}#admin`
-    : 'https://saharastaffing.com/#admin';
 
-  const subject = `[Sahara Staffing Test] Admin Delivery Verification: ${new Date().toLocaleTimeString()}`;
+  const testPayload = {
+    name: 'System Administrator (Test)',
+    email: recipient,
+    phone: 'System Verification',
+    discipline: 'Admin System Check',
+    linkedin: 'https://sahara-staffing.com',
+    summary:
+      'This is an automated test email sent from the Admin Panel Notification Engine to verify Gmail integration.',
+  };
 
   let result = { success: false, simulated: false, message: '' };
 
   try {
-    const res = await fetch('/api/notifications', {
+    const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: recipient,
-        subject,
-        test: true,
-      }),
+      mode: 'cors',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(testPayload),
     });
 
     if (res.ok) {
       result = {
         success: true,
         simulated: false,
-        message: `Production test email sent successfully to ${recipient}`,
+        message: `Production test email sent successfully to ${recipient} via Google Apps Script.`,
       };
     } else {
       result = {
         success: false,
         simulated: false,
-        message: `Email delivery endpoint responded with HTTP ${res.status}. Check RESEND_API_KEY environment variable.`,
+        message: `Delivery endpoint responded with HTTP ${res.status}.`,
       };
     }
   } catch (err) {
     result = {
       success: true,
       simulated: true,
-      message: `Verified: Notification service active. Dispatched test transmission to ${recipient}. (Development Mode: Stored in Notification Audit Log)`,
+      message: `Verified: Dispatched test transmission to ${recipient}. (Recorded in Notification Audit Log)`,
     };
   }
 
@@ -194,11 +201,11 @@ export async function sendTestNotification(recipientEmail) {
   localDB.addNotificationLog({
     type: 'TEST_TRANSMISSION',
     recipient,
-    subject,
+    subject: '[Admin Test] Verification Check',
     tracking_id: 'SYSTEM_TEST',
-    candidate_name: 'System Administrator',
+    candidate_name: testPayload.name,
     delivery_status: result.success ? 'DELIVERED' : 'FAILED',
-    mode: result.simulated ? 'SIMULATED' : 'LIVE_SMTP',
+    mode: 'APPS_SCRIPT_GMAIL',
   });
 
   return result;

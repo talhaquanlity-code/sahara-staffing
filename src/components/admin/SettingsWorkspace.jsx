@@ -9,6 +9,10 @@ import { useCMS } from '../../context/CMSContext';
 import { isSupabaseConfigured, localDB } from '../../lib/supabase';
 import { sendTestNotification, DEFAULT_NOTIFICATION_EMAIL } from '../../lib/notifications';
 
+const APPS_SCRIPT_URL =
+  import.meta.env.VITE_APPS_SCRIPT_URL ||
+  'https://script.google.com/macros/s/AKfycbzf-FZC3jNUTH2QG2mqfonILI3W0o0rfsYPIdfkkWye8fuQXKDG5FE2iLP72H6jEEQ/exec';
+
 const BRAND_PALETTES = [
   { name: 'Sahara Amber Gold (Default)', hex: '#E69D2B' },
   { name: 'Warm Sahara Gold', hex: '#F5A623' },
@@ -61,14 +65,62 @@ export default function SettingsWorkspace() {
     setIsSendingTest(true);
     setTestResult(null);
 
+    const testPayload = {
+      name: 'System Administrator (Test)',
+      email: recipientEmail.trim().toLowerCase() || 'contact@sahara-staffing.com',
+      phone: 'System Verification',
+      discipline: 'Admin System Check',
+      linkedin: 'https://sahara-staffing.com',
+      summary:
+        'This is an automated test email sent from the Admin Panel Notification Engine to verify Gmail integration.',
+    };
+
     try {
-      const result = await sendTestNotification(recipientEmail);
-      setTestResult(result);
-      setLogs(localDB.getNotificationLogs());
+      const response = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(testPayload),
+      });
+
+      let data = null;
+      try {
+        const rawText = await response.text();
+        try {
+          data = JSON.parse(rawText);
+        } catch {
+          data = { status: response.ok ? 'success' : 'error', raw: rawText };
+        }
+      } catch {
+        data = { status: response.ok ? 'success' : 'error' };
+      }
+
+      if (data && (data.status === 'success' || data.success || response.ok)) {
+        const trackingId = data.tracking_id || data.trackingId || '#SAH-TEST';
+        setTestResult({
+          success: true,
+          message: `Test email dispatched to ${testPayload.email} via Google Apps Script (Tracking: ${trackingId}).`,
+        });
+
+        localDB.addNotificationLog({
+          type: 'TEST_TRANSMISSION',
+          recipient: testPayload.email,
+          subject: '[Admin Test] Verification Check',
+          tracking_id: trackingId,
+          candidate_name: testPayload.name,
+          delivery_status: 'DELIVERED',
+          mode: 'APPS_SCRIPT_GMAIL',
+        });
+        setLogs(localDB.getNotificationLogs());
+      } else {
+        throw new Error(data?.message || 'Google Apps Script endpoint rejected the test payload.');
+      }
     } catch (err) {
+      console.warn('Test email dispatch failed:', err);
       setTestResult({
         success: false,
-        message: err.message || 'Failed to dispatch test notification.',
+        message: err.message || 'Failed to dispatch test notification via Google Apps Script.',
       });
     } finally {
       setIsSendingTest(false);
