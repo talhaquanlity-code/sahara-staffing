@@ -707,45 +707,100 @@ export default function ContactPage() {
                 /* Ultra-clean Executive Confirmation State */
                 <motion.div
                   key="intake-success"
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className="max-w-xl mx-auto py-12 px-6 text-center space-y-6"
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="max-w-xl mx-auto py-12 px-6 text-center space-y-8"
                 >
-                  {/* Minimal Success Icon Accent */}
-                  <div className="w-16 h-16 mx-auto rounded-full bg-[#E69D2B]/10 border border-[#E69D2B]/30 flex items-center justify-center text-[#E69D2B] shadow-sm">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
+                  {/* Premium Fully Animated Emblem Symbol */}
+                  <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
+                    {/* Glowing pulse aura */}
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.15, 0.35] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                      className="absolute inset-0 rounded-full bg-[#E69D2B]/20 blur-md pointer-events-none"
+                    />
+
+                    {/* Outer Rotating/Expanding Ring */}
+                    <motion.svg
+                      className="w-20 h-20 absolute inset-0 -rotate-90 pointer-events-none"
+                      viewBox="0 0 80 80"
+                    >
+                      <circle
+                        cx="40"
+                        cy="40"
+                        r="34"
+                        stroke="rgba(230, 157, 43, 0.2)"
+                        strokeWidth="2"
+                        fill="none"
+                      />
+                      <motion.circle
+                        cx="40"
+                        cy="40"
+                        r="34"
+                        stroke="#E69D2B"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        fill="none"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ duration: 0.85, ease: [0.65, 0, 0.35, 1] }}
+                      />
+                    </motion.svg>
+
+                    {/* Inner Badge Background with Animated Scale */}
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', damping: 14, stiffness: 200, delay: 0.15 }}
+                      className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1E293B] to-[#0B0F17] border border-[#E69D2B]/40 shadow-[0_8px_24px_rgba(230,157,43,0.25)] flex items-center justify-center relative z-10"
+                    >
+                      {/* Animated Gold Checkmark Path */}
+                      <svg className="w-7 h-7 text-[#E69D2B]" viewBox="0 0 24 24" fill="none">
+                        <motion.path
+                          d="M5 13l4.5 4.5L19 7"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          initial={{ pathLength: 0 }}
+                          animate={{ pathLength: 1 }}
+                          transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
+                        />
+                      </svg>
+                    </motion.div>
                   </div>
 
-                  {/* Typography */}
-                  <div className="space-y-3">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                  {/* Typography with Crisp Contrast */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.25 }}
+                    className="space-y-3"
+                  >
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0B0F17] tracking-tight">
                       Thank You for Reaching Out.
                     </h1>
-                    <p className="text-base text-gray-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
+                    <p className="text-sm sm:text-base text-[#475569] max-w-lg mx-auto leading-relaxed font-normal">
                       We have received your application and resume. Our executive talent acquisition team will review your credentials and contact you directly if your background matches an active placement.
                     </p>
-                  </div>
+                  </motion.div>
 
-                  {/* Clean Action Buttons */}
-                  <div className="pt-6 flex flex-wrap items-center justify-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      className="px-6 py-3 rounded-full bg-[#0B0F17] text-white hover:bg-slate-800 transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
-                    >
-                      <span>&larr;</span> Submit another application
-                    </button>
-
+                  {/* Clean Action Button: Single Homepage Destination */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.45, delay: 0.35 }}
+                    className="pt-2 flex justify-center"
+                  >
                     <a
                       href="#home"
-                      className="px-6 py-3 text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+                      className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-[#0B0F17] hover:bg-[#E69D2B] text-white hover:text-[#0B0F17] font-semibold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-md hover:shadow-lg active:scale-98 cursor-pointer"
                     >
                       Return to Homepage
                     </a>
-                  </div>
+                  </motion.div>
                 </motion.div>
               )}
             </AnimatePresence>
