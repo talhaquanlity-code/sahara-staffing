@@ -25,7 +25,7 @@ const DISCIPLINES = [
 
 const APPS_SCRIPT_URL =
   import.meta.env.VITE_APPS_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbzf-FZC3jNUTH2QG2mqfonILI3W0o0rfsYPIdfkkWye8fuQXKDG5FE2iLP72H6jEEQ/exec';
+  'https://script.google.com/macros/s/AKfycbwmJquvA6KOUuT1Rc5iJ9F_5zMt5Hb1XCGQYCf3I3JQFqcHv0E-lsVIr0q67GXE1s8/exec';
 
 const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {

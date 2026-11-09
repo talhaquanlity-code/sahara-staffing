@@ -147,7 +147,7 @@ export async function sendCandidateNotification(candidate, settings = {}) {
 
 const APPS_SCRIPT_URL =
   (typeof import.meta !== 'undefined' && import.meta.env?.VITE_APPS_SCRIPT_URL) ||
-  'https://script.google.com/macros/s/AKfycbzf-FZC3jNUTH2QG2mqfonILI3W0o0rfsYPIdfkkWye8fuQXKDG5FE2iLP72H6jEEQ/exec';
+  'https://script.google.com/macros/s/AKfycbwmJquvA6KOUuT1Rc5iJ9F_5zMt5Hb1XCGQYCf3I3JQFqcHv0E-lsVIr0q67GXE1s8/exec';
 
 /**
  * Send test email from admin settings
