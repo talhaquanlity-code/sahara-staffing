@@ -612,7 +612,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       type="text"
                       value={btn.label || ''}
                       onChange={(e) => onUpdate(idx, 'label', e.target.value)}
-                      placeholder={isPrimary ? 'Request Talent →' : 'Explore Open Roles'}
+                      placeholder={isPrimary ? 'Request Talent' : 'Explore Open Roles'}
                       className="w-full px-2.5 py-1.5 rounded-lg bg-[#0E131F] border border-[#1E293B] text-white text-xs font-inter focus:border-[#E69D2B] focus:outline-none"
                     />
                   </div>
@@ -1232,7 +1232,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         const newBtn = {
                           id: 'btn-' + Date.now(),
                           enabled: true,
-                          label: isFirst ? 'Request Talent →' : 'Explore Open Roles',
+                          label: isFirst ? 'Request Talent' : 'Explore Open Roles',
                           destination: isFirst ? '/contact' : '/services',
                           variant: isFirst ? 'primary' : 'secondary',
                         };

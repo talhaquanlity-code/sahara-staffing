@@ -47,7 +47,7 @@ export default function SpeakToExperts({ onNavigateContact }) {
             if (onNavigateContact) onNavigateContact();
             else openModal('Speak to a Sahara Staffing Expert');
           }}
-          className="btn-shimmer w-full sm:w-auto justify-center bg-obsidian hover:bg-slateCard text-crispWhite text-xs sm:text-sm font-medium px-7 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all shadow-lg active:scale-95 group cursor-pointer"
+          className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-obsidian hover:bg-slateCard text-crispWhite text-xs sm:text-sm font-medium px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all shadow-lg active:scale-95 group cursor-pointer"
         >
           <span>Talk to staffing</span>
           <ArrowRight className="w-4 h-4 text-saharaGold transition-transform group-hover:translate-x-1" />

@@ -20,7 +20,7 @@ export const INITIAL_CMS_CONTENT = {
         {
           id: 'btn-1',
           enabled: true,
-          label: 'Request Talent →',
+          label: 'Request Talent',
           destination: '/contact',
           variant: 'primary',
         },
@@ -391,7 +391,7 @@ export const INITIAL_CMS_CONTENT = {
       {
         id: 'btn-1',
         enabled: true,
-        label: 'Request Talent →',
+        label: 'Request Talent',
         destination: '/contact',
         variant: 'primary',
       },
@@ -403,7 +403,7 @@ export const INITIAL_CMS_CONTENT = {
         variant: 'secondary',
       },
     ],
-    primaryCtaLabel: 'Request Talent →',
+    primaryCtaLabel: 'Request Talent',
     primaryCtaRoute: 'contact',
     secondaryCtaLabel: 'Explore Open Roles',
     secondaryCtaRoute: 'services',

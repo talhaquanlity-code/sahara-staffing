@@ -109,50 +109,54 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
     if (prefersReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      // 1. PREMIUM FLOATING HOVER LOOP on the entire right orbit section
-      gsap.to(orbitContainerRef.current, {
-        y: -12,
-        duration: 3.5,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut',
-      });
+      const mm = gsap.matchMedia();
 
-      // 2. Slow ethereal ambient drift on the outer decorative guide ring
-      gsap.to(outerRingRef.current, {
-        rotation: 360,
-        duration: 45,
-        repeat: -1,
-        ease: 'none',
-      });
+      // Mobile fix: Only run floating loops and scrollTrigger on desktop (>= 768px)
+      mm.add('(min-width: 768px)', () => {
+        // 1. PREMIUM FLOATING HOVER LOOP on the entire right orbit section
+        gsap.to(orbitContainerRef.current, {
+          y: -12,
+          duration: 3.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+        });
 
-      // 3. Initialize GSAP quickTo for SLOW, luxurious cursor-following logo motion (1.6s duration)
-      if (logoWrapperRef.current) {
-        quickRotZ.current = gsap.quickTo(logoWrapperRef.current, 'rotation', {
-          duration: 1.6,
-          ease: 'power3.out',
+        // 2. Slow ethereal ambient drift on the outer decorative guide ring
+        gsap.to(outerRingRef.current, {
+          rotation: 360,
+          duration: 45,
+          repeat: -1,
+          ease: 'none',
         });
-        quickRotX.current = gsap.quickTo(logoWrapperRef.current, 'rotationX', {
-          duration: 1.6,
-          ease: 'power3.out',
-        });
-        quickRotY.current = gsap.quickTo(logoWrapperRef.current, 'rotationY', {
-          duration: 1.6,
-          ease: 'power3.out',
-        });
-      }
 
-      // 4. NATURAL SCROLL ANIMATION (Zero scroll hijacking / NO PINNING)
-      // Fast, responsive progression: covers all 3 stages completely while the card is in frame!
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: 'top 78%',
-        end: 'bottom 28%',
-        scrub: 0.3, // Immediate, fluid response without drag
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          applyProgress(self.progress);
-        },
+        // 3. Initialize GSAP quickTo for SLOW, luxurious cursor-following logo motion (1.6s duration)
+        if (logoWrapperRef.current) {
+          quickRotZ.current = gsap.quickTo(logoWrapperRef.current, 'rotation', {
+            duration: 1.6,
+            ease: 'power3.out',
+          });
+          quickRotX.current = gsap.quickTo(logoWrapperRef.current, 'rotationX', {
+            duration: 1.6,
+            ease: 'power3.out',
+          });
+          quickRotY.current = gsap.quickTo(logoWrapperRef.current, 'rotationY', {
+            duration: 1.6,
+            ease: 'power3.out',
+          });
+        }
+
+        // 4. NATURAL SCROLL ANIMATION (Zero scroll hijacking / NO PINNING)
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top 78%',
+          end: 'bottom 28%',
+          scrub: 0.3,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            applyProgress(self.progress);
+          },
+        });
       });
     }, sectionRef);
 
@@ -200,14 +204,14 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
     <section
       ref={sectionRef}
       id="staffing-momentum"
-      className="rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-10 sm:py-16 lg:py-20 select-none relative"
+      className="rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-12 px-6 md:py-16 lg:py-20 select-none relative"
     >
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-10 lg:px-14">
+      <div className="max-w-[1280px] mx-auto px-0 md:px-10 lg:px-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* =================================================================== */}
           {/* 1. LEFT COLUMN: EDITORIAL STAFFING NARRATIVE                        */}
           {/* =================================================================== */}
-          <div className="lg:col-span-6 space-y-4 sm:space-y-6">
+          <div className="lg:col-span-6 space-y-6">
             {/* Eyebrow */}
             <div>
               <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#B87314] block">
@@ -232,7 +236,7 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
               <button
                 type="button"
                 onClick={handleCtaClick}
-                className="bg-[#0B0F17] hover:bg-[#1E293B] text-white text-xs sm:text-sm lg:text-base font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all duration-200 shadow-md group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
+                className="w-full sm:w-auto min-h-[48px] justify-center bg-[#0B0F17] hover:bg-[#1E293B] text-white text-xs sm:text-sm lg:text-base font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all duration-200 shadow-md group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
               >
                 <span>Find Your Talent</span>
                 <ArrowRight className="w-4 h-4 text-[#F5A623] transition-transform duration-200 group-hover:translate-x-1" />
@@ -248,7 +252,7 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
               ref={orbitContainerRef}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className="relative w-[280px] h-[280px] xs:w-[320px] xs:h-[320px] sm:w-[380px] sm:h-[380px] lg:w-[420px] lg:h-[420px] flex items-center justify-center will-change-transform shrink-0"
+              className="relative w-52 h-52 mx-auto sm:w-[380px] sm:h-[380px] lg:w-[420px] lg:h-[420px] flex items-center justify-center will-change-transform shrink-0 opacity-100 transform-none"
             >
               {/* Concentric Architectural SVG Tracks */}
               <svg
@@ -307,13 +311,13 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
 
               {/* Central Medallion (Stationary Deep Obsidian Navy + Real Sahara Brand Symbol) */}
               <div
-                className="relative z-20 w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 rounded-full bg-[#0B0F17] border border-[#F5A623]/30 shadow-[0_12px_28px_rgba(11,15,23,0.16)] flex items-center justify-center"
+                className="relative z-20 w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-[#0B0F17] border border-[#F5A623]/30 shadow-[0_12px_28px_rgba(11,15,23,0.16)] flex items-center justify-center"
                 style={{ perspective: 600 }}
               >
                 {/* Symbol Wrapper with SLOW Cursor-Following 3D Directional Motion */}
                 <div
                   ref={logoWrapperRef}
-                  className="w-12 h-12 xs:w-14 xs:h-14 sm:w-16 sm:h-16 flex items-center justify-center will-change-transform"
+                  className="w-10 h-10 sm:w-16 sm:h-16 flex items-center justify-center will-change-transform"
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   <img

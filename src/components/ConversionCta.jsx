@@ -87,14 +87,14 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-wrap items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row w-full sm:w-auto items-center justify-center gap-3.5 sm:gap-4"
         >
           <button
             onClick={() => {
               if (onNavigateContact) onNavigateContact();
               else openModal('Discuss Your Hiring Needs');
             }}
-            className="btn-shimmer bg-[#0B0F17] hover:bg-[#1E293B] text-white font-bold text-sm sm:text-base px-8 py-4 rounded-full inline-flex items-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 cursor-pointer"
+            className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-[#0B0F17] hover:bg-[#1E293B] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 cursor-pointer"
           >
             <span>Discuss Your Hiring Needs</span>
             <ArrowRight className="w-4 h-4 text-[#E69D2B]" />
@@ -108,7 +108,7 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="bg-white/90 backdrop-blur-sm border border-slate-300 hover:border-[#0B0F17] text-[#0B0F17] font-semibold text-sm sm:text-base px-8 py-4 rounded-full hover:bg-white transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
+            className="w-full sm:w-auto min-h-[48px] justify-center bg-white/90 backdrop-blur-sm border border-slate-300 hover:border-[#0B0F17] text-[#0B0F17] font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full hover:bg-white transition-all duration-200 active:scale-95 cursor-pointer shadow-xs inline-flex items-center"
           >
             Explore Our Services
           </button>

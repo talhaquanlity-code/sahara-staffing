@@ -389,15 +389,19 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
             <div className="hero-appear-actions flex flex-col sm:flex-row w-full sm:w-auto items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12">
               {configuredButtons.slice(0, 2).map((btn, idx) => {
                 const isPrimary = btn.variant === 'primary' || idx === 0;
+                // Strip duplicate arrow characters from labels
+                const rawLabel = btn.label || (isPrimary ? 'Request Talent' : 'Explore Open Roles');
+                const cleanLabel = rawLabel.replace(/\s*(→|->|&rarr;)\s*$/, '').trim();
+
                 if (isPrimary) {
                   return (
                     <button
                       key={btn.id || idx}
                       onClick={() => handleButtonClick(btn)}
-                      className="btn-shimmer w-full sm:w-auto justify-center bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] font-semibold text-sm sm:text-base px-7 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 hover:-translate-y-0.5 group cursor-pointer"
+                      className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center shadow-xl transition-all duration-200 active:scale-95 hover:-translate-y-0.5 group cursor-pointer"
                     >
-                      <span>{btn.label || 'Request Talent →'}</span>
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      <span className="font-semibold">{cleanLabel}</span>
+                      <ArrowRight className="w-4 h-4 ml-2 inline-block transition-transform group-hover:translate-x-1" />
                     </button>
                   );
                 }
@@ -405,9 +409,9 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
                   <button
                     key={btn.id || idx}
                     onClick={() => handleButtonClick(btn)}
-                    className="w-full sm:w-auto justify-center bg-white/5 border border-white/20 hover:border-white/40 text-white font-medium text-sm sm:text-base px-7 sm:px-8 py-3.5 sm:py-4 rounded-full hover:bg-white/10 transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm"
+                    className="w-full sm:w-auto min-h-[48px] justify-center bg-white/5 border border-white/20 hover:border-white/40 text-white font-medium text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full hover:bg-white/10 transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm"
                   >
-                    {btn.label || 'Explore Open Roles'}
+                    <span>{cleanLabel}</span>
                   </button>
                 );
               })}

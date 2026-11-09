@@ -343,14 +343,18 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           <div
             ref={carouselRef}
             onScroll={handleCarouselScroll}
-            className="flex overflow-x-auto snap-x snap-mandatory gap-3.5 pb-4 -mx-5 px-5 scrollbar-none scroll-smooth touch-pan-x"
-            style={{ WebkitOverflowScrolling: 'touch' }}
+            className="overflow-x-auto snap-x snap-mandatory scrollbar-none flex gap-4 px-4 pb-4 -mx-5 scroll-smooth touch-pan-y"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
+            }}
           >
             {activeStaffingSolutions.map((item) => (
               <div
                 key={item.id}
                 onClick={() => openModal(item.modalTitle)}
-                className="w-[84vw] max-w-[320px] h-[390px] shrink-0 snap-center rounded-[24px] overflow-hidden border border-slate-200/90 bg-[#0B0F17] shadow-xl relative flex flex-col justify-between p-6 select-none cursor-pointer active:scale-[0.98] transition-transform duration-200"
+                style={{ touchAction: 'pan-y' }}
+                className="w-[84vw] max-w-[320px] h-[390px] shrink-0 snap-center rounded-[24px] overflow-hidden border border-slate-200/90 bg-[#0B0F17] shadow-xl relative flex flex-col justify-between p-6 select-none cursor-pointer active:scale-[0.98] transition-transform duration-200 touch-pan-y"
               >
                 {/* Background Image & Vignette */}
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

@@ -167,176 +167,140 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
   }, []);
 
   // ===========================================================================
-  // MOBILE / LIVE PREVIEW PRESENTATION (Natural Editorial Flow, No Pinned Locking)
+  // RESPONSIVE PRESENTATION: MOBILE STATIC STACK (< md) + DESKTOP PINNED (md+)
   // ===========================================================================
-  if (isMobile || isLivePreview) {
-    return (
-      <section id="process-story" className="w-full bg-[#0B0F17] text-white py-14 sm:py-20 px-5 sm:px-8 pb-24">
-        <div className="max-w-2xl mx-auto space-y-12 sm:space-y-16">
-          {/* Section Introduction */}
+  return (
+    <>
+      {/* ===================================================================== */}
+      {/* 1. DEDICATED MOBILE CONTAINER (< md): CLEAN VERTICAL STATIC STACK    */}
+      {/* ===================================================================== */}
+      <section
+        id="process-story-mobile"
+        className="block md:hidden w-full bg-[#0B0F17] text-white px-5 py-8"
+      >
+        <div className="max-w-xl mx-auto space-y-6">
+          {/* Header */}
           <div>
-            <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#F5A623] block mb-2.5">
+            <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#E69D2B] block mb-2">
               The Sahara Approach
             </span>
-            <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-white leading-[1.15] mb-3">
-              Great Teams
-              <br />
-              Don&apos;t Happen
-              <br />
-              by Accident.
+            <h2 className="text-2xl font-bold tracking-tight text-white leading-tight mb-2">
+              Strategic Process. Measurable Impact.
             </h2>
-            <p className="text-slate-300 text-sm sm:text-base font-normal leading-relaxed pr-6 sm:pr-0">
-              Every successful placement begins with understanding the business, the role, and the
-              people who will help it grow.
+            <p className="text-slate-400 text-xs leading-relaxed">
+              Every successful placement begins with deep understanding, rigorous sourcing, and long-term alignment.
             </p>
           </div>
 
-          {/* Scene 1: Photography Card */}
-          <div className="space-y-3.5">
-            <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/10 shadow-lg">
-              <img
-                src={vettingImages[0] || content?.vettingStages?.[0]?.image || '/assets/card1-staffing.jpg'}
-                alt="Leadership Team in Discussion"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/90 via-[#0B0F17]/20 to-transparent" />
-            </div>
-            <div className="pt-1 pr-12 sm:pr-0">
-              <span className="text-xs font-sans tracking-widest text-[#F5A623] uppercase block mb-1">
-                {stagesList[0]?.label || '01 / Understand'}
-              </span>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                {stagesList[0]?.description || 'Before searching, we take the time to understand the business, the leadership dynamics, and the specific objectives of the hire.'}
-              </p>
-            </div>
-          </div>
-
-          {/* Scene 2: The Search */}
-          <div className="space-y-5 pt-4 border-t border-white/10">
-            <div>
-              <span className="text-xs font-sans tracking-widest text-[#F5A623] uppercase block mb-1.5">
-                {stagesList[1]?.label || '02 / Discover'}
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-medium text-white tracking-tight leading-[1.18] mb-2.5">
-                Finding the Right People
-                <br />
-                Takes More Than a Search.
-              </h3>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-5 pr-6 sm:pr-0">
-                {stagesList[1]?.description || 'We look beyond job titles to understand relevant experience, capabilities, and the needs of each role.'}
-              </p>
-            </div>
-
-            {/* Candidate Editorial Portrait */}
-            <div className="flex flex-row gap-4 sm:gap-5 items-start bg-[#121826]/70 border border-white/5 p-4 rounded-2xl">
-              <img
-                src={vettingImages[4] || content?.vettingStages?.[4]?.image || '/assets/female-executive-beige.jpg'}
-                alt="Candidate Profile"
-                className="w-20 h-28 sm:w-28 sm:h-36 object-cover object-top rounded-xl border border-white/10 shadow-md shrink-0"
-              />
-              <div className="space-y-1.5 pr-4 sm:pr-0">
-                <h4 className="text-base sm:text-lg font-medium text-white tracking-tight">Elena Vance</h4>
-                <p className="text-xs text-[#F5A623] font-normal">VP of Systems Engineering</p>
-                <p className="text-slate-300 text-[11.5px] sm:text-xs leading-relaxed line-clamp-3">
-                  Fourteen years leading infrastructure architecture and distributed platform
-                  engineering in high-scale environments.
+          {/* Static Vertical Order: 01 Discover, 02 Source, 03 Connect */}
+          <div className="space-y-6">
+            {/* Card 01: Discover */}
+            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
+                  01 Discover
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Organizational Mapping</span>
+              </div>
+              <div className="aspect-[16/9] w-full overflow-hidden rounded-[12px] border border-slate-800/80">
+                <img
+                  src={vettingImages[0] || content?.vettingStages?.[0]?.image || '/assets/card1-staffing.jpg'}
+                  alt="01 Discover"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-base font-bold text-white tracking-tight">
+                  Understanding Your Strategic Need
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Before searching, we analyze your technical stack, team dynamics, and precise growth milestones to define the ideal candidate profile.
                 </p>
-                <div className="flex flex-wrap gap-x-2 text-[10.5px] sm:text-[11px] text-slate-400 pt-0.5">
-                  <span>Distributed Architecture</span>
-                  <span>&bull;</span>
-                  <span>Platform Scaling</span>
-                </div>
               </div>
             </div>
-          </div>
 
-          {/* Scene 3: The Connection */}
-          <div className="space-y-5 pt-4 border-t border-white/10">
-            <div>
-              <span className="text-xs font-sans tracking-widest text-[#F5A623] uppercase block mb-1.5">
-                03 / Connect
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-medium text-white tracking-tight leading-[1.18] mb-2.5">
-                The Right Fit
-                <br />
-                Changes Everything.
-              </h3>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed pr-6 sm:pr-0">
-                We help businesses and suitable candidates move through the hiring process with
-                clarity and communication.
-              </p>
-            </div>
-            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-2xl border border-white/10 shadow-lg">
-              <img
-                src={vettingImages[2] || content?.vettingStages?.[2]?.image || '/assets/service-workforce.jpg'}
-                alt="Professional Dialogue"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/80 via-transparent to-transparent" />
-            </div>
-          </div>
-
-          {/* Scene 4: The Outcome (Executive Workspace & Dark Navy Slate) */}
-          <div className="space-y-5 pt-4 border-t border-white/10">
-            <div className="relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-2xl border border-white/10 shadow-lg">
-              <img
-                src={vettingImages[3] || content?.vettingStages?.[3]?.image || '/assets/hero-1.jpg'}
-                alt="Executive Workspace"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/60 to-transparent" />
+            {/* Card 02: Source */}
+            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
+                  02 Source
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Candidate Diligence</span>
+              </div>
+              <div className="flex flex-row gap-3.5 items-center bg-[#0B0F17]/80 border border-slate-800/80 p-3.5 rounded-[12px]">
+                <img
+                  src={vettingImages[4] || content?.vettingStages?.[4]?.image || '/assets/female-executive-beige.jpg'}
+                  alt="Elena Vance"
+                  className="w-16 h-20 object-cover object-top rounded-[10px] border border-slate-800 shrink-0"
+                />
+                <div className="min-w-0 space-y-1">
+                  <h4 className="text-sm font-bold text-white tracking-tight truncate">Elena Vance</h4>
+                  <p className="text-[11px] text-[#E69D2B] font-medium truncate">VP of Systems Engineering</p>
+                  <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">
+                    14+ years scaling distributed systems, cloud infrastructure, and engineering teams.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-base font-bold text-white tracking-tight">
+                  Rigorous Technical &amp; Cultural Vetting
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  We look beyond resumes through structured technical evaluations and leadership references, delivering verified top-tier talent.
+                </p>
+              </div>
             </div>
 
-            <div className="bg-[#0E131F] text-white rounded-2xl p-5 sm:p-10 space-y-4 border border-white/10">
-              <span className="text-xs font-sans tracking-widest text-[#E69D2B] uppercase block">
-                04 / Placement &amp; Support
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-medium text-white tracking-tight leading-[1.15]">
-                Build the Team
-                <br />
-                That Moves You Forward.
-              </h3>
-              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                From understanding the role to supporting the hiring journey, Sahara helps businesses
-                take the next step toward stronger teams.
-              </p>
-              <div className="flex flex-col gap-3 pt-2">
+            {/* Card 03: Connect */}
+            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
+                  03 Connect
+                </span>
+                <span className="text-[11px] text-slate-500 font-medium">Placement &amp; Retention</span>
+              </div>
+              <div className="aspect-[16/9] w-full overflow-hidden rounded-[12px] border border-slate-800/80">
+                <img
+                  src={vettingImages[2] || content?.vettingStages?.[2]?.image || '/assets/service-workforce.jpg'}
+                  alt="03 Connect"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="text-base font-bold text-white tracking-tight">
+                  Seamless Placement &amp; 90-Day Guarantee
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  We handle offer coordination, executive onboarding support, and back every placement with our comprehensive 90-day retention guarantee.
+                </p>
+              </div>
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={onNavigateContact}
-                  className="w-full rounded-full px-6 py-3.5 bg-[#0B0F17] hover:bg-[#E69D2B] hover:text-[#0B0F17] text-white font-semibold transition-all duration-300 shadow-md border border-white/20 hover:border-[#E69D2B] cursor-pointer inline-flex items-center justify-center gap-2 text-sm"
+                  className="w-full min-h-[48px] rounded-full px-6 py-3.5 bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] font-semibold transition-all duration-300 shadow-md inline-flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95"
                 >
-                  <span>Discuss Your Hiring Needs</span>
-                  <ArrowRight className="w-4 h-4 text-[#E69D2B]" />
-                </button>
-                <button
-                  type="button"
-                  onClick={onNavigateServices}
-                  className="w-full text-center text-slate-300 hover:text-white text-xs sm:text-sm font-medium py-2 transition-colors cursor-pointer"
-                >
-                  Explore Our Services
+                  <span className="font-semibold">Discuss Your Hiring Needs</span>
+                  <ArrowRight className="w-4 h-4 text-[#0B0F17]" />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </section>
-    );
-  }
 
-  // ===========================================================================
-  // DESKTOP EDITORIAL CANVAS (Pinned Master Scroll Narrative)
-  // ===========================================================================
-  return (
-    <section
-      id="process-story"
-      ref={containerRef}
-      className="relative w-full h-[360vh] bg-[#0B0F17] text-white select-none overflow-clip"
-      style={{
-        backgroundColor: isIvoryMode ? '#F8F6F1' : '#0B0F17',
-        transition: 'background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-      }}
-    >
+      {/* ===================================================================== */}
+      {/* 2. DESKTOP EDITORIAL CANVAS (Pinned Master Scroll Narrative: md+)      */}
+      {/* ===================================================================== */}
+      <section
+        id="process-story"
+        ref={containerRef}
+        className="hidden md:block relative w-full h-[360vh] bg-[#0B0F17] text-white select-none overflow-clip"
+        style={{
+          backgroundColor: isIvoryMode ? '#F8F6F1' : '#0B0F17',
+          transition: 'background-color 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
       {/* STICKY STAGE CONTAINER */}
       <div
         ref={stageRef}
@@ -613,5 +577,6 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
         </footer>
       </div>
     </section>
+    </>
   );
 }

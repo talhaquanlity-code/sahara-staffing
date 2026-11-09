@@ -15,21 +15,24 @@ export default function FAQ() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '.faq-row',
-        { opacity: 0, y: 25 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: '.faq-list-container',
-            start: 'top 85%',
-          },
-        }
-      );
+      const mm = gsap.matchMedia();
+      mm.add('(min-width: 768px)', () => {
+        gsap.fromTo(
+          '.faq-row',
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            stagger: 0.12,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: '.faq-list-container',
+              start: 'top 85%',
+            },
+          }
+        );
+      });
     }, faqRef);
 
     return () => ctx.revert();
@@ -40,8 +43,8 @@ export default function FAQ() {
   };
 
   return (
-    <section ref={faqRef} className="bg-obsidian text-crispWhite py-14 sm:py-32">
-      <div className="max-w-[1320px] mx-auto px-4 sm:px-8">
+    <section ref={faqRef} className="bg-obsidian text-crispWhite px-6 py-10 md:py-32 md:px-8">
+      <div className="max-w-[1320px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Left Column: Title & Subtitle */}
           <div className="lg:col-span-5 space-y-3 sm:space-y-4">
@@ -60,14 +63,14 @@ export default function FAQ() {
             {faqList.map((item, index) => {
               const isOpen = openIndex === index;
               return (
-                <div key={item.id || index} className="faq-row py-4 sm:py-6">
+                <div key={item.id || index} className="faq-row py-4 border-b border-slate-800/80 md:py-6">
                   <button
                     onClick={() => toggleFaq(index)}
                     className="w-full flex items-center justify-between text-left gap-3.5 sm:gap-4 group focus:outline-none cursor-pointer"
                     aria-expanded={isOpen}
                   >
                     <span
-                      className={`text-base sm:text-xl font-medium transition-colors duration-200 leading-snug ${
+                      className={`text-base sm:text-lg font-semibold leading-snug transition-colors duration-200 ${
                         isOpen
                           ? 'text-saharaGold'
                           : 'text-crispWhite group-hover:text-saharaGold'
@@ -91,7 +94,7 @@ export default function FAQ() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="text-xs sm:text-sm text-slateGray leading-relaxed max-w-2xl">
+                      <p className="pt-2 text-sm text-slate-400 leading-relaxed max-w-2xl font-normal">
                         {item.answer}
                       </p>
                     </div>
