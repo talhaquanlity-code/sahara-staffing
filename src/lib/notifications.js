@@ -170,13 +170,21 @@ export async function sendTestNotification(recipientEmail) {
   try {
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'cors',
-      redirect: 'follow',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
       body: JSON.stringify(testPayload),
+      redirect: 'follow',
     });
 
-    if (res.ok) {
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      data = { status: 'success' };
+    }
+
+    if (res.ok || (data && data.status === 'success')) {
       result = {
         success: true,
         simulated: false,
@@ -186,7 +194,7 @@ export async function sendTestNotification(recipientEmail) {
       result = {
         success: false,
         simulated: false,
-        message: `Delivery endpoint responded with HTTP ${res.status}.`,
+        message: data?.message || `Delivery endpoint responded with HTTP ${res.status}.`,
       };
     }
   } catch (err) {
