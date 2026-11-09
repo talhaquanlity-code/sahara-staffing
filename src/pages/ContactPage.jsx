@@ -25,7 +25,7 @@ const DISCIPLINES = [
 
 const APPS_SCRIPT_URL =
   import.meta.env.VITE_APPS_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbwTdcXHTuU6GLi_6ToFZojnA3GTSVF5ffEPgrSL3qrCBdQboRtF855UtEmVsV2Ovvs/exec';
+  'https://script.google.com/macros/s/AKfycbzf0PgaYovxvvv8CWsPqZP-6XXpwVyEEP331mV9zdpLfKbyoO33Q0U3g52WPjHNZSI/exec';
 
 const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
@@ -34,6 +34,12 @@ const convertFileToBase64 = (file) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = (error) => reject(error);
   });
+};
+
+const isValidLinkedInUrl = (url) => {
+  if (!url) return true;
+  const linkedinRegex = /^(https?:\/\/)?([\w-]+\.)*linkedin\.com\/in\/[\w%-]+\/?$/i;
+  return linkedinRegex.test(url.trim());
 };
 
 export default function ContactPage() {
@@ -177,8 +183,9 @@ export default function ContactPage() {
 
     if (!formData.linkedinUrl.trim()) {
       errs.linkedinUrl = 'Please provide your LinkedIn profile URL.';
-    } else if (!/^https?:\/\/(www\.)?linkedin\.com\/.*$/i.test(formData.linkedinUrl.trim())) {
-      errs.linkedinUrl = 'Please enter a valid LinkedIn URL (https://www.linkedin.com/in/...).';
+    } else if (!isValidLinkedInUrl(formData.linkedinUrl)) {
+      errs.linkedinUrl =
+        'Please enter a valid LinkedIn URL (e.g., https://linkedin.com/in/yourname or https://ae.linkedin.com/in/yourname)';
     }
 
     if (!resumeFile) {
