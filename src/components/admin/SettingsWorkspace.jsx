@@ -11,7 +11,7 @@ import { sendTestNotification, DEFAULT_NOTIFICATION_EMAIL } from '../../lib/noti
 
 const APPS_SCRIPT_URL =
   import.meta.env.VITE_APPS_SCRIPT_URL ||
-  'https://script.google.com/macros/s/AKfycbwmJquvA6KOUuT1Rc5iJ9F_5zMt5Hb1XCGQYCf3I3JQFqcHv0E-lsVIr0q67GXE1s8/exec';
+  'https://script.google.com/macros/s/AKfycbwTdcXHTuU6GLi_6ToFZojnA3GTSVF5ffEPgrSL3qrCBdQboRtF855UtEmVsV2Ovvs/exec';
 
 const BRAND_PALETTES = [
   { name: 'Sahara Amber Gold (Default)', hex: '#E69D2B' },
