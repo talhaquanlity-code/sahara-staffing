@@ -704,67 +704,44 @@ export default function ContactPage() {
                   </div>
                 </motion.form>
               ) : (
-                /* Success State */
+                /* Ultra-clean Executive Confirmation State */
                 <motion.div
                   key="intake-success"
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className="max-w-xl mx-auto space-y-6 py-4"
+                  className="max-w-xl mx-auto py-12 px-6 text-center space-y-6"
                 >
-                  <div className="space-y-2">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
-                      Submission Received.
+                  {/* Minimal Success Icon Accent */}
+                  <div className="w-16 h-16 mx-auto rounded-full bg-[#E69D2B]/10 border border-[#E69D2B]/30 flex items-center justify-center text-[#E69D2B] shadow-sm">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+
+                  {/* Typography */}
+                  <div className="space-y-3">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                      Thank You for Reaching Out.
                     </h1>
-                    <p className="text-sm text-[#475569] leading-relaxed">
-                      Our executive talent acquisition team will review your profile and contact you shortly.
+                    <p className="text-base text-gray-600 dark:text-slate-300 max-w-lg mx-auto leading-relaxed">
+                      We have received your application and resume. Our executive talent acquisition team will review your credentials and contact you directly if your background matches an active placement.
                     </p>
                   </div>
 
-                  {/* Tracking Card */}
-                  <div className="p-6 rounded-2xl bg-[#0B0F17] text-white space-y-4 border border-white/10 shadow-xl">
-                    <div className="text-[10.5px] font-semibold uppercase tracking-wider text-[#94A3B8]">
-                      Application Tracking Identifier
-                    </div>
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-mono text-2xl sm:text-3xl font-bold text-[#E69D2B] tracking-wider select-all">
-                        {String(submittedCandidate.tracking_id || '').replace(/\s+/g, '')}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleCopyId}
-                        className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs text-white flex items-center gap-2 transition-all cursor-pointer font-medium active:scale-95"
-                      >
-                        {copiedTrackingId ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
-                            <span className="text-emerald-400 font-medium">Copied</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5 text-[#E69D2B]" />
-                            <span>Copy ID</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <p className="text-xs text-[#94A3B8] pt-3 border-t border-white/10 leading-relaxed">
-                      Please retain this tracking reference for any future correspondence with Sahara Staffing Inc.
-                    </p>
-                  </div>
-
-                  {/* Centered Horizontal Action Bar */}
-                  <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm">
+                  {/* Clean Action Buttons */}
+                  <div className="pt-6 flex flex-wrap items-center justify-center gap-4">
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-[#0B0F17] hover:bg-[#E69D2B] text-white hover:text-[#0B0F17] font-semibold transition-all duration-200 cursor-pointer shadow-sm text-center"
+                      className="px-6 py-3 rounded-full bg-[#0B0F17] text-white hover:bg-slate-800 transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer shadow-sm active:scale-95"
                     >
-                      &larr; Submit another application
+                      <span>&larr;</span> Submit another application
                     </button>
+
                     <a
                       href="#home"
-                      className="text-[#64748B] hover:text-[#0B0F17] font-medium transition-colors text-center py-1"
+                      className="px-6 py-3 text-sm font-medium text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
                     >
                       Return to Homepage
                     </a>
