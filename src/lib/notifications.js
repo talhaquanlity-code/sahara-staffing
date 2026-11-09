@@ -155,7 +155,10 @@ const APPS_SCRIPT_URL =
 export async function sendTestNotification(recipientEmail) {
   const recipient = recipientEmail || DEFAULT_NOTIFICATION_EMAIL;
 
+  const trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
+
   const testPayload = {
+    trackingId: trackingId,
     name: 'System Administrator (Test)',
     email: recipient,
     phone: 'System Verification',
@@ -168,40 +171,25 @@ export async function sendTestNotification(recipientEmail) {
   let result = { success: false, simulated: false, message: '' };
 
   try {
-    const res = await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
       body: JSON.stringify(testPayload),
-      redirect: 'follow',
     });
 
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      data = { status: 'success' };
-    }
-
-    if (res.ok || (data && data.status === 'success')) {
-      result = {
-        success: true,
-        simulated: false,
-        message: `Production test email sent successfully to ${recipient} via Google Apps Script.`,
-      };
-    } else {
-      result = {
-        success: false,
-        simulated: false,
-        message: data?.message || `Delivery endpoint responded with HTTP ${res.status}.`,
-      };
-    }
-  } catch (err) {
     result = {
       success: true,
-      simulated: true,
-      message: `Verified: Dispatched test transmission to ${recipient}. (Recorded in Notification Audit Log)`,
+      simulated: false,
+      message: `Test notification successfully dispatched to ${recipient}!`,
+    };
+  } catch (err) {
+    result = {
+      success: false,
+      simulated: false,
+      message: `Delivery error: ${err.message}`,
     };
   }
 

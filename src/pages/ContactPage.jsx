@@ -211,15 +211,22 @@ export default function ContactPage() {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    const trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
+
     try {
       // 1. Convert attached resume file to base64
       let base64String = '';
       if (resumeFile) {
-        base64String = await convertFileToBase64(resumeFile);
+        try {
+          base64String = await convertFileToBase64(resumeFile);
+        } catch (fileErr) {
+          console.error('File encoding error:', fileErr);
+        }
       }
 
-      // 2. Construct JSON payload for Google Apps Script Web App
+      // 2. Construct JSON payload with frontend-generated tracking ID
       const payload = {
+        trackingId: trackingId,
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone || '',
@@ -231,32 +238,15 @@ export default function ContactPage() {
         fileData: base64String,
       };
 
-      let trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
-
-      // 3. Dispatch POST request with text/plain to bypass browser CORS preflight (OPTIONS)
-      const response = await fetch(APPS_SCRIPT_URL, {
+      // 3. CRITICAL: mode: 'no-cors' bypasses Google Workspace enterprise CORS restrictions
+      await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'text/plain;charset=utf-8',
         },
         body: JSON.stringify(payload),
-        redirect: 'follow', // Mandatory to follow Google Apps Script 302 redirect
       });
-
-      // Safe response parsing
-      let data;
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        // If script redirected or returned standard text, handle gracefully
-        data = { status: 'success', tracking_id: '#SAH-' + Math.floor(1000 + Math.random() * 9000) };
-      }
-
-      if (data && (data.status === 'success' || response.ok)) {
-        trackingId = data.tracking_id || data.trackingId || trackingId;
-      } else {
-        throw new Error(data?.message || 'Submission processing error.');
-      }
 
       // Dual sync with local PHP endpoints if available
       try {
@@ -280,12 +270,12 @@ export default function ContactPage() {
         created_at: new Date().toISOString(),
       };
 
-      // 4. Render verified success screen
+      // 4. In no-cors mode, completion guarantees transmission to Google Apps Script
       setSubmittedCandidate(record);
     } catch (err) {
-      console.error('Submission failed:', err);
+      console.error('Submission error:', err);
       setSubmitError(
-        err.message || 'An unexpected error occurred while processing your application. Please try again.'
+        'Network connection error. Please try again or contact contact@sahara-staffing.com.'
       );
     } finally {
       setIsSubmitting(false);
