@@ -322,15 +322,17 @@ export default function ContactPage() {
       {/* ========================================================================= */}
       {/* SPLIT-LAYOUT CANDIDATE INTAKE CONTAINER (~1200px MAX-WIDTH)               */}
       {/* ========================================================================= */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-10 lg:px-12 pt-24 sm:pt-40 pb-16 sm:pb-32">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-10 lg:px-12 pt-20 sm:pt-40 pb-16 sm:pb-32">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
           {/* ===================================================================== */}
           {/* LEFT COLUMN: CANDIDATE INTRO & VERIFIED CONTACT DETAILS (40%)         */}
+          {/* On Mobile: Rendered cleanly under the form (order-2)                  */}
+          {/* On Desktop: Anchored on the left (order-1 lg:col-span-5)              */}
           {/* ===================================================================== */}
-          <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-            {/* Editorial Eyebrow & Title */}
-            <div>
+          <div className="order-2 lg:order-1 lg:col-span-5 space-y-6 sm:space-y-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-[#E5E0D5] w-full">
+            {/* Editorial Eyebrow & Title (Desktop Primary, Hidden on Mobile to avoid duplicate hero) */}
+            <div className="hidden lg:block">
               <div className="text-[11px] font-bold tracking-[0.2em] text-[#B87314] uppercase mb-3">
                 SAHARA STAFFING INC. / CANDIDATE NETWORK
               </div>
@@ -352,7 +354,7 @@ export default function ContactPage() {
             </div>
 
             {/* Verified Contact Details (Direct Executive Email & SLA) */}
-            <div className="pt-4 border-t border-[#E5E0D5] space-y-4">
+            <div className="pt-2 lg:pt-4 border-t lg:border-t border-[#E5E0D5] space-y-4">
               <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B0F17]">
                 Sahara Executive Office
               </div>
@@ -410,8 +412,10 @@ export default function ContactPage() {
 
           {/* ===================================================================== */}
           {/* RIGHT COLUMN: APPLICATION FORM OR SUCCESS STATE (60%)                 */}
+          {/* On Mobile: Prioritized FIRST (order-1) so inputs are immediately seen */}
+          {/* On Desktop: Renders on the right (order-2 lg:col-span-7)              */}
           {/* ===================================================================== */}
-          <div className="lg:col-span-7">
+          <div className="order-1 lg:order-2 lg:col-span-7 w-full">
             <AnimatePresence mode="wait">
               {!submittedCandidate ? (
                 /* Application Form */
@@ -425,8 +429,22 @@ export default function ContactPage() {
                   noValidate
                   className="space-y-6"
                 >
-                  {/* Form Heading: Aligned with the top of left column */}
-                  <div>
+                  {/* Mobile-First Header: Friendly, direct, immediate context */}
+                  <div className="block lg:hidden pb-2">
+                    <div className="text-[10.5px] font-bold tracking-[0.2em] text-[#B87314] uppercase mb-2">
+                      SAHARA STAFFING INC. / CANDIDATE NETWORK
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] leading-tight tracking-tight mb-2">
+                      Your next opportunity starts with a{' '}
+                      <span className="text-[#B87314]">conversation.</span>
+                    </h1>
+                    <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
+                      Complete your profile below to connect directly with our executive placement partners.
+                    </p>
+                  </div>
+
+                  {/* Desktop Form Heading: Aligned with the top of left column */}
+                  <div className="hidden lg:block">
                     <h2 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
                       Introduce yourself.
                     </h2>

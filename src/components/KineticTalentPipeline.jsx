@@ -31,9 +31,9 @@ export default function KineticTalentPipeline() {
     <section
       ref={sectionRef}
       id="kinetic-pipeline"
-      className="bg-[#0B0F17] py-14 sm:py-18 lg:py-20 px-6 sm:px-10 lg:px-16 text-white relative select-none font-sans overflow-hidden border-t border-white/[0.08]"
+      className="bg-[#0B0F17] py-10 sm:py-18 lg:py-20 px-4 sm:px-10 lg:px-16 text-white relative select-none font-sans overflow-hidden border-t border-white/[0.08]"
     >
-      <div className="max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center relative z-10">
+      <div className="max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center relative z-10">
         
         {/* ===================================================================== */}
         {/* 1. LEFT COLUMN: MODERN & REFINED RADAR WITH SCROLL PARALLAX           */}
@@ -47,7 +47,7 @@ export default function KineticTalentPipeline() {
             onMouseEnter={() => setIsHovered(true)}
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setIsHovered(false)}
-            className="relative w-full max-w-[380px] aspect-square rounded-[32px] bg-[#0E131F]/90 border border-white/[0.08] p-6 flex items-center justify-center overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] cursor-crosshair group"
+            className="relative w-full max-w-[270px] sm:max-w-[340px] lg:max-w-[380px] aspect-square rounded-[24px] sm:rounded-[32px] bg-[#0E131F]/90 border border-white/[0.08] p-4 sm:p-6 flex items-center justify-center overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)] cursor-crosshair group"
           >
             {/* Minimal Modern Concentric Rings & Crosshairs */}
             <svg
@@ -71,7 +71,7 @@ export default function KineticTalentPipeline() {
             </svg>
 
             {/* Smooth Rotating Gold Radar Beam */}
-            <div className="w-[340px] h-[340px] absolute inset-0 m-auto pointer-events-none rounded-full overflow-hidden">
+            <div className="w-[85%] h-[85%] sm:w-[340px] sm:h-[340px] absolute inset-0 m-auto pointer-events-none rounded-full overflow-hidden">
               <div
                 className="w-full h-full rounded-full animate-spin [animation-duration:8s] [animation-timing-function:linear]"
                 style={{
@@ -82,11 +82,11 @@ export default function KineticTalentPipeline() {
             </div>
 
             {/* Central Sahara Core Medallion with Real Sahara Brand Symbol */}
-            <div className="relative z-10 w-24 h-24 sm:w-26 sm:h-26 rounded-full bg-[#0B0F17] border border-white/10 shadow-[0_12px_28px_rgba(0,0,0,0.85)] flex items-center justify-center pointer-events-none">
+            <div className="relative z-10 w-20 h-20 sm:w-26 sm:h-26 rounded-full bg-[#0B0F17] border border-white/10 shadow-[0_12px_28px_rgba(0,0,0,0.85)] flex items-center justify-center pointer-events-none">
               <motion.div
                 animate={{ scale: [1, 1.025, 1] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-14 h-14 sm:w-15 sm:h-15 flex items-center justify-center select-none"
+                className="w-12 h-12 sm:w-15 sm:h-15 flex items-center justify-center select-none"
               >
                 <img
                   src={saharaMarkImg}
@@ -183,7 +183,7 @@ export default function KineticTalentPipeline() {
               whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-bold text-white tracking-[-0.025em] leading-[1.3] sm:leading-[1.28] lg:leading-[1.24] font-sans"
+              className="text-2xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-bold text-white tracking-tight sm:tracking-[-0.025em] leading-snug sm:leading-[1.28] lg:leading-[1.24] font-sans"
             >
               “Great teams aren’t built by headcount - they’re defined by the{' '}
               <span className="text-[#E69D2B]">pivotal talent</span> that moves business forward.”
