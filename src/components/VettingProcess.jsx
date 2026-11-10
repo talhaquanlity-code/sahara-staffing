@@ -172,7 +172,7 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
   return (
     <>
       {/* ===================================================================== */}
-      {/* 1. DEDICATED MOBILE CONTAINER (< md): CLEAN VERTICAL STATIC STACK    */}
+      {/* 1. DEDICATED EXECUTIVE MOBILE TIMELINE STEPPER (< md)                */}
       {/* ===================================================================== */}
       <section
         id="process-story-mobile"
@@ -192,99 +192,91 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
             </p>
           </div>
 
-          {/* Static Vertical Order: 01 Discover, 02 Source, 03 Connect */}
-          <div className="space-y-6">
-            {/* Card 01: Discover */}
-            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
-                  01 Discover
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium">Organizational Mapping</span>
-              </div>
-              <div className="aspect-[16/9] w-full overflow-hidden rounded-[12px] border border-slate-800/80">
-                <img
-                  src={vettingImages[0] || content?.vettingStages?.[0]?.image || '/assets/card1-staffing.jpg'}
-                  alt="01 Discover"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-base font-bold text-white tracking-tight">
-                  Understanding Your Strategic Need
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Before searching, we analyze your technical stack, team dynamics, and precise growth milestones to define the ideal candidate profile.
-                </p>
-              </div>
-            </div>
-
-            {/* Card 02: Source */}
-            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
-                  02 Source
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium">Candidate Diligence</span>
-              </div>
-              <div className="flex flex-row gap-3.5 items-center bg-[#0B0F17]/80 border border-slate-800/80 p-3.5 rounded-[12px]">
-                <img
-                  src={vettingImages[4] || content?.vettingStages?.[4]?.image || '/assets/female-executive-beige.jpg'}
-                  alt="Elena Vance"
-                  className="w-16 h-20 object-cover object-top rounded-[10px] border border-slate-800 shrink-0"
-                />
-                <div className="min-w-0 space-y-1">
-                  <h4 className="text-sm font-bold text-white tracking-tight truncate">Elena Vance</h4>
-                  <p className="text-[11px] text-[#E69D2B] font-medium truncate">VP of Systems Engineering</p>
-                  <p className="text-[11px] text-slate-400 leading-snug line-clamp-2">
-                    14+ years scaling distributed systems, cloud infrastructure, and engineering teams.
-                  </p>
+          {/* Minimal Executive Vertical Timeline Stepper */}
+          <div className="relative pl-6 space-y-5 before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[2px] before:bg-[#E69D2B]/30">
+            {/* Stage 01: DISCOVER */}
+            <div className="relative">
+              {/* Gold Node Indicator */}
+              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
+              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">01</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
+                    ORGANIZATIONAL MAPPING
+                  </span>
                 </div>
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-base font-bold text-white tracking-tight">
-                  Rigorous Technical &amp; Cultural Vetting
-                </h3>
+                <h3 className="text-base font-bold text-white">Understanding Your Strategic Need</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  We look beyond resumes through structured technical evaluations and leadership references, delivering verified top-tier talent.
+                  We analyze your technical architecture, leadership dynamics, and growth milestones to define the exact talent requirement.
                 </p>
               </div>
             </div>
 
-            {/* Card 03: Connect */}
-            <div className="rounded-[12px] border border-slate-800 bg-[#121826]/70 p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">
-                  03 Connect
-                </span>
-                <span className="text-[11px] text-slate-500 font-medium">Placement &amp; Retention</span>
-              </div>
-              <div className="aspect-[16/9] w-full overflow-hidden rounded-[12px] border border-slate-800/80">
-                <img
-                  src={vettingImages[2] || content?.vettingStages?.[2]?.image || '/assets/service-workforce.jpg'}
-                  alt="03 Connect"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-base font-bold text-white tracking-tight">
-                  Seamless Placement &amp; 90-Day Guarantee
-                </h3>
+            {/* Stage 02: SOURCE */}
+            <div className="relative">
+              {/* Gold Node Indicator */}
+              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
+              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">02</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
+                    CANDIDATE DILIGENCE
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white">Active Market Mapping &amp; Diligence</h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  We handle offer coordination, executive onboarding support, and back every placement with our comprehensive 90-day retention guarantee.
+                  Direct outbound search targeting passive top-tier candidates with structured technical evaluations and leadership references.
                 </p>
               </div>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={onNavigateContact}
-                  className="w-full min-h-[48px] rounded-full px-6 py-3.5 bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] font-semibold transition-all duration-300 shadow-md inline-flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95"
-                >
-                  <span className="font-semibold">Discuss Your Hiring Needs</span>
-                  <ArrowRight className="w-4 h-4 text-[#0B0F17]" />
-                </button>
+            </div>
+
+            {/* Stage 03: CONNECT */}
+            <div className="relative">
+              {/* Gold Node Indicator */}
+              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
+              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">03</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
+                    ALIGNMENT &amp; DIALOGUE
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white">Coordinated Interviews &amp; Offer</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Precision interview scheduling, transparent communication, and structured negotiations for seamless candidate alignment.
+                </p>
               </div>
             </div>
+
+            {/* Stage 04: DELIVER */}
+            <div className="relative">
+              {/* Gold Node Indicator */}
+              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
+              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">04</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
+                    RETENTION GUARANTEE
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white">Seamless Placement &amp; 90-Day SLA</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Executive onboarding support and a complete 90-day retention guarantee ensuring lasting team performance and ROI.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={onNavigateContact}
+              className="w-full min-h-[48px] rounded-full px-6 py-3.5 bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] font-semibold transition-all duration-300 shadow-md inline-flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95"
+            >
+              <span className="font-semibold">Discuss Your Hiring Needs</span>
+              <ArrowRight className="w-4 h-4 text-[#0B0F17]" />
+            </button>
           </div>
         </div>
       </section>

@@ -305,7 +305,7 @@ function AppContent() {
           <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
 
             {/* 4. Staffing Value & Interactive Sahara Orbit */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
               <Calculator
                 onNavigateContact={() => navigate('contact')}
                 onProceedToContact={(data) => navigate('contact', data)}

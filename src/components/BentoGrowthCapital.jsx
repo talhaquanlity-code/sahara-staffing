@@ -301,15 +301,11 @@ export default function BentoGrowthCapital({ onNavigateService }) {
         {/* ========================================================================= */}
         {/* 1. SECTION HEADER                                                         */}
         {/* ========================================================================= */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 24 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ type: 'spring', stiffness: 220, damping: 22, mass: 0.8 }}
-          className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-5 sm:gap-6 mb-8 sm:mb-12"
+        <div
+          className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-5 sm:gap-6 mb-8 sm:mb-12 opacity-100 transform-none"
         >
           {/* Left Column */}
-          <div className="max-w-2xl space-y-2.5">
+          <div className="max-w-2xl space-y-2.5 opacity-100 transform-none">
             <span className="text-[#B87314] text-xs font-bold tracking-wider uppercase font-sans">
               STAFFING SOLUTIONS
             </span>
@@ -320,7 +316,7 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           </div>
 
           {/* Right Column */}
-          <div className="flex flex-col items-start lg:items-end gap-3.5 sm:gap-4">
+          <div className="flex flex-col items-start lg:items-end gap-3.5 sm:gap-4 opacity-100 transform-none">
             <p className="text-slate-600 text-xs sm:text-sm max-w-sm lg:text-right leading-relaxed font-sans">
               Connect with pre-vetted professionals and build stronger teams through recruitment
               solutions designed around your business.
@@ -334,7 +330,7 @@ export default function BentoGrowthCapital({ onNavigateService }) {
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* ========================================================================= */}
         {/* 2. MOBILE SWIPEABLE CAROUSEL (< md)                                       */}
@@ -343,18 +339,18 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           <div
             ref={carouselRef}
             onScroll={handleCarouselScroll}
-            className="overflow-x-auto snap-x snap-mandatory scrollbar-none flex gap-4 px-4 pb-4 -mx-5 scroll-smooth touch-pan-y"
+            className="overflow-x-auto snap-x snap-mandatory flex gap-4 px-5 pb-4 -mx-5 scrollbar-none"
             style={{
               WebkitOverflowScrolling: 'touch',
-              touchAction: 'pan-y',
+              touchAction: 'pan-x pan-y',
             }}
           >
             {activeStaffingSolutions.map((item) => (
               <div
                 key={item.id}
                 onClick={() => openModal(item.modalTitle)}
-                style={{ touchAction: 'pan-y' }}
-                className="w-[84vw] max-w-[320px] h-[390px] shrink-0 snap-center rounded-[24px] overflow-hidden border border-slate-200/90 bg-[#0B0F17] shadow-xl relative flex flex-col justify-between p-6 select-none cursor-pointer active:scale-[0.98] transition-transform duration-200 touch-pan-y"
+                style={{ touchAction: 'pan-x pan-y' }}
+                className="w-[84vw] max-w-[320px] h-[390px] shrink-0 snap-center rounded-[24px] overflow-hidden border border-slate-200/90 bg-[#0B0F17] shadow-xl relative flex flex-col justify-between p-6 select-none cursor-pointer active:scale-[0.98] transition-transform duration-200 opacity-100 transform-none"
               >
                 {/* Background Image & Vignette */}
                 <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -380,7 +376,7 @@ export default function BentoGrowthCapital({ onNavigateService }) {
                 </div>
 
                 {/* Bottom Content: Title & Subtitle */}
-                <div className="relative z-10 space-y-2">
+                <div className="relative z-10 space-y-2 opacity-100 transform-none">
                   <h3 className="text-2xl font-bold text-white tracking-tight leading-tight font-sans">
                     {item.title}
                   </h3>

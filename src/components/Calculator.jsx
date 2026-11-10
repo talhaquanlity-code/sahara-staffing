@@ -204,50 +204,50 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
     <section
       ref={sectionRef}
       id="staffing-momentum"
-      className="rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-12 px-6 md:py-16 lg:py-20 select-none relative"
+      className="rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-10 px-5 md:py-16 lg:py-20 md:px-10 lg:px-14 select-none relative"
     >
       <div className="max-w-[1280px] mx-auto px-0 md:px-10 lg:px-14">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           {/* =================================================================== */}
           {/* 1. LEFT COLUMN: EDITORIAL STAFFING NARRATIVE                        */}
           {/* =================================================================== */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-6 space-y-4 md:space-y-6 text-center md:text-left">
             {/* Eyebrow */}
             <div>
-              <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#B87314] block">
+              <span className="text-xs font-sans font-semibold tracking-wider uppercase text-[#E69D2B] md:text-[#B87314] block">
                 SAHARA STAFFING INC. / TALENT SOLUTIONS
               </span>
             </div>
 
-            {/* Headline (Title Case, Exactly 2 Lines on Desktop) */}
-            <h2 className="text-2xl xs:text-3xl sm:text-4xl lg:text-[48px] font-bold tracking-tight text-[#0B0F17] leading-[1.15] sm:leading-[1.12] font-sans">
-              Talent That <span className="text-[#B87314]">Moves</span>
+            {/* Headline */}
+            <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-[48px] font-bold tracking-tight text-white md:text-[#0B0F17] leading-tight md:leading-[1.12] font-sans mt-1">
+              Talent That <span className="text-[#E69D2B] md:text-[#B87314]">Moves</span>
               <br className="hidden sm:inline" /> Business Forward.
             </h2>
 
             {/* Supporting Paragraph */}
-            <p className="text-sm sm:text-base lg:text-lg text-slate-600 font-normal leading-relaxed max-w-lg font-sans">
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 md:text-slate-600 font-normal leading-relaxed max-w-sm mx-auto md:max-w-lg md:mx-0 font-sans">
               The people behind every great business. We connect ambitious teams with talent built
               to move them forward.
             </p>
 
-            {/* Primary CTA (Rounded Pill Button matching Sahara Brand Standard) */}
-            <div className="pt-1 sm:pt-2">
+            {/* Primary CTA */}
+            <div className="pt-2 md:pt-2 flex justify-center md:justify-start">
               <button
                 type="button"
                 onClick={handleCtaClick}
-                className="w-full sm:w-auto min-h-[48px] justify-center bg-[#0B0F17] hover:bg-[#1E293B] text-white text-xs sm:text-sm lg:text-base font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all duration-200 shadow-md group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
+                className="w-full sm:w-auto min-h-[48px] justify-center bg-[#E69D2B] md:bg-[#0B0F17] hover:bg-[#F6C467] md:hover:bg-[#1E293B] text-[#0B0F17] md:text-white text-xs sm:text-sm lg:text-base font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all duration-200 shadow-md group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
               >
                 <span>Find Your Talent</span>
-                <ArrowRight className="w-4 h-4 text-[#F5A623] transition-transform duration-200 group-hover:translate-x-1" />
+                <ArrowRight className="w-4 h-4 text-[#0B0F17] md:text-[#F5A623] transition-transform duration-200 group-hover:translate-x-1" />
               </button>
             </div>
           </div>
 
           {/* =================================================================== */}
-          {/* 2. RIGHT COLUMN: INTERACTIVE FLOATING SAHARA ORBIT                  */}
+          {/* 2. RIGHT COLUMN: INTERACTIVE FLOATING SAHARA ORBIT (Desktop Only)   */}
           {/* =================================================================== */}
-          <div className="lg:col-span-6 flex flex-col items-center lg:items-end">
+          <div className="hidden md:flex lg:col-span-6 flex-col items-center lg:items-end">
             <div
               ref={orbitContainerRef}
               onMouseMove={handleMouseMove}

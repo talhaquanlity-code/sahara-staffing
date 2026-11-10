@@ -43,12 +43,12 @@ export default function FAQ() {
   };
 
   return (
-    <section ref={faqRef} className="bg-obsidian text-crispWhite px-6 py-10 md:py-32 md:px-8">
+    <section ref={faqRef} className="bg-obsidian text-crispWhite px-5 py-6 md:py-32 md:px-8">
       <div className="max-w-[1320px] mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-start">
           {/* Left Column: Title & Subtitle */}
-          <div className="lg:col-span-5 space-y-3 sm:space-y-4">
-            <h2 className="text-3xl sm:text-5xl font-semibold tracking-[-0.03em] leading-[1.12] sm:leading-[1.08] text-saharaGold">
+          <div className="lg:col-span-5 space-y-2.5 sm:space-y-4">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-semibold tracking-[-0.03em] leading-tight md:leading-[1.08] text-saharaGold">
               Frequently
               <br className="hidden sm:inline" />{' '}
               Asked Questions
@@ -63,26 +63,26 @@ export default function FAQ() {
             {faqList.map((item, index) => {
               const isOpen = openIndex === index;
               return (
-                <div key={item.id || index} className="faq-row py-4 border-b border-slate-800/80 md:py-6">
+                <div key={item.id || index} className="faq-row py-3.5 border-b border-slate-800/80 md:py-6">
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full flex items-center justify-between text-left gap-3.5 sm:gap-4 group focus:outline-none cursor-pointer"
+                    className="w-full flex items-center justify-between text-left group focus:outline-none cursor-pointer"
                     aria-expanded={isOpen}
                   >
                     <span
-                      className={`text-base sm:text-lg font-semibold leading-snug transition-colors duration-200 ${
+                      className={`text-sm md:text-lg font-semibold leading-snug text-white transition-colors duration-200 ${
                         isOpen
                           ? 'text-saharaGold'
-                          : 'text-crispWhite group-hover:text-saharaGold'
+                          : 'text-white group-hover:text-saharaGold'
                       }`}
                     >
                       {item.question}
                     </span>
                     <span
-                      className={`text-xl sm:text-2xl font-light shrink-0 transition-transform duration-300 w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full ${
+                      className={`w-4 h-4 text-[#E69D2B] flex-shrink-0 ml-3 flex items-center justify-center text-sm md:text-2xl font-light transition-transform duration-300 md:w-8 md:h-8 md:rounded-full ${
                         isOpen
-                          ? 'text-saharaGold rotate-180 bg-slateCard/60'
-                          : 'text-slateGray group-hover:text-saharaGold group-hover:bg-slateCard/40'
+                          ? 'rotate-180 md:bg-slateCard/60'
+                          : 'group-hover:md:bg-slateCard/40'
                       }`}
                     >
                       {isOpen ? '−' : '+'}
@@ -90,11 +90,11 @@ export default function FAQ() {
                   </button>
                   <div
                     className={`grid transition-all duration-300 ease-in-out ${
-                      isOpen ? 'grid-rows-[1fr] opacity-100 mt-2.5 sm:mt-3' : 'grid-rows-[0fr] opacity-0'
+                      isOpen ? 'grid-rows-[1fr] opacity-100 mt-2 sm:mt-3' : 'grid-rows-[0fr] opacity-0'
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <p className="pt-2 text-sm text-slate-400 leading-relaxed max-w-2xl font-normal">
+                      <p className="pt-2 text-xs md:text-sm text-slate-400 leading-relaxed max-w-none font-normal text-left">
                         {item.answer}
                       </p>
                     </div>
