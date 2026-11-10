@@ -236,7 +236,7 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
               <button
                 type="button"
                 onClick={handleCtaClick}
-                className="w-full sm:w-auto min-h-[48px] justify-center bg-[#E69D2B] md:bg-[#0B0F17] hover:bg-[#F6C467] md:hover:bg-[#1E293B] text-[#0B0F17] md:text-white text-xs sm:text-sm lg:text-base font-semibold px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 transition-all duration-200 shadow-md group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
+                className="w-full py-3.5 px-6 bg-[#E69D2B] text-[#0B0F17] font-bold text-sm rounded-xl shadow-lg hover:bg-[#d89020] flex items-center justify-center gap-2 md:w-auto md:bg-[#0B0F17] md:hover:bg-[#1E293B] md:text-white md:rounded-full md:px-8 md:py-4 md:text-base transition-all duration-200 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
               >
                 <span>Find Your Talent</span>
                 <ArrowRight className="w-4 h-4 text-[#0B0F17] md:text-[#F5A623] transition-transform duration-200 group-hover:translate-x-1" />

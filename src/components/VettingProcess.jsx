@@ -14,6 +14,39 @@ const DEFAULT_STAGES = [
   { id: '05', name: 'Support', label: '05 Support' },
 ];
 
+const MOBILE_DECK_STAGES = [
+  {
+    index: '01',
+    category: 'STAGE 01',
+    title: 'Organizational Mapping',
+    description: 'Deep technical architecture & leadership alignment analysis.',
+  },
+  {
+    index: '02',
+    category: 'STAGE 02',
+    title: 'Active Market Mapping',
+    description: 'Direct outbound search targeting passive top-tier executive talent.',
+  },
+  {
+    index: '03',
+    category: 'STAGE 03',
+    title: 'Rigorous Diligence',
+    description: 'Structured technical evaluations, peer references, and leadership scoring.',
+  },
+  {
+    index: '04',
+    category: 'STAGE 04',
+    title: 'Executive Alignment',
+    description: 'Seamless candidate intake, confidential introductions, and offer negotiation.',
+  },
+  {
+    index: '05',
+    category: 'STAGE 05',
+    title: 'Guarantee & Integration',
+    description: '100-day placement guarantee with ongoing quarterly integration check-ins.',
+  },
+];
+
 export default function VettingProcess({ onNavigateContact, onNavigateServices }) {
   const { content, isLivePreview } = useCMS();
   const stagesList = content?.vettingStages && content.vettingStages.length > 0
@@ -48,6 +81,25 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
   const [overallProgress, setOverallProgress] = useState(0);
   const [isIvoryMode, setIsIvoryMode] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile Interactive Y-Axis Card Deck State
+  const [activeDeckIndex, setActiveDeckIndex] = useState(0);
+  const touchStartY = useRef(null);
+
+  const handleDeckTouchStart = (e) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleDeckTouchEnd = (e) => {
+    if (touchStartY.current === null) return;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+    if (deltaY < -35 && activeDeckIndex < MOBILE_DECK_STAGES.length - 1) {
+      setActiveDeckIndex((prev) => prev + 1);
+    } else if (deltaY > 35 && activeDeckIndex > 0) {
+      setActiveDeckIndex((prev) => prev - 1);
+    }
+    touchStartY.current = null;
+  };
 
   useEffect(() => {
     // Detect mobile viewport or user motion preference
@@ -172,111 +224,108 @@ export default function VettingProcess({ onNavigateContact, onNavigateServices }
   return (
     <>
       {/* ===================================================================== */}
-      {/* 1. DEDICATED EXECUTIVE MOBILE TIMELINE STEPPER (< md)                */}
+      {/* 1. DEDICATED EXECUTIVE MOBILE Y-AXIS CARD DECK (< md)                 */}
       {/* ===================================================================== */}
       <section
         id="process-story-mobile"
         className="block md:hidden w-full bg-[#0B0F17] text-white px-5 py-8"
       >
-        <div className="max-w-xl mx-auto space-y-6">
-          {/* Header */}
-          <div>
-            <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#E69D2B] block mb-2">
-              The Sahara Approach
-            </span>
-            <h2 className="text-2xl font-bold tracking-tight text-white leading-tight mb-2">
-              Strategic Process. Measurable Impact.
-            </h2>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Every successful placement begins with deep understanding, rigorous sourcing, and long-term alignment.
-            </p>
-          </div>
-
-          {/* Minimal Executive Vertical Timeline Stepper */}
-          <div className="relative pl-6 space-y-5 before:absolute before:left-[11px] before:top-4 before:bottom-4 before:w-[2px] before:bg-[#E69D2B]/30">
-            {/* Stage 01: DISCOVER */}
-            <div className="relative">
-              {/* Gold Node Indicator */}
-              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
-              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">01</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
-                    ORGANIZATIONAL MAPPING
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-white">Understanding Your Strategic Need</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  We analyze your technical architecture, leadership dynamics, and growth milestones to define the exact talent requirement.
-                </p>
-              </div>
+        <div className="max-w-xl mx-auto space-y-5">
+          {/* Header & Y-Axis Controls */}
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <span className="text-xs font-sans font-semibold tracking-[0.2em] uppercase text-[#E69D2B] block mb-1">
+                The Sahara Approach
+              </span>
+              <h2 className="text-2xl font-bold tracking-tight text-white leading-tight">
+                Executive Process.
+              </h2>
             </div>
 
-            {/* Stage 02: SOURCE */}
-            <div className="relative">
-              {/* Gold Node Indicator */}
-              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
-              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">02</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
-                    CANDIDATE DILIGENCE
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-white">Active Market Mapping &amp; Diligence</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Direct outbound search targeting passive top-tier candidates with structured technical evaluations and leadership references.
-                </p>
-              </div>
-            </div>
+            {/* Y-Axis Navigation Control Bar */}
+            <div className="flex items-center gap-1.5 bg-[#121826] border border-slate-800 rounded-full px-2.5 py-1 shadow-lg shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveDeckIndex((prev) => Math.max(0, prev - 1))}
+                disabled={activeDeckIndex === 0}
+                aria-label="Previous Stage"
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
+                  activeDeckIndex === 0
+                    ? 'text-slate-600 cursor-not-allowed'
+                    : 'text-[#E69D2B] hover:bg-slate-800 active:scale-90'
+                }`}
+              >
+                &uarr;
+              </button>
 
-            {/* Stage 03: CONNECT */}
-            <div className="relative">
-              {/* Gold Node Indicator */}
-              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
-              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">03</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
-                    ALIGNMENT &amp; DIALOGUE
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-white">Coordinated Interviews &amp; Offer</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Precision interview scheduling, transparent communication, and structured negotiations for seamless candidate alignment.
-                </p>
-              </div>
-            </div>
+              <span className="text-[11px] font-mono font-bold text-slate-300 px-1 select-none">
+                {MOBILE_DECK_STAGES[activeDeckIndex].index} / 05
+              </span>
 
-            {/* Stage 04: DELIVER */}
-            <div className="relative">
-              {/* Gold Node Indicator */}
-              <div className="absolute -left-6 top-5 w-[14px] h-[14px] rounded-full bg-[#0B0F17] border-2 border-[#E69D2B] shadow-[0_0_8px_rgba(230,157,43,0.5)] -translate-x-[5px]" />
-              <div className="bg-[#0E1420] border border-slate-800 rounded-xl p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider text-[#E69D2B] uppercase">04</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-wider uppercase bg-[#E69D2B]/10 text-[#E69D2B] border border-[#E69D2B]/20">
-                    RETENTION GUARANTEE
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-white">Seamless Placement &amp; 90-Day SLA</h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Executive onboarding support and a complete 90-day retention guarantee ensuring lasting team performance and ROI.
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setActiveDeckIndex((prev) => Math.min(MOBILE_DECK_STAGES.length - 1, prev + 1))}
+                disabled={activeDeckIndex === MOBILE_DECK_STAGES.length - 1}
+                aria-label="Next Stage"
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-colors cursor-pointer ${
+                  activeDeckIndex === MOBILE_DECK_STAGES.length - 1
+                    ? 'text-slate-600 cursor-not-allowed'
+                    : 'text-[#E69D2B] hover:bg-slate-800 active:scale-90'
+                }`}
+              >
+                &darr;
+              </button>
             </div>
           </div>
 
-          {/* CTA Button */}
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={onNavigateContact}
-              className="w-full min-h-[48px] rounded-full px-6 py-3.5 bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] font-semibold transition-all duration-300 shadow-md inline-flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95"
-            >
-              <span className="font-semibold">Discuss Your Hiring Needs</span>
-              <ArrowRight className="w-4 h-4 text-[#0B0F17]" />
-            </button>
+          {/* Interactive Y-Axis Card Deck */}
+          <div
+            onTouchStart={handleDeckTouchStart}
+            onTouchEnd={handleDeckTouchEnd}
+            className="touch-pan-y"
+          >
+            <div className="bg-gradient-to-b from-[#131A26] to-[#0B0F17] border-l-2 border-l-[#E69D2B] border-t border-r border-b border-slate-800/80 rounded-2xl p-6 shadow-2xl relative min-h-[220px] flex flex-col justify-between transition-all duration-300">
+              {/* Top Meta Row */}
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-black text-[#E69D2B] font-mono leading-none">
+                  {MOBILE_DECK_STAGES[activeDeckIndex].index}
+                </span>
+                <span className="text-[10px] font-bold tracking-widest uppercase text-slate-400 bg-slate-800/50 px-2.5 py-1 rounded-md border border-slate-700/50">
+                  {MOBILE_DECK_STAGES[activeDeckIndex].category}
+                </span>
+              </div>
+
+              {/* Card Body */}
+              <div className="my-auto py-2">
+                <h3 className="text-lg font-bold text-white tracking-tight mt-3 mb-2">
+                  {MOBILE_DECK_STAGES[activeDeckIndex].title}
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed font-normal">
+                  {MOBILE_DECK_STAGES[activeDeckIndex].description}
+                </p>
+              </div>
+
+              {/* Bottom Progress Indicator: 5-segment pagination bar */}
+              <div className="flex gap-1.5 pt-4 border-t border-slate-800/60">
+                {MOBILE_DECK_STAGES.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setActiveDeckIndex(i)}
+                    aria-label={`Jump to stage 0${i + 1}`}
+                    className={`h-1.5 flex-1 rounded-full transition-all duration-300 cursor-pointer ${
+                      activeDeckIndex === i ? 'bg-[#E69D2B]' : 'bg-[#1E293B] hover:bg-slate-700'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Gesture Hint */}
+            <div className="flex items-center justify-between pt-2 px-1 text-[11px] text-slate-500 font-medium">
+              <span>Swipe vertical &uarr;&darr; or use controls</span>
+              <span className="text-[#E69D2B]">Tap segment to jump</span>
+            </div>
           </div>
         </div>
       </section>
