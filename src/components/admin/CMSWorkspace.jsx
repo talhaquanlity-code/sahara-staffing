@@ -1084,7 +1084,7 @@ export default function CMSWorkspace({
           {/* Save & Publish Changes Gold CTA */}
           <button
             type="button"
-            onClick={publishChanges}
+            onClick={() => publishChanges()}
             disabled={publishStatus === 'saving' || !hasUnsavedChanges}
             className="bg-[#E69D2B] text-[#0B0F17] font-bold px-4 py-2 rounded-xl text-xs hover:bg-[#F2A51A] transition-all shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-95"
           >

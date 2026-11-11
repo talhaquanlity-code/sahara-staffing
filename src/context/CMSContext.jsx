@@ -1122,8 +1122,46 @@ export function CMSProvider({ children }) {
     };
   }, []);
 
+  // Helper to detect accidental React SyntheticEvents, DOM Events, or DOM Nodes
+  const isEventOrDom = (val) =>
+    Boolean(val) &&
+    typeof val === 'object' &&
+    (Boolean(val._reactName || val.nativeEvent) ||
+      (typeof Event !== 'undefined' && val instanceof Event) ||
+      (typeof Node !== 'undefined' && val instanceof Node));
+
+  // Strip any circular references, DOM nodes, or React fibers before JSON serialization
+  const sanitizeForJson = (data) => {
+    if (data === null || typeof data !== 'object') return data;
+    if (isEventOrDom(data)) return Array.isArray(data) ? [] : {};
+    const seen = new WeakSet();
+    return JSON.parse(
+      JSON.stringify(data, (key, value) => {
+        if (value === null || typeof value !== 'object') return value;
+        if (
+          value._reactName ||
+          value.nativeEvent ||
+          (typeof HTMLElement !== 'undefined' && value instanceof HTMLElement) ||
+          (typeof Element !== 'undefined' && value instanceof Element) ||
+          (typeof Node !== 'undefined' && value instanceof Node) ||
+          (typeof Event !== 'undefined' && value instanceof Event) ||
+          (typeof Window !== 'undefined' && value instanceof Window) ||
+          key.startsWith('__react') ||
+          key === 'stateNode'
+        ) {
+          return undefined;
+        }
+        if (seen.has(value)) return undefined;
+        seen.add(value);
+        return value;
+      })
+    );
+  };
+
   // Update working draft
   const updateDraft = (section, data) => {
+    if (data && typeof data === 'object' && isEventOrDom(data)) return;
+    const cleanData = data && typeof data === 'object' ? sanitizeForJson(data) : data;
     setDraftContent((prev) => {
       let next;
       if (typeof section === 'string' && section.includes('.')) {
@@ -1132,11 +1170,11 @@ export function CMSProvider({ children }) {
           ...prev,
           [parent]: {
             ...prev[parent],
-            [child]: data,
+            [child]: cleanData,
           },
         };
       } else {
-        next = { ...prev, [section]: data };
+        next = { ...prev, [section]: cleanData };
       }
 
       if (section === 'home' || section === 'home.hero') {
@@ -1189,8 +1227,10 @@ export function CMSProvider({ children }) {
 
   // Update brand/additional settings
   const updateSettings = (newSettings) => {
+    if (!newSettings || isEventOrDom(newSettings)) return;
+    const cleanNewSettings = sanitizeForJson(newSettings);
     setSettings((prev) => {
-      const updated = { ...prev, ...newSettings };
+      const updated = sanitizeForJson({ ...prev, ...cleanNewSettings });
       try {
         localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(updated));
       } catch {}
@@ -1203,13 +1243,18 @@ export function CMSProvider({ children }) {
   const publishChanges = async (overrideSettings = null, overrideContent = null) => {
     setPublishStatus('saving');
     try {
-      const payload = overrideContent ? { ...overrideContent } : { ...draftContent };
-      const settingsPayload = overrideSettings ? { ...settings, ...overrideSettings } : { ...settings };
+      const validOverrideSettings = overrideSettings && !isEventOrDom(overrideSettings) ? overrideSettings : null;
+      const validOverrideContent = overrideContent && !isEventOrDom(overrideContent) ? overrideContent : null;
+
+      const payload = sanitizeForJson(validOverrideContent ? { ...validOverrideContent } : { ...draftContent });
+      const settingsPayload = sanitizeForJson(
+        validOverrideSettings ? { ...settings, ...validOverrideSettings } : { ...settings }
+      );
 
       localStorage.setItem(CMS_STORAGE_KEY, JSON.stringify(payload));
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settingsPayload));
-      if (overrideContent) setDraftContent(payload);
-      if (overrideSettings) setSettings(settingsPayload);
+      if (validOverrideContent) setDraftContent(payload);
+      if (validOverrideSettings) setSettings(settingsPayload);
       setPublishedContent(payload);
 
       // Retrieve admin bearer token for secured save endpoint
@@ -1227,17 +1272,19 @@ export function CMSProvider({ children }) {
         ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
       };
 
+      const serializedBody = JSON.stringify({ content: payload, settings: settingsPayload });
+
       try {
         let response = await fetch('/api/save-content.php', {
           method: 'POST',
           headers: authHeaders,
-          body: JSON.stringify({ content: payload, settings: settingsPayload }),
+          body: serializedBody,
         });
         if (!response.ok) {
           response = await fetch('/data/save-content.php', {
             method: 'POST',
             headers: authHeaders,
-            body: JSON.stringify({ content: payload, settings: settingsPayload }),
+            body: serializedBody,
           });
         }
         if (response.ok) {
