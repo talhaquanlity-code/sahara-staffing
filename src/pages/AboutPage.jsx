@@ -1,14 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useInView, animate } from 'framer-motion';
-import { ArrowRight, Linkedin, Mail } from 'lucide-react';
-import { useUI } from '../context/UIContext';
+import { motion, useScroll, useTransform, useInView, animate } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
-import saharaMarkImg from '../assets/sahara-mark.png';
+import saharaMarkImg from '../assets/sahara-mark.webp';
 import KineticTalentPipeline from '../components/KineticTalentPipeline';
 
-// ============================================================================
-// COMPONENT: ANIMATED STAT COUNTER (500+, 98%, 14 Days, $250M+)
-// ============================================================================
 function AnimatedStatCounter({ value }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-40px' });
@@ -45,73 +41,215 @@ function AnimatedStatCounter({ value }) {
   return <span ref={ref}>{displayVal}</span>;
 }
 
-// ============================================================================
-// DATA: SECTION FOUR — THE PRINCIPLES THAT DEFINE SAHARA
-// Spacious horizontal editorial list — modern typography, fine lines, subtle hover
-// ============================================================================
-const PRINCIPLES = [
+const DEFAULT_BENCHMARKS = [
   {
     num: '01',
-    title: 'People first',
-    desc: 'We consider the people behind every role and the teams they become part of.',
+    title: 'Precision & alignment first',
+    desc: 'We prioritize candidates whose technical capabilities and leadership temperament align directly with your organizational stack.',
   },
   {
     num: '02',
-    title: 'Clarity before assumptions',
-    desc: 'Understanding the business\u2019s needs is an important starting point for the staffing conversation.',
+    title: 'Rigorous multi-stage vetting',
+    desc: 'Every candidate completes hands-on technical architecture screens, peer code evaluations, and leadership interviews.',
   },
   {
     num: '03',
-    title: 'Meaningful connections',
-    desc: 'We focus on relevant professional connections and alignment between people and roles.',
+    title: 'Placement performance commitment',
+    desc: 'We back every technical and executive hire with our comprehensive 90-day placement continuity guarantee.',
   },
 ];
 
-// ============================================================================
-// DATA: SECTION FIVE — THE SAHARA MINDSET NARRATIVE CHAPTERS
-// Pinned scroll-hijacked cinematic storytelling
-// ============================================================================
-const STORY_CHAPTERS = [
+const DEFAULT_CHAPTERS = [
   {
     id: '01',
     badge: 'CHAPTER 01',
-    title: 'Understand the people',
-    text: 'Every staffing conversation begins with listening and learning about the needs behind the role.',
-    image: '/assets/female-executive-beige.jpg',
-    fallback: '/assets/card1-staffing.jpg',
-    tag: 'Active Discovery',
+    title: 'Workforce & Role Scoping (Scoping)',
+    text: 'Deep-dive alignment with engineering leads and executives to define precise candidate profiles and technical specs.',
+    image: '/assets/img 10.webp',
+    fallback: '/assets/hero-2.webp',
+    tag: 'Role Scoping',
   },
   {
     id: '02',
     badge: 'CHAPTER 02',
-    title: 'See the bigger picture',
-    text: 'Business priorities, professional experience, and team needs all contribute to a more informed conversation.',
-    image: '/assets/card2-talent.jpg',
-    fallback: '/assets/service-workforce.jpg',
-    tag: 'Context & Perspective',
+    title: 'Targeted Sourcing & Screening (Sourcing)',
+    text: 'Leveraging specialized recruiter networks and passive talent pipelines to source and vet exceptional contributors.',
+    image: '/assets/img 11.webp',
+    fallback: '/assets/img 6.webp',
+    tag: 'Targeted Sourcing',
   },
   {
     id: '03',
     badge: 'CHAPTER 03',
-    title: 'Focus on the connection',
-    text: 'The goal is to help businesses and professionals move toward a connection that makes sense for both.',
-    image: '/assets/card3-workforce.jpg',
-    fallback: '/assets/card1-female-clean.jpg',
-    tag: 'Enduring Partnerships',
+    title: 'Candidate Shortlisting & Selection (Selection)',
+    text: 'Peer-level technical interviews and architectural screens deliver a curated shortlist complete with diligence notes.',
+    image: '/assets/img 12.webp',
+    fallback: '/assets/img 4.webp',
+    tag: 'Technical Selection',
+  },
+  {
+    id: '04',
+    badge: 'CHAPTER 04',
+    title: 'Onboarding & Retention SLA (Placement)',
+    text: 'Rapid onboarding integration backed by our comprehensive 90-day placement performance commitment.',
+    image: '/assets/img 5.webp',
+    fallback: '/assets/img 6.webp',
+    tag: 'Placement SLA',
   },
 ];
 
+function splitHeadlineHighlight(headline, highlightWord) {
+  const full = String(headline || '');
+  const kw = String(highlightWord || '').trim();
+  if (!kw) return { before: full, highlight: '' };
+  const idx = full.toLowerCase().lastIndexOf(kw.toLowerCase());
+  if (idx === -1) return { before: full, highlight: '' };
+  return {
+    before: full.slice(0, idx).trimEnd(),
+    highlight: full.slice(idx),
+  };
+}
+
+// ============================================================================
+// MOBILE HARDWARE-ACCELERATED SNAP DECK (< md)
+// ============================================================================
+function MobileMindsetDeck({ chapters = DEFAULT_CHAPTERS, mindsetSection = {} }) {
+  const deckCards = (chapters && chapters.length > 0 ? chapters : DEFAULT_CHAPTERS).slice(0, 4);
+  const scrollRef = useRef(null);
+  const thumbRef = useRef(null);
+  const rafRef = useRef(null);
+
+  const handleScroll = () => {
+    if (rafRef.current) return;
+    rafRef.current = window.requestAnimationFrame(() => {
+      const container = scrollRef.current;
+      const thumb = thumbRef.current;
+      if (container && thumb) {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        const progress =
+          maxScroll > 0 ? Math.min(1, Math.max(0, container.scrollLeft / maxScroll)) : 0;
+        const maxTranslatePct = Math.max(0, deckCards.length - 1) * 100;
+        thumb.style.transform = `translate3d(${progress * maxTranslatePct}%, 0, 0)`;
+      }
+      rafRef.current = null;
+    });
+  };
+
+  const handleTrackClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickRatio = (e.clientX - rect.left) / rect.width;
+    const container = scrollRef.current;
+    if (container) {
+      const maxScroll = container.scrollWidth - container.clientWidth;
+      container.scrollTo({ left: clickRatio * maxScroll, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) window.cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  return (
+    <section
+      id="about-mindset-mobile"
+      className="block md:hidden w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] py-12 px-4 overflow-hidden"
+    >
+      <div className="max-w-md mx-auto">
+        <div className="text-left space-y-2 mb-6">
+          <div className="flex items-center gap-2">
+            <span className="w-4 h-[1.5px] bg-[#F5A623]" />
+            <span className="text-[10px] font-mono font-bold tracking-[0.22em] text-[#B87314] uppercase">
+              {mindsetSection?.eyebrow || 'THE SAHARA MINDSET'}
+            </span>
+          </div>
+          <h2 className="text-xl font-bold text-[#080B12] text-left tracking-tight leading-snug font-sans">
+            {mindsetSection?.headline || 'A disciplined approach to every engagement.'}
+          </h2>
+          <p className="text-xs text-slate-600 text-left leading-relaxed mt-1 font-sans">
+            {mindsetSection?.subtitle ||
+              'Every engagement is structured around clarity, precision, and enduring execution.'}
+          </p>
+        </div>
+
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-x pan-y',
+          }}
+          className="overflow-x-auto snap-x snap-mandatory flex gap-4 scrollbar-none px-4 -mx-4 pb-2"
+        >
+          {deckCards.map((ch, idx) => (
+            <div
+              key={ch.id || idx}
+              className="w-[86vw] max-w-[340px] shrink-0 snap-center relative h-[360px] rounded-2xl overflow-hidden shadow-2xl border border-slate-800 bg-[#0B0F17] select-none transform-gpu will-change-transform transition-transform duration-300 ease-out"
+            >
+              <img
+                src={ch.image}
+                onError={(e) => {
+                  e.currentTarget.src = ch.fallback || '/assets/hero-2.webp';
+                }}
+                alt={ch.title}
+                className="object-cover w-full h-full brightness-75 contrast-110 pointer-events-none"
+                draggable={false}
+                loading="lazy"
+                decoding="async"
+              />
+
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/60 to-transparent p-6 flex flex-col justify-end text-left pointer-events-none">
+                <span className="text-[10px] font-mono text-[#E69D2B] uppercase tracking-widest mb-1 block">
+                  {ch.badge || `CHAPTER 0${idx + 1}`} {ch.tag ? `• ${ch.tag}` : ''}
+                </span>
+                <h3 className="text-xl font-bold text-white tracking-tight leading-snug mb-2 font-sans">
+                  {ch.title}
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed font-normal line-clamp-3 font-sans">
+                  {ch.text}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center mt-4">
+          <div
+            onClick={handleTrackClick}
+            role="scrollbar"
+            aria-label="Chapter scroll indicator"
+            className="relative w-28 h-[3px] bg-[#E2DBD0] rounded-full overflow-hidden cursor-pointer"
+          >
+            <div
+              ref={thumbRef}
+              style={{
+                width: `${100 / Math.max(1, deckCards.length)}%`,
+                transform: 'translate3d(0%, 0, 0)',
+              }}
+              className="h-full bg-[#E69D2B] rounded-full transform-gpu will-change-transform"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ============================================================================
 // COMPONENT: SECTION FIVE — THE SAHARA MINDSET NARRATIVE CHAPTERS
-// Supports two layout engines:
-// 1. 'sticky': Interactive pinned scroll-driven storytelling (h-[300vh], top-[100px], h-[calc(100vh-140px)])
-// 2. 'grid': Clean 2x2 static grid cards for zero scroll-hijacking
 // ============================================================================
-function MindsetSection({ chapters = STORY_CHAPTERS, layoutEngine = 'sticky', prefersReducedMotion }) {
+function MindsetSection({
+  chapters = DEFAULT_CHAPTERS,
+  mindsetSection = {},
+  layoutEngine = 'sticky',
+  prefersReducedMotion,
+  isLivePreview = false,
+}) {
   const containerRef = useRef(null);
   const [activeChapter, setActiveChapter] = useState(0);
 
-  const activeChapters = chapters && chapters.length > 0 ? chapters : STORY_CHAPTERS;
+  const activeChapters = chapters && chapters.length > 0 ? chapters : DEFAULT_CHAPTERS;
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -127,183 +265,139 @@ function MindsetSection({ chapters = STORY_CHAPTERS, layoutEngine = 'sticky', pr
   }, [scrollYProgress, activeChapters.length]);
 
   const current = activeChapters[activeChapter] || activeChapters[0];
+  const eyebrow = mindsetSection?.eyebrow || 'THE SAHARA MINDSET';
+  const headline = mindsetSection?.headline || 'A disciplined approach to every engagement.';
+  const subtitle =
+    mindsetSection?.subtitle ||
+    'Every engagement is structured around three foundational stages: understanding the business context, architecting the right strategy, and executing with clarity.';
 
-  // ---------------------------------------------------------------------------
-  // LAYOUT ENGINE B: STATIC GRID CARDS (CLEAN 2x2 GRID, NO SCROLL HIJACKING)
-  // ---------------------------------------------------------------------------
   if (layoutEngine === 'grid') {
     return (
-      <section
-        id="about-mindset"
-        className="w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] py-16 sm:py-24 px-5 sm:px-10 lg:px-16"
-      >
-        <div className="max-w-[1360px] mx-auto space-y-12">
-          {/* Section Header */}
-          <div className="max-w-2xl space-y-3">
-            <div className="flex items-center gap-2.5">
-              <span className="w-5 h-[1.5px] bg-[#F5A623]" />
-              <span className="text-[11px] font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
-                THE SAHARA MINDSET
-              </span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#080B12] tracking-tight leading-tight font-sans">
-              A people-centered approach to every search.
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-sans">
-              We believe thoughtful staffing is grounded in perspective, patience, and a genuine
-              focus on long-term team cohesion.
-            </p>
-          </div>
+      <>
+        <MobileMindsetDeck chapters={activeChapters} mindsetSection={mindsetSection} />
 
-          {/* 2x2 Static Card Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-            {activeChapters.map((ch, idx) => (
-              <div
-                key={ch.id || idx}
-                className="group relative rounded-[28px] overflow-hidden bg-[#0D111B] shadow-xl p-8 sm:p-10 text-white min-h-[340px] flex flex-col justify-end border border-black/10 transition-all duration-300 hover:shadow-2xl"
-              >
-                <img
-                  src={ch.image}
-                  onError={(e) => {
-                    e.currentTarget.src = ch.fallback || '/assets/card1-staffing.jpg';
-                  }}
-                  alt={ch.title}
-                  className="absolute inset-0 w-full h-full object-cover object-center filter contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/60 to-[#080B12]/20 pointer-events-none" />
-                <div className="relative z-10 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10.5px] font-mono font-bold tracking-[0.2em] text-[#F5A623] uppercase">
-                      {ch.badge || `CHAPTER 0${idx + 1}`}
-                    </span>
-                    <span className="text-white/40 text-xs">&bull;</span>
-                    <span className="text-[11px] text-white/70 font-sans font-medium">
-                      {ch.tag}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-bold tracking-tight text-white font-sans">
-                    {ch.title}
-                  </h3>
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans font-normal pt-1">
-                    {ch.text}
-                  </p>
-                </div>
+        <section
+          id="about-mindset"
+          className="hidden md:block w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] py-16 sm:py-24 px-5 sm:px-10 lg:px-16"
+        >
+          <div className="max-w-[1360px] mx-auto space-y-12">
+            <div className="max-w-2xl space-y-3">
+              <div className="flex items-center gap-2.5">
+                <span className="w-5 h-[1.5px] bg-[#F5A623]" />
+                <span className="text-[11px] font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
+                  {eyebrow}
+                </span>
               </div>
-            ))}
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#080B12] tracking-tight leading-tight font-sans">
+                {headline}
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-sans">
+                {subtitle}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              {activeChapters.map((ch, idx) => (
+                <div
+                  key={ch.id || idx}
+                  className="group relative rounded-[28px] overflow-hidden bg-[#0D111B] shadow-xl p-8 sm:p-10 text-white min-h-[340px] flex flex-col justify-end border border-black/10 transition-all duration-300 hover:shadow-2xl"
+                >
+                  <img
+                    src={ch.image}
+                    onError={(e) => {
+                      e.currentTarget.src = ch.fallback || '/assets/hero-2.webp';
+                    }}
+                    alt={ch.title}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover object-[center_18%] filter contrast-[1.05] group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/60 to-[#080B12]/20 pointer-events-none" />
+                  <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10.5px] font-mono font-bold tracking-[0.2em] text-[#F5A623] uppercase">
+                        {ch.badge || `CHAPTER 0${idx + 1}`}
+                      </span>
+                      {ch.tag && <span className="text-white/40 text-xs">&bull;</span>}
+                      {ch.tag && (
+                        <span className="text-[11px] text-white/70 font-sans font-medium">
+                          {ch.tag}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-2xl font-bold tracking-tight text-white font-sans">
+                      {ch.title}
+                    </h3>
+                    <p className="text-slate-300 text-xs sm:text-sm leading-relaxed font-sans font-normal pt-1">
+                      {ch.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </>
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // LAYOUT ENGINE A: RESPONSIVE HYBRID
-  // Mobile (< md): Clean unclipped vertical stack (prevents scroll-traps & squished cards)
-  // Desktop (>= md): Exact 300vh sticky scroll crossfade stage (100% intact)
-  // ---------------------------------------------------------------------------
   return (
     <>
-      {/* MOBILE EXPERIENCE (< md): Natural smooth scroll, unclipped cards */}
-      <section
-        id="about-mindset-mobile"
-        className="block md:hidden w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] py-12 px-4"
-      >
-        <div className="max-w-[1360px] mx-auto space-y-8">
-          {/* Section Header */}
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="w-4 h-[1.5px] bg-[#F5A623]" />
-              <span className="text-[10.5px] font-bold tracking-[0.22em] text-[#B87314] uppercase font-sans">
-                THE SAHARA MINDSET
-              </span>
-            </div>
-            <h2 className="text-2xl font-extrabold text-[#080B12] tracking-tight leading-tight font-sans">
-              A people-centered approach to every search.
-            </h2>
-            <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-sans">
-              We believe thoughtful staffing is grounded in perspective, patience, and a genuine focus on long-term team cohesion.
-            </p>
-          </div>
+      <MobileMindsetDeck chapters={activeChapters} mindsetSection={mindsetSection} />
 
-          {/* Clean Vertical Stack of Chapter Cards */}
-          <div className="space-y-4">
-            {activeChapters.map((ch, idx) => (
-              <div
-                key={ch.id || idx}
-                className="group relative rounded-2xl overflow-hidden bg-[#0D111B] shadow-lg p-6 text-white min-h-[300px] flex flex-col justify-end border border-black/10"
-              >
-                <img
-                  src={ch.image}
-                  onError={(e) => {
-                    e.currentTarget.src = ch.fallback || '/assets/card1-staffing.jpg';
-                  }}
-                  alt={ch.title}
-                  className="absolute inset-0 w-full h-full object-cover object-center filter contrast-[1.05]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/65 to-[#080B12]/25 pointer-events-none" />
-                <div className="relative z-10 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold tracking-[0.2em] text-[#F5A623] uppercase">
-                      {ch.badge || `CHAPTER 0${idx + 1}`}
-                    </span>
-                    <span className="text-white/40 text-xs">&bull;</span>
-                    <span className="text-[10.5px] text-white/70 font-sans font-medium">
-                      {ch.tag}
-                    </span>
-                  </div>
-                  <h3 className="text-xl font-bold tracking-tight text-white font-sans leading-snug">
-                    {ch.title}
-                  </h3>
-                  <p className="text-slate-300 text-xs leading-relaxed font-sans font-normal pt-1">
-                    {ch.text}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* DESKTOP EXPERIENCE (>= md): Strict Container Fix: h-[300vh] with position: relative */}
       <section
         ref={containerRef}
         id="about-mindset"
-        className="hidden md:block relative w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] h-[300vh]"
+        className={`hidden md:block relative w-full bg-[#FAF9F6] text-[#080B12] border-t border-[#E7E3D9] ${
+          isLivePreview ? 'h-auto py-8' : 'h-[300vh]'
+        }`}
       >
-        {/* Pinned Sticky Stage */}
-        <div className="sticky top-[100px] h-[calc(100vh-140px)] w-full flex items-center justify-center overflow-hidden px-6 sm:px-10 lg:px-16">
-          <div className="max-w-[1360px] mx-auto w-full my-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-              
-              {/* Left Column: Fixed Context & Synced Gold Progress Track */}
-              <div className="lg:col-span-5 space-y-6 sm:space-y-8">
-                {/* Eyebrow */}
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-[1.5px] bg-[#F5A623]" />
-                  <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
-                    THE SAHARA MINDSET
-                  </span>
+        <div
+          className={`${
+            isLivePreview
+              ? 'relative w-full flex items-center justify-center'
+              : 'sticky top-[96px] h-[calc(100vh-108px)] min-h-[420px] w-full flex items-center justify-center'
+          }`}
+        >
+          <div className="w-full max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center overflow-hidden">
+            <div className="lg:col-span-5 space-y-4 min-w-0">
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-[1.5px] bg-[#F5A623]" />
+                <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
+                  {eyebrow}
+                </span>
+              </div>
+
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#080B12] tracking-[-0.03em] leading-[1.15] font-sans max-w-xl">
+                {headline}
+              </h2>
+
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed font-sans max-w-xl font-normal">
+                {subtitle}
+              </p>
+
+              <div className="flex items-center gap-5 pt-4">
+                <div className="flex items-center gap-1.5 font-sans text-xs font-extrabold text-[#B87314]">
+                  <span>0{activeChapter + 1}</span>
+                  <span className="text-slate-300 font-normal">/</span>
+                  <span className="text-slate-400 font-normal">0{activeChapters.length}</span>
                 </div>
 
-                {/* Anchored Left Statement */}
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#080B12] tracking-[-0.03em] leading-[1.08] font-sans">
-                  A people-centered approach to every search.
-                </h2>
-
-                <p className="text-slate-600 text-base sm:text-lg leading-relaxed font-sans max-w-md font-normal">
-                  We believe thoughtful staffing is grounded in perspective, patience, and a genuine
-                  focus on long-term team cohesion.
-                </p>
-
-                {/* Gold Progress Track */}
-                <div className="flex items-center gap-5 pt-4">
-                  <div className="flex items-center gap-1.5 font-sans text-xs font-extrabold text-[#B87314]">
-                    <span>0{activeChapter + 1}</span>
-                    <span className="text-slate-300 font-normal">/</span>
-                    <span className="text-slate-400 font-normal">0{activeChapters.length}</span>
+                {isLivePreview ? (
+                  <div className="flex items-center gap-2">
+                    {activeChapters.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveChapter(idx)}
+                        className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                          activeChapter === idx ? 'w-8 bg-[#F5A623]' : 'w-3 bg-[#E2DBD0]'
+                        }`}
+                        aria-label={`Chapter 0${idx + 1}`}
+                      />
+                    ))}
                   </div>
-
-                  {/* Smooth Progress Bar linked to scroll */}
+                ) : (
                   <div className="relative w-36 sm:w-44 h-[3px] bg-[#E2DBD0] rounded-full overflow-hidden">
                     <motion.div
                       style={{
@@ -313,61 +407,57 @@ function MindsetSection({ chapters = STORY_CHAPTERS, layoutEngine = 'sticky', pr
                       className="absolute inset-0 bg-[#F5A623]"
                     />
                   </div>
+                )}
 
-                  {/* Active Chapter Label with Smooth Crossfade */}
-                  <span className="text-[11px] font-sans font-bold text-slate-500 uppercase tracking-wider transition-colors duration-300">
-                    {current?.tag}
-                  </span>
-                </div>
+                <span className="text-[11px] font-sans font-bold text-slate-500 uppercase tracking-wider transition-colors duration-300 truncate">
+                  {current?.tag}
+                </span>
               </div>
+            </div>
 
-              {/* Right Column: Pre-rendered Layered Visual Cards with Fluid Crossfade */}
-              <div className="lg:col-span-7">
-                <div className="relative w-full aspect-[16/11] min-h-[400px] sm:min-h-[460px] rounded-[28px] sm:rounded-[36px] overflow-hidden bg-[#0D111B] shadow-2xl">
-                  {activeChapters.map((ch, idx) => {
-                    const isCurrent = activeChapter === idx;
-                    return (
-                      <div
-                        key={ch.id || idx}
-                        className={`absolute inset-0 w-full h-full flex flex-col justify-end p-8 sm:p-12 text-white transition-all duration-700 ease-out ${
-                          isCurrent
-                            ? 'opacity-100 scale-100 z-10 pointer-events-auto'
-                            : 'opacity-0 scale-[0.98] z-0 pointer-events-none'
-                        }`}
-                      >
-                        {/* Photographic Background */}
-                        <img
-                          src={ch.image}
-                          onError={(e) => {
-                            e.currentTarget.src = ch.fallback || '/assets/card1-staffing.jpg';
-                          }}
-                          alt={ch.title}
-                          className="absolute inset-0 w-full h-full object-cover object-center filter contrast-[1.05]"
-                        />
+            <div className="lg:col-span-7 relative w-full flex justify-center lg:justify-end min-w-0">
+              <div className="relative w-full max-w-lg h-[min(460px,calc(100vh-156px))] min-h-[340px] rounded-[28px] sm:rounded-[36px] overflow-hidden bg-[#0D111B] shadow-2xl">
+                {activeChapters.map((ch, idx) => {
+                  const isCurrent = activeChapter === idx;
+                  return (
+                    <div
+                      key={ch.id || idx}
+                      className={`absolute inset-0 w-full h-full flex flex-col justify-end p-8 sm:p-10 text-white transition-all duration-700 ease-out ${
+                        isCurrent
+                          ? 'opacity-100 scale-100 z-10 pointer-events-auto visible'
+                          : 'opacity-0 scale-[0.98] z-0 pointer-events-none invisible'
+                      }`}
+                    >
+                      <img
+                        src={ch.image}
+                        onError={(e) => {
+                          e.currentTarget.src = ch.fallback || '/assets/hero-2.webp';
+                        }}
+                        alt={ch.title}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover object-[center_18%] filter contrast-[1.05]"
+                      />
 
-                        {/* Cinematic Gradient Vignette */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/50 to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/50 to-transparent pointer-events-none" />
 
-                        {/* Overlaid Chapter Content */}
-                        <div className="relative z-10 max-w-xl space-y-3">
-                          <span className="text-[11px] font-sans font-bold tracking-[0.2em] text-[#F5A623] uppercase block">
-                            {ch.badge || `CHAPTER 0${idx + 1}`} &bull; {ch.tag}
-                          </span>
+                      <div className="relative z-10 max-w-xl space-y-3">
+                        <span className="text-[11px] font-sans font-bold tracking-[0.2em] text-[#F5A623] uppercase block">
+                          {ch.badge || `CHAPTER 0${idx + 1}`} {ch.tag ? `• ${ch.tag}` : ''}
+                        </span>
 
-                          <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold tracking-tight text-white font-sans leading-tight">
-                            {ch.title}
-                          </h3>
+                        <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-sans leading-tight">
+                          {ch.title}
+                        </h3>
 
-                          <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-sans font-normal pt-1">
-                            {ch.text}
-                          </p>
-                        </div>
+                        <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-sans font-normal pt-1">
+                          {ch.text}
+                        </p>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
-
             </div>
           </div>
         </div>
@@ -377,15 +467,37 @@ function MindsetSection({ chapters = STORY_CHAPTERS, layoutEngine = 'sticky', pr
 }
 
 // ============================================================================
-// MAIN COMPONENT: SAHARA STAFFING ABOUT PAGE (CINEMATIC REBUILD)
+// MAIN COMPONENT: SAHARA STAFFING INC. ABOUT PAGE
 // ============================================================================
 export default function AboutPage({ onNavigateContact, onNavigateServices }) {
-  const { openModal } = useUI();
-  const { content } = useCMS();
-  const aboutData = content?.about;
-  const heroRef = useRef(null);
+  const { content, settings, isLivePreview } = useCMS();
+  const aboutData = content?.about || {};
+  const heroData = aboutData?.hero || {};
+  const perspectiveData = aboutData?.perspective || {};
+  const humanMomentData = aboutData?.humanMoment || {};
+  const principlesSection = aboutData?.principlesSection || {};
+  const benchmarks =
+    Array.isArray(aboutData?.benchmarks) && aboutData.benchmarks.length > 0
+      ? aboutData.benchmarks
+      : DEFAULT_BENCHMARKS;
+  const mindsetSection = aboutData?.mindsetSection || {};
+  const statsSection = aboutData?.statsSection || {};
+  const stats =
+    Array.isArray(aboutData?.stats) && aboutData.stats.length > 0
+      ? aboutData.stats
+      : [
+          { value: '500+', label: 'Technical Placements' },
+          { value: '98%', label: 'Placement Retention Rate' },
+          { value: '14 Days', label: 'Average Match Time' },
+          { value: '90 Days', label: 'Performance Guarantee SLA' },
+        ];
+  const finalCta = aboutData?.finalCta || {};
+  const brandMark = settings?.brandMarkUrl || saharaMarkImg;
+  const companyName = settings?.companyName || 'Sahara Staffing Inc.';
 
-  // Viewport & Reduced Motion Detection
+  const heroRef = useRef(null);
+  const perspectiveRef = useRef(null);
+  const humanMomentRef = useRef(null);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -393,13 +505,9 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
     setPrefersReducedMotion(motionQuery.matches);
     const motionListener = (e) => setPrefersReducedMotion(e.matches);
     motionQuery.addEventListener('change', motionListener);
-
-    return () => {
-      motionQuery.removeEventListener('change', motionListener);
-    };
+    return () => motionQuery.removeEventListener('change', motionListener);
   }, []);
 
-  // Section 1: Hero Scroll Parallax
   const { scrollYProgress: heroScroll } = useScroll({
     target: heroRef,
     offset: ['start start', 'end start'],
@@ -415,8 +523,6 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
     !prefersReducedMotion ? ['0%', '-12%'] : ['0%', '0%']
   );
 
-  // Section 2: Perspective Editorial Columns Parallax
-  const perspectiveRef = useRef(null);
   const { scrollYProgress: perspectiveScroll } = useScroll({
     target: perspectiveRef,
     offset: ['start end', 'end start'],
@@ -424,7 +530,7 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
   const perspectiveLeftY = useTransform(
     perspectiveScroll,
     [0, 1],
-    !prefersReducedMotion ? [25, -25] : [0, 0]
+    !prefersReducedMotion ? [20, -20] : [0, 0]
   );
   const perspectiveRightY = useTransform(
     perspectiveScroll,
@@ -432,8 +538,6 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
     !prefersReducedMotion ? [-18, 18] : [0, 0]
   );
 
-  // Section 3: Cinematic Human Moment Parallax Window (with safe 140% bleed buffer)
-  const humanMomentRef = useRef(null);
   const { scrollYProgress: humanScroll } = useScroll({
     target: humanMomentRef,
     offset: ['start end', 'end start'],
@@ -454,30 +558,42 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
     !prefersReducedMotion ? ['18px', '-18px'] : ['0px', '0px']
   );
 
-  const handleContactClick = () => {
+  const navigateDestination = (destination) => {
+    if (destination === '/services' || destination === 'services') {
+      if (onNavigateServices) onNavigateServices();
+      else window.location.hash = 'services';
+      return;
+    }
     if (onNavigateContact) onNavigateContact();
-    else openModal('Discuss Your Hiring Needs');
+    else window.location.hash = 'contact';
   };
+
+  const heroTitleParts = splitHeadlineHighlight(
+    heroData.headline || 'A Modern Staffing Firm Built on Precision.',
+    heroData.highlightWord || 'Precision.'
+  );
+  const perspectiveTitleParts = splitHeadlineHighlight(
+    perspectiveData.headline || 'Strong growth starts with understanding.',
+    perspectiveData.highlightWord || 'understanding.'
+  );
+
+  const enabledHeroButtons = (heroData.buttons || []).filter((b) => b?.enabled !== false);
+  const enabledFinalButtons = (finalCta.buttons || []).filter((b) => b?.enabled !== false);
 
   return (
     <div className="w-full bg-[#080B12] text-white font-sans selection:bg-[#F5A623] selection:text-[#080B12] overflow-x-clip">
-      {/* ===================================================================== */}
-      {/* 03. HERO — A DISTINCTIVE FIRST IMPRESSION (DEEP OBSIDIAN #080B12)     */}
-      {/* Cinematic, asymmetric composition with line-by-line masked reveals    */}
-      {/* ===================================================================== */}
+      {/* 01. HERO SECTION */}
       <section
         id="about-hero"
         ref={heroRef}
-        className="relative w-full min-h-[85vh] lg:min-h-[92vh] pt-24 sm:pt-40 lg:pt-44 pb-14 sm:pb-24 px-5 sm:px-10 lg:px-16 flex flex-col justify-center border-b border-white/[0.08] overflow-hidden"
+        className="relative w-full pt-28 sm:pt-36 lg:pt-36 pb-14 sm:pb-20 px-5 sm:px-10 lg:px-16 flex flex-col justify-center border-b border-white/[0.08] overflow-hidden"
       >
-        <div className="max-w-[1360px] mx-auto w-full my-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-            {/* Left Column: Eyebrow, Line-Masked Headline, Staggered Supporting Copy */}
+        <div className="max-w-[1360px] mx-auto w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
             <motion.div
               style={{ y: heroTextParallax }}
-              className="lg:col-span-7 space-y-5 sm:space-y-8 will-change-transform"
+              className="lg:col-span-7 space-y-4 sm:space-y-5 will-change-transform"
             >
-              {/* 1. Eyebrow */}
               <motion.div
                 initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -486,53 +602,50 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
               >
                 <span className="w-6 h-[1.5px] bg-[#F5A623]" />
                 <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#F5A623] uppercase font-sans">
-                  SAHARA STAFFING INC. / OUR STORY
+                  {heroData.kicker || 'SAHARA STAFFING INC. / WHO WE ARE'}
                 </span>
               </motion.div>
 
-              {/* 2. Main Headline (Line-by-Line Masked Reveal) */}
-              <h1 className="text-3xl xs:text-5xl sm:text-6xl lg:text-[76px] xl:text-[84px] font-extrabold text-white tracking-[-0.035em] leading-[1.08] sm:leading-[1.03] font-sans">
-                <span className="block overflow-hidden">
-                  <motion.span
-                    initial={prefersReducedMotion ? { y: 0 } : { y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-                    className="block"
-                  >
-                    People make
-                  </motion.span>
-                </span>
-                <span className="block overflow-hidden">
-                  <motion.span
-                    initial={prefersReducedMotion ? { y: 0 } : { y: '100%' }}
-                    animate={{ y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                    className="block text-[#F5A623]"
-                  >
-                    the difference.
-                  </motion.span>
-                </span>
+              <h1 className="text-3xl sm:text-4xl lg:text-[48px] font-extrabold text-white tracking-tight leading-[1.12] font-sans max-w-xl">
+                {heroTitleParts.before && (
+                  <span className="block overflow-hidden">
+                    <motion.span
+                      initial={prefersReducedMotion ? { y: 0 } : { y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                      className="block"
+                    >
+                      {heroTitleParts.before}
+                    </motion.span>
+                  </span>
+                )}
+                {heroTitleParts.highlight && (
+                  <span className="block overflow-hidden">
+                    <motion.span
+                      initial={prefersReducedMotion ? { y: 0 } : { y: '100%' }}
+                      animate={{ y: 0 }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                      className="block text-[#F5A623]"
+                    >
+                      {heroTitleParts.highlight}
+                    </motion.span>
+                  </span>
+                )}
               </h1>
 
-              {/* 3. Supporting Copy with Slight Stagger */}
               <motion.div
                 initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, delay: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-2.5 sm:space-y-3 pt-1"
+                className="space-y-4 pt-1"
               >
-                <p className="text-slate-300 text-sm sm:text-xl lg:text-[22px] leading-relaxed font-normal max-w-xl font-sans">
-                  We connect businesses with professional talent through a thoughtful,
-                  people-centered approach to staffing.
-                </p>
-
-                <p className="text-xs sm:text-base font-medium tracking-wide text-[#F5A623]/90 font-sans">
-                  Built around people. Focused on possibilities.
+                <p className="text-gray-400 text-base sm:text-lg leading-relaxed font-normal max-w-lg font-sans">
+                  {heroData.subtitle ||
+                    'Connecting ambitious enterprises with specialized technical talent and executive leadership.'}
                 </p>
               </motion.div>
             </motion.div>
 
-            {/* Right Column: High-Resolution Authentic Corporate Photography */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
               <motion.div
                 initial={
@@ -543,24 +656,28 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
                 animate={{ opacity: 1, clipPath: 'inset(0% 0% 0% 0% round 32px)' }}
                 transition={{ duration: 1.1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 style={{ y: heroImgParallax }}
-                className="relative w-full max-w-[500px] aspect-[4/5] sm:aspect-[1/1] lg:aspect-[4/5] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-white/10 shadow-[0_28px_72px_rgba(0,0,0,0.65)] bg-[#0D111B] group will-change-transform"
+                className="relative w-full max-w-[440px] aspect-[4/5] sm:aspect-[1/1] lg:aspect-[4/5] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-white/10 shadow-[0_28px_72px_rgba(0,0,0,0.65)] bg-[#0D111B] group will-change-transform"
               >
                 <img
-                  src="/assets/card1-female-clean.jpg"
+                  src={heroData.heroImage || '/assets/img 14.webp'}
                   onError={(e) => {
-                    e.currentTarget.src = '/assets/service-staffing.jpg';
+                    e.currentTarget.src = heroData.heroFallbackImage || '/assets/img 8.webp';
                   }}
-                  alt="Sahara Staffing executive professional"
+                  alt={heroData.heroImageBadgeRight || companyName}
+                  loading="eager"
+                  decoding="async"
                   className="w-full h-full object-cover object-top filter grayscale-[15%] contrast-[1.05] group-hover:scale-103 group-hover:grayscale-0 transition-all duration-700 ease-out"
                 />
 
-                {/* Subtle Luxury Film Gradient Vignette */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/85 via-transparent to-transparent pointer-events-none" />
 
-                {/* Lower Inset Details */}
                 <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-xs text-slate-300/90 font-sans pointer-events-none">
-                  <span className="font-medium tracking-wide">People-Centered Staffing</span>
-                  <span className="text-[#F5A623] font-sans font-semibold text-[11px] uppercase tracking-wider">Sahara Executive</span>
+                  <span className="font-medium tracking-wide">
+                    {heroData.heroImageBadgeLeft || 'People-Centered Strategy'}
+                  </span>
+                  <span className="text-[#F5A623] font-sans font-semibold text-[11px] uppercase tracking-wider">
+                    {heroData.heroImageBadgeRight || companyName}
+                  </span>
                 </div>
               </motion.div>
             </div>
@@ -568,9 +685,42 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* 04. STREAMLINED CINEMATIC EDITORIAL STATEMENT                         */}
-      {/* ===================================================================== */}
+      {/* 02. EDITORIAL PERSPECTIVE BAND */}
+      <section
+        id="about-perspective"
+        ref={perspectiveRef}
+        className="relative w-full bg-[#FAF9F6] text-[#080B12] py-16 sm:py-24 px-5 sm:px-10 lg:px-16 border-b border-[#E7E3D9] overflow-hidden"
+      >
+        <div className="max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+          <motion.div style={{ y: perspectiveLeftY }} className="lg:col-span-5 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="w-6 h-[1.5px] bg-[#F5A623]" />
+              <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
+                {perspectiveData.eyebrow || 'OUR PERSPECTIVE'}
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#080B12] tracking-[-0.03em] leading-[1.15] font-sans max-w-xl">
+              {perspectiveTitleParts.before}{' '}
+              {perspectiveTitleParts.highlight && (
+                <span className="text-[#B87314]">{perspectiveTitleParts.highlight}</span>
+              )}
+            </h2>
+          </motion.div>
+
+          <motion.div style={{ y: perspectiveRightY }} className="lg:col-span-7 space-y-4 text-slate-700 text-base sm:text-lg leading-relaxed font-sans">
+            <p>
+              {perspectiveData.paragraph1 ||
+                'We take the time to understand your organization’s goals, technical ecosystem, and operational priorities before designing any engagement.'}
+            </p>
+            <p className="text-slate-600">
+              {perspectiveData.paragraph2 ||
+                'By prioritizing genuine communication and long-term alignment over generic playbooks, we create strategic engagements that endure.'}
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 03. STREAMLINED CINEMATIC EDITORIAL STATEMENT */}
       <section
         ref={humanMomentRef}
         className="relative w-full bg-[#FAF9F6] py-10 sm:py-20 lg:py-24 px-4 sm:px-8 lg:px-12 border-b border-[#E7E3D9] overflow-hidden"
@@ -583,23 +733,25 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
             }}
             className="relative w-full rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-[#0D111B] shadow-2xl min-h-[360px] sm:min-h-[480px] aspect-auto sm:aspect-[2/1] lg:aspect-[2.3/1] flex items-end p-5 sm:p-14 lg:p-16 text-white group border-0 outline-none ring-0 isolate"
           >
-            {/* Parallax Photographic Layer with Safe 140% Vertical Bleed Buffer */}
-            <div className="absolute inset-x-0 -top-[20%] -bottom-[20%] w-full h-[140%] pointer-events-none overflow-hidden">
+            <div
+              className="absolute inset-x-0 -top-[20%] -bottom-[20%] w-full h-[140%] pointer-events-none overflow-hidden will-change-transform"
+              style={{ transform: 'translateZ(0)' }}
+            >
               <motion.img
-                src="/assets/service-workforce.jpg"
+                src={humanMomentData.image || '/assets/img 4.webp'}
                 onError={(e) => {
-                  e.currentTarget.src = '/assets/card2-talent.jpg';
+                  e.currentTarget.src = humanMomentData.fallbackImage || '/assets/img 2.webp';
                 }}
-                alt="Executive talent and client collaboration"
+                alt={humanMomentData.headline || 'Enterprise leadership collaboration'}
+                loading="lazy"
+                decoding="async"
                 style={{ y: humanImgY, scale: humanImgScale }}
                 className="w-full h-full object-cover object-center filter contrast-[1.05] will-change-transform"
               />
             </div>
 
-            {/* Cinematic Gradient Vignette Overlay for Crisp Contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#080B12]/95 via-[#080B12]/45 to-transparent pointer-events-none" />
 
-            {/* Overlay Editorial Content with Counter-Parallax for 3D Depth */}
             <motion.div
               style={{ y: humanTextY }}
               initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 22 }}
@@ -608,35 +760,32 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="relative z-10 max-w-2xl space-y-2.5 sm:space-y-3.5 will-change-transform w-full"
             >
-              {/* Refined Eyebrow */}
               <div className="flex items-center gap-2.5">
                 <span className="w-5 h-[1.5px] bg-[#F5A623]" />
                 <span className="text-[10px] sm:text-[11px] font-sans font-bold tracking-[0.24em] text-[#F5A623] uppercase block">
-                  OUR PERSPECTIVE
+                  {humanMomentData.eyebrow || 'OUR PERSPECTIVE'}
                 </span>
               </div>
 
-              {/* Headline */}
               <h2 className="text-xl sm:text-4xl lg:text-[44px] font-extrabold text-white tracking-tight sm:tracking-[-0.03em] leading-snug sm:leading-[1.12] font-sans break-words">
-                Hiring is about people, not just positions.
+                {humanMomentData.headline || 'Growth is about people and clarity, not just checklists.'}
               </h2>
 
-              {/* Supporting Text */}
               <p className="text-slate-200 text-xs sm:text-base lg:text-lg leading-relaxed font-sans max-w-xl font-normal pt-1">
-                Behind every search is a business objective and a professional’s career. We align both with clarity, precision, and enduring team velocity.
+                {humanMomentData.description ||
+                  'Behind every initiative is a business objective and a leadership vision. We align both with precision, accountability, and sustained momentum.'}
               </p>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* 06. SECTION FOUR — THE PRINCIPLES THAT DEFINE SAHARA (DARK NAVY)      */}
-      {/* Clean horizontal editorial list with modern premium typography        */}
-      {/* ===================================================================== */}
-      <section id="about-benchmarks" className="relative w-full bg-[#0D111B] text-white py-28 sm:py-36 lg:py-40 px-6 sm:px-10 lg:px-16 border-b border-white/[0.08]">
+      {/* 04. SECTION FOUR — PRINCIPLES / CORE VALUES */}
+      <section
+        id="about-benchmarks"
+        className="relative w-full bg-[#0D111B] text-white py-28 sm:py-36 lg:py-40 px-6 sm:px-10 lg:px-16 border-b border-white/[0.08]"
+      >
         <div className="max-w-[1360px] mx-auto space-y-16 sm:space-y-20">
-          {/* Section Header */}
           <motion.div
             initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -647,25 +796,24 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
             <div className="flex items-center gap-3">
               <span className="w-6 h-[1.5px] bg-[#F5A623]" />
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#F5A623] uppercase font-sans">
-                WHAT GUIDES US
+                {principlesSection.eyebrow || 'WHAT GUIDES US'}
               </span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-[-0.03em] leading-[1.08] font-sans">
-              A more thoughtful approach.
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.03em] leading-[1.15] font-sans max-w-xl">
+              {principlesSection.headline || 'A more thoughtful approach.'}
             </h2>
 
-            <p className="text-slate-300 text-base sm:text-lg lg:text-xl leading-relaxed font-sans max-w-2xl pt-1">
-              We believe effective staffing begins with understanding the business, respecting the
-              people involved, and focusing on meaningful alignment.
+            <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-sans max-w-xl pt-1">
+              {principlesSection.subtitle ||
+                'We believe enterprise staffing begins with understanding your business, respecting the teams involved, and focusing on measurable alignment.'}
             </p>
           </motion.div>
 
-          {/* Horizontal Editorial List (Rows, Not Boxed Cards) */}
           <div className="divide-y divide-white/10 border-y border-white/10">
-            {PRINCIPLES.map((item, index) => (
+            {benchmarks.map((item, index) => (
               <motion.div
-                key={item.num}
+                key={item.num || index}
                 initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-30px' }}
@@ -673,22 +821,19 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
                 className="group py-8 sm:py-10 transition-colors duration-300 hover:bg-white/[0.02]"
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-baseline">
-                  {/* Modern Premium Gold Number */}
                   <div className="lg:col-span-2 flex items-baseline gap-3">
                     <span className="text-xl sm:text-2xl font-sans font-extrabold text-[#F5A623] tracking-tight">
-                      {item.num}
+                      {item.num || `0${index + 1}`}
                     </span>
                     <span className="hidden lg:block w-8 h-[2px] bg-white/20 group-hover:w-14 group-hover:bg-[#F5A623] transition-all duration-500 rounded-full" />
                   </div>
 
-                  {/* Principle Heading */}
                   <div className="lg:col-span-4">
                     <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-sans group-hover:text-[#F5A623] transition-colors duration-300">
                       {item.title}
                     </h3>
                   </div>
 
-                  {/* Principle Description */}
                   <div className="lg:col-span-6">
                     <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-sans font-normal">
                       {item.desc}
@@ -701,44 +846,43 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* 07. SECTION FIVE — THE SAHARA MINDSET (SCROLL HIJACK & GRID ENGINES)  */}
-      {/* ===================================================================== */}
+      {/* 05. SECTION FIVE — THE SAHARA MINDSET */}
       <MindsetSection
         chapters={aboutData?.chapters}
+        mindsetSection={mindsetSection}
         layoutEngine={aboutData?.chaptersLayout}
         prefersReducedMotion={prefersReducedMotion}
+        isLivePreview={isLivePreview}
       />
 
-      {/* ===================================================================== */}
-      {/* 08. SECTION SIX — HARD SCALE STATS (ANIMATED VELOCITY COUNTERS)       */}
-      {/* ===================================================================== */}
-      <section id="about-stats" className="relative w-full bg-[#FAF9F6] text-[#080B12] py-20 sm:py-28 px-6 sm:px-10 lg:px-16 border-b border-[#E7E3D9]">
-        <div className="max-w-[1360px] mx-auto space-y-12">
+      {/* 06. SECTION SIX — HARD SCALE STATS */}
+      <section
+        id="about-stats"
+        className="relative w-full bg-[#FAF9F6] text-[#080B12] py-14 sm:py-28 px-4 sm:px-10 lg:px-16 border-b border-[#E7E3D9]"
+      >
+        <div className="max-w-[1360px] mx-auto space-y-8 sm:space-y-12">
           <div className="max-w-2xl space-y-3">
             <div className="flex items-center gap-3">
               <span className="w-6 h-[1.5px] bg-[#F5A623]" />
               <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#B87314] uppercase font-sans">
-                MEASURABLE SCALE
+                {statsSection.eyebrow || 'MEASURABLE SCALE'}
               </span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#080B12] tracking-tight leading-tight font-sans">
-              Proven Velocity at Scale.
+            <h2 className="text-2xl sm:text-5xl font-extrabold text-[#080B12] tracking-tight leading-tight font-sans">
+              {statsSection.headline || 'Proven Velocity at Scale.'}
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {(aboutData?.stats || [
-              { value: '500+', label: 'Placements Delivered' },
-              { value: '98%', label: 'Retention SLA' },
-              { value: '14 Days', label: 'Average Time-to-Fill' },
-              { value: '$250M+', label: 'Enterprise Value Backed' },
-            ]).map((stat, idx) => (
-              <div key={idx} className="p-6 rounded-2xl bg-white border border-[#E7E3D9] shadow-sm space-y-2">
-                <span className="text-3xl sm:text-5xl font-extrabold text-[#B87314] tracking-tight font-sans block">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-6">
+            {stats.map((stat, idx) => (
+              <div
+                key={idx}
+                className="p-4 sm:p-6 rounded-2xl bg-white border border-[#E7E3D9] shadow-sm space-y-1.5 sm:space-y-2 min-w-0 flex flex-col justify-between overflow-hidden"
+              >
+                <span className="text-[22px] sm:text-4xl lg:text-5xl font-extrabold text-[#B87314] tracking-tight font-sans block leading-tight whitespace-nowrap">
                   <AnimatedStatCounter value={stat.value} />
                 </span>
-                <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-wide font-sans block">
+                <span className="text-[11px] sm:text-sm font-semibold text-slate-700 tracking-wide font-sans block leading-snug">
                   {stat.label}
                 </span>
               </div>
@@ -747,20 +891,21 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
         </div>
       </section>
 
-      {/* ===================================================================== */}
-      {/* 10. THE SAHARA PHILOSOPHY (KINETIC TALENT PIPELINE & RADAR)           */}
-      {/* ===================================================================== */}
+      {/* 07. PHILOSOPHY PIPELINE */}
       <KineticTalentPipeline />
 
-      {/* ===================================================================== */}
-      {/* 11. SECTION NINE — AN ELEGANT BRAND CLOSING (DEEP OBSIDIAN #080B12)   */}
-      {/* ===================================================================== */}
-      <section id="about-final-cta" className="relative w-full bg-[#080B12] text-white py-28 sm:py-36 lg:py-44 px-6 sm:px-10 lg:px-16 text-center overflow-hidden">
-        {aboutData?.finalCta?.backgroundImage && (
+      {/* 08. FINAL CTA */}
+      <section
+        id="about-final-cta"
+        className="relative w-full bg-[#080B12] text-white py-28 sm:py-36 lg:py-44 px-6 sm:px-10 lg:px-16 text-center overflow-hidden"
+      >
+        {finalCta?.backgroundImage && (
           <div className="absolute inset-0 pointer-events-none opacity-25">
             <img
-              src={aboutData.finalCta.backgroundImage}
+              src={finalCta.backgroundImage}
               alt="Background overlay"
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-[#080B12] via-[#080B12]/80 to-[#080B12]" />
@@ -773,40 +918,47 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="relative z-10 max-w-[880px] mx-auto space-y-7 sm:space-y-8"
         >
-          {/* Official Sahara Golden Symbol as Tasteful Signature */}
           <div className="flex justify-center">
             <img
-              src={saharaMarkImg}
-              alt="Sahara Staffing"
+              src={brandMark}
+              onError={(e) => {
+                e.currentTarget.src = saharaMarkImg;
+              }}
+              alt={companyName}
+              loading="lazy"
+              decoding="async"
               className="h-9 sm:h-10 w-auto object-contain opacity-90 drop-shadow-[0_4px_16px_rgba(245,166,35,0.25)]"
             />
           </div>
 
-          {/* Eyebrow */}
           <span className="text-[11px] sm:text-xs font-bold tracking-[0.24em] text-[#F5A623] uppercase font-sans block">
-            SAHARA STAFFING INC.
+            {finalCta?.eyebrow || 'SAHARA STAFFING INC.'}
           </span>
 
-          {/* Main Headline */}
-          <h2 className="text-3xl sm:text-5xl lg:text-[62px] font-extrabold text-white tracking-[-0.035em] leading-[1.06] font-sans">
-            {aboutData?.finalCta?.headline || "Let's find the right people for your team."}
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.03em] leading-[1.15] font-sans max-w-xl mx-auto">
+            {finalCta?.headline || 'Let’s secure the talent behind your next stage.'}
           </h2>
 
-          {/* Supporting Copy */}
           <p className="text-slate-300 text-base sm:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed font-sans font-normal">
-            {aboutData?.finalCta?.subtitle || "Tell us about your business and your hiring needs. Let's start a conversation."}
+            {finalCta?.subtitle ||
+              'From critical contractor placements to executive search, Sahara Staffing is your precision talent partner.'}
           </p>
 
-          {/* Single Primary CTA Button */}
-          <div className="pt-4 flex justify-center">
-            <button
-              type="button"
-              onClick={handleContactClick}
-              className="bg-[#F5A623] hover:bg-[#F2A51A] text-[#080B12] font-bold text-sm sm:text-base px-9 sm:px-10 py-4 rounded-full inline-flex items-center gap-3 shadow-xl hover:shadow-2xl transition-all duration-300 active:scale-95 group cursor-pointer"
-            >
-              <span>{aboutData?.finalCta?.buttons?.[0]?.label || 'Discuss Your Hiring Needs'}</span>
-              <ArrowRight className="w-4 h-4 text-[#080B12] group-hover:translate-x-1.5 transition-transform duration-300" />
-            </button>
+          <div className="pt-4 flex flex-wrap justify-center gap-4">
+            {(enabledFinalButtons.length > 0
+              ? enabledFinalButtons
+              : [{ id: 'default-cta', label: 'Request Talent ->', destination: '/contact', variant: 'primary' }]
+            ).map((btn, idx) => (
+              <button
+                key={btn.id || idx}
+                type="button"
+                onClick={() => navigateDestination(btn.destination)}
+                className="bg-[#F5A623] hover:bg-[#F2A51A] text-[#080B12] font-bold text-sm sm:text-base px-9 sm:px-10 py-4 rounded-full inline-flex items-center gap-3 shadow-xl hover:shadow-2xl transition-all duration-300 active:scale-95 group cursor-pointer"
+              >
+                <span>{btn.label}</span>
+                <ArrowRight className="w-4 h-4 text-[#080B12] group-hover:translate-x-1.5 transition-transform duration-300" />
+              </button>
+            ))}
           </div>
         </motion.div>
       </section>

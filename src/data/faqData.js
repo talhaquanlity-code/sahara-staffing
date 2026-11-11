@@ -1,26 +1,26 @@
 export const faqData = [
   {
     id: 0,
-    question: "What is Sahara's average time-to-fill for senior tech & executive roles?",
+    question: "How quickly can Sahara Staffing place technical talent?",
     answer:
-      "Our average time-to-deploy for pre-vetted senior architects, engineering leads, and C-suite executives is 10 to 14 business days.",
+      "Most contract engineers and specialized technical contributors are matched and ready for onboarding within 10 to 14 business days from initial scoping.",
   },
   {
     id: 1,
-    question: "How does your 5-stage candidate vetting framework work?",
+    question: "How does your 4-stage recruitment process work?",
     answer:
-      "Every candidate completes technical peer assessments, live coding/architecture reviews, executive background verifications, and cultural alignment interviews.",
+      "Our pipeline covers workforce & role scoping, targeted sourcing & screening, candidate shortlisting, and onboarding backed by our 90-day placement continuity guarantee.",
   },
   {
     id: 2,
-    question: "What happens if a placed candidate is not a long-term fit?",
+    question: "What placement guarantees do you provide?",
     answer:
-      "We back every placement with a 100% 90-Day Candidate Replacement Guarantee at zero additional cost to your firm.",
+      "Every placement is backed by our comprehensive 90-day placement continuity guarantee at zero financial risk to your organization.",
   },
   {
     id: 3,
-    question: "What engagement models do you support?",
+    question: "What hiring models does Sahara Staffing support?",
     answer:
-      "We provide flexible options including Retained Executive Search, Specialized Direct-Hire Squads, Contract-to-Hire, and Interim Leadership.",
+      "We support flexible staffing models including Executive Search, IT Staff Augmentation, Contract-to-Hire, and Direct Permanent Placement.",
   },
 ];

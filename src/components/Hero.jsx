@@ -3,14 +3,12 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
 import Header from './Header';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero({ onNavigate, onNavigateContact, onNavigateServices, currentRoute }) {
-  const { openModal } = useUI();
   const { content } = useCMS();
   const heroData = content?.hero;
   const heroRef = useRef(null);
@@ -195,7 +193,10 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
       {/* ========================================================================= */}
       {/* BACKGROUND LAYER: SEAMLESS 10-SEC DUAL VIDEO CROSSFADE WITH PARALLAX     */}
       {/* ========================================================================= */}
-      <div className="hero-parallax-bg absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform">
+      <div
+        className="hero-parallax-bg absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform"
+        style={{ transform: 'translateZ(0)' }}
+      >
         {/* Channel A Video */}
         <video
           ref={videoRefA}
@@ -280,7 +281,7 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
         <div className="hero-appear-badge mb-7 flex flex-col items-center group cursor-default">
           <div className="flex items-center gap-2.5 text-[#E69D2B] text-[11px] sm:text-xs font-semibold tracking-[0.22em] uppercase drop-shadow-[0_2px_12px_rgba(230,157,43,0.4)]">
             <span className="text-xs transition-transform duration-300 group-hover:rotate-45">✦</span>
-            <span>{heroData?.kicker || 'Pre-Vetted Tech & Executive Recruitment'}</span>
+            <span>{heroData?.kicker || 'ENTERPRISE TALENT ACQUISITION'}</span>
             <span className="text-xs transition-transform duration-300 group-hover:rotate-45">✦</span>
           </div>
 
@@ -315,10 +316,10 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
         </div>
 
         {/* Clean, Minimalist Headline with Subtle Text Sheen */}
-        <h1 className="hero-appear-title text-[clamp(2.1rem,7vw,4.5rem)] font-bold text-white leading-[1.12] sm:leading-[1.08] tracking-tight mb-5 sm:mb-6 max-w-3xl drop-shadow-xl">
+        <h1 className="hero-appear-title text-4xl sm:text-5xl md:text-6xl lg:text-[62px] font-extrabold text-white leading-[1.08] tracking-tight mb-5 sm:mb-6 max-w-4xl drop-shadow-xl">
           {(() => {
-            const headline = heroData?.headline || 'Connecting Elite Talent with High-Growth Enterprises';
-            const highlight = heroData?.highlightWord || 'Elite Talent';
+            const headline = heroData?.headline || 'Flexible Staffing & Executive Placement Built for Precision.';
+            const highlight = heroData?.highlightWord || 'Precision.';
             if (highlight && headline.includes(highlight)) {
               const parts = headline.split(highlight);
               return (
@@ -336,8 +337,8 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
         </h1>
 
         {/* Subtitle */}
-        <p className="hero-appear-subtitle text-[#94A3B8] text-sm sm:text-lg leading-relaxed max-w-2xl mb-7 sm:mb-9 font-normal">
-          {heroData?.subtitle || 'A premium end-to-end staffing partner placing pre-vetted specialists across technology, finance, and executive leadership in record time.'}
+        <p className="hero-appear-subtitle text-[#94A3B8] text-sm sm:text-base leading-relaxed max-w-2xl mb-7 sm:mb-9 font-normal">
+          {heroData?.subtitle || 'Connecting ambitious enterprises with top-tier technical contractors, specialized teams, and executive leadership.'}
         </p>
 
         {/* Dynamic Action Buttons (Strict Max 2 Buttons: 0, 1, or 2 rendered) */}
@@ -380,38 +381,47 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
               if (el) el.scrollIntoView({ behavior: 'smooth' });
             } else if (onNavigate && dest.replace('/', '')) {
               onNavigate(dest.replace('/', ''));
+            } else if (onNavigateContact) {
+              onNavigateContact();
             } else {
-              openModal(btn.label || 'Request Talent');
+              window.location.hash = 'contact';
             }
           };
 
+          const visibleButtons = configuredButtons.slice(0, 2);
+
           return (
-            <div className="hero-appear-actions flex flex-col sm:flex-row w-full sm:w-auto items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12">
-              {configuredButtons.slice(0, 2).map((btn, idx) => {
+            <div
+              className={`hero-appear-actions ${
+                visibleButtons.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2'
+              } gap-2.5 w-full sm:w-auto sm:flex sm:flex-row items-center justify-center sm:gap-4 mb-10 sm:mb-12`}
+            >
+              {visibleButtons.map((btn, idx) => {
                 const isPrimary = btn.variant === 'primary' || idx === 0;
-                // Strip duplicate arrow characters from labels
-                const rawLabel = btn.label || (isPrimary ? 'Request Talent' : 'Explore Open Roles');
+                const rawLabel = btn.label || (isPrimary ? 'Request Talent ->' : 'Explore Services');
                 const cleanLabel = rawLabel.replace(/\s*(→|->|&rarr;)\s*$/, '').trim();
 
                 if (isPrimary) {
                   return (
                     <button
                       key={btn.id || idx}
+                      type="button"
                       onClick={() => handleButtonClick(btn)}
-                      className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center shadow-xl transition-all duration-200 active:scale-95 hover:-translate-y-0.5 group cursor-pointer"
+                      className="btn-shimmer w-full sm:w-auto min-h-[44px] sm:min-h-[48px] justify-center bg-[#E69D2B] hover:bg-[#F6C467] text-[#0B0F17] text-xs sm:text-base px-3 sm:px-8 py-3 sm:py-4 rounded-full inline-flex items-center shadow-xl transition-all duration-200 active:scale-95 hover:-translate-y-0.5 group cursor-pointer whitespace-nowrap"
                     >
-                      <span className="font-semibold">{cleanLabel}</span>
-                      <ArrowRight className="w-4 h-4 ml-2 inline-block transition-transform group-hover:translate-x-1" />
+                      <span className="font-semibold truncate">{cleanLabel}</span>
+                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 shrink-0 inline-block transition-transform group-hover:translate-x-1" />
                     </button>
                   );
                 }
                 return (
                   <button
                     key={btn.id || idx}
+                    type="button"
                     onClick={() => handleButtonClick(btn)}
-                    className="w-full sm:w-auto min-h-[48px] justify-center bg-white/5 border border-white/20 hover:border-white/40 text-white font-medium text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full hover:bg-white/10 transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm"
+                    className="w-full sm:w-auto min-h-[44px] sm:min-h-[48px] justify-center bg-white/5 border border-white/20 hover:border-white/40 text-white font-medium text-xs sm:text-base px-3 sm:px-8 py-3 sm:py-4 rounded-full hover:bg-white/10 transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm inline-flex items-center whitespace-nowrap"
                   >
-                    <span>{cleanLabel}</span>
+                    <span className="truncate">{cleanLabel}</span>
                   </button>
                 );
               })}
@@ -425,7 +435,7 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
       {/* ========================================================================= */}
       <div className="relative z-30 w-full max-w-[1400px] mx-auto px-5 sm:px-8 pb-4 sm:pb-6 flex items-center justify-center sm:justify-between text-xs text-slateGray pointer-events-auto">
         <div className="text-[11px] text-white/40 hidden sm:block font-medium">
-          Enterprise Staffing &amp; Executive Recruitment
+          {heroData?.bottomCaption || 'Enterprise Staffing & Executive Search Solutions'}
         </div>
 
         {/* 10-Second Loop Indicators */}

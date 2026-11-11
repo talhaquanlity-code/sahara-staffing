@@ -86,8 +86,27 @@ export function ScrollProvider({ children }) {
     }
   };
 
+  const resetScrollToTop = () => {
+    const l = lenisRef.current;
+    const isAdmin =
+      window.location.hash.toLowerCase().includes('admin') ||
+      window.location.pathname.toLowerCase().includes('admin');
+
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    if (l) {
+      if (!isAdmin) {
+        l.start();
+      }
+      l.scrollTo(0, { immediate: true, force: true });
+      l.resize();
+    }
+  };
+
   return (
-    <ScrollContext.Provider value={{ lenis, scrollTo }}>
+    <ScrollContext.Provider value={{ lenis, scrollTo, resetScrollToTop }}>
       {children}
     </ScrollContext.Provider>
   );
@@ -95,6 +114,6 @@ export function ScrollProvider({ children }) {
 
 export function useScroll() {
   const context = useContext(ScrollContext);
-  return context || { lenis: null, scrollTo: () => {} };
+  return context || { lenis: null, scrollTo: () => {}, resetScrollToTop: () => {} };
 }
 

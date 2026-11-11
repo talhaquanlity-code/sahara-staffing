@@ -1,13 +1,25 @@
 import React, { useState } from 'react';
 import { Menu, X, User } from 'lucide-react';
-import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
-import logoImg from '../assets/sahara-logo.png';
+import logoImg from '../assets/sahara-logo.webp';
 
 export default function Header({ onNavigate, currentRoute = 'home' }) {
-  const { openModal } = useUI();
-  const { settings } = useCMS();
+  const { content, settings } = useCMS();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const brandLogo = settings?.brandLogoUrl || logoImg;
+  const companyName = settings?.companyName || 'Sahara Staffing Inc.';
+  const navConfig = content?.navbar || {};
+  const navLinks =
+    Array.isArray(navConfig.links) && navConfig.links.length > 0
+      ? navConfig.links
+      : [
+          { id: 'home', label: 'Home' },
+          { id: 'about', label: 'About Us' },
+          { id: 'services', label: 'Services' },
+          { id: 'contact', label: 'Contact' },
+        ];
+  const ctaLabel = navConfig.ctaLabel || 'Join';
 
   // Other than homepage, navbar has fixed floating positioning.
   // On homepage, obeys global settings.stickyNavbar toggle (defaults to false / non-sticky)
@@ -15,15 +27,25 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
   const isStickyNavbar = Boolean(settings?.stickyNavbar);
 
   const handleNav = (route, anchorFallback) => {
+    const targetRoute = route === 'executive-search' ? 'services' : route;
     if (onNavigate) {
-      onNavigate(route);
+      onNavigate(targetRoute);
     } else if (anchorFallback) {
       const el = document.querySelector(anchorFallback);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
-      else window.location.hash = route;
+      else window.location.hash = targetRoute;
     } else {
-      window.location.hash = route;
+      window.location.hash = targetRoute;
     }
+  };
+
+  const handleAdminLoginRedirect = () => {
+    try {
+      sessionStorage.removeItem('sahara_admin_session_v2');
+    } catch {}
+    setMobileMenuOpen(false);
+    window.dispatchEvent(new CustomEvent('sahara:admin-login-redirect'));
+    handleNav('admin');
   };
 
   return (
@@ -45,21 +67,23 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
           type="button"
           onClick={() => handleNav('home', '#')}
           className="flex items-center focus:outline-none cursor-pointer"
-          aria-label="Sahara Staffing Inc. Home"
+          aria-label={`${companyName} Home`}
         >
           <img
-            src={logoImg}
-            alt="Sahara Staffing Inc."
+            src={brandLogo}
+            alt={companyName}
+            loading="eager"
+            decoding="async"
             className="h-6 w-auto object-contain drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
           />
         </button>
 
-        {/* Right Actions: Account Icon | Join Us | Hamburger Toggle */}
+        {/* Right Actions: Account Icon | Get Started | Hamburger Toggle */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
-            onClick={() => openModal('Account Login')}
-            aria-label="Account login"
+            onClick={handleAdminLoginRedirect}
+            aria-label="Admin Portal Login"
             className="w-7 h-7 rounded-full flex items-center justify-center text-white/80 hover:text-saharaGold transition-colors cursor-pointer focus:outline-none"
           >
             <User className="w-3.5 h-3.5" strokeWidth={1.75} />
@@ -70,7 +94,7 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
             onClick={() => handleNav('contact')}
             className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-xs px-3 py-1.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap"
           >
-            Join Us
+            {ctaLabel}
           </button>
 
           <button
@@ -102,65 +126,45 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
                 ? 'bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full px-5 py-3 shadow-2xl hover:border-white/20 hover:bg-[#0B0F17]/95 active:scale-95'
                 : ''
             }`}
-            aria-label="Sahara Staffing Inc. Home"
+            aria-label={`${companyName} Home`}
           >
             <img
-              src={logoImg}
-              alt="Sahara Staffing Inc."
+              src={brandLogo}
+              alt={companyName}
+              loading="eager"
+              decoding="async"
               className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
             />
           </button>
         </div>
 
-        {/* PART 2: CENTER PILL — EXACTLY: Home | About | Services | Contact */}
+        {/* PART 2: CENTER PILL */}
         <nav className="flex items-center gap-7 lg:gap-8 xl:gap-9 bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full px-8 lg:px-10 py-4 shadow-2xl text-[13px] font-medium text-white/85 transition-all">
-          <button
-            type="button"
-            onClick={() => handleNav('home', '#')}
-            className={`transition-colors tracking-wide cursor-pointer focus:outline-none ${
-              currentRoute === 'home' ? 'text-saharaGold font-semibold' : 'hover:text-saharaGold'
-            }`}
-          >
-            Home
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleNav('about')}
-            className={`transition-colors tracking-wide cursor-pointer focus:outline-none ${
-              currentRoute === 'about' ? 'text-saharaGold font-semibold' : 'hover:text-saharaGold'
-            }`}
-          >
-            About
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleNav('services', '#payment-section')}
-            className={`transition-colors tracking-wide cursor-pointer focus:outline-none ${
-              currentRoute === 'services' ? 'text-saharaGold font-semibold' : 'hover:text-saharaGold'
-            }`}
-          >
-            Services
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleNav('contact')}
-            className={`transition-colors tracking-wide cursor-pointer focus:outline-none ${
-              currentRoute === 'contact' ? 'text-saharaGold font-semibold' : 'hover:text-saharaGold'
-            }`}
-          >
-            Contact
-          </button>
+          {navLinks.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() =>
+                handleNav(
+                  item.id,
+                  item.id === 'home' ? '#' : item.id === 'services' ? '#payment-section' : undefined
+                )
+              }
+              className={`transition-colors tracking-wide cursor-pointer focus:outline-none ${
+                currentRoute === item.id ? 'text-saharaGold font-semibold' : 'hover:text-saharaGold'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
         </nav>
 
-        {/* PART 3: RIGHT PILL — [ ACCOUNT ICON | JOIN US | MOBILE MENU TOGGLE ] */}
+        {/* PART 3: RIGHT PILL */}
         <div className="flex items-center gap-2 bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full p-2 pl-4 shadow-2xl shrink-0">
           <button
             type="button"
-            onClick={() => openModal('Account Login')}
-            aria-label="Account login"
+            onClick={handleAdminLoginRedirect}
+            aria-label="Admin Portal Login"
             className="w-8 h-8 rounded-full flex items-center justify-center text-white/80 hover:text-saharaGold transition-colors cursor-pointer focus:outline-none"
           >
             <User className="w-4 h-4" strokeWidth={1.75} />
@@ -171,75 +175,39 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
             onClick={() => handleNav('contact')}
             className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-[13px] px-5 py-2.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap"
           >
-            Join Us
+            {ctaLabel}
           </button>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* MOBILE DRAWER MENU — EXACTLY: Home | About | Services | Contact           */}
+      {/* MOBILE DRAWER MENU                                                        */}
       {/* ========================================================================= */}
       {mobileMenuOpen && (
         <div className="pointer-events-auto absolute top-20 right-4 left-4 bg-[#0B0F17]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 shadow-2xl flex flex-col gap-3 text-center z-50 md:hidden animate-in fade-in slide-in-from-top-2">
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              handleNav('home', '#');
-            }}
-            className={`text-sm py-2 transition-colors border-b border-white/5 cursor-pointer ${
-              currentRoute === 'home' ? 'text-saharaGold font-bold' : 'text-white hover:text-saharaGold'
-            }`}
-          >
-            Home
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              handleNav('about');
-            }}
-            className={`text-sm py-2 transition-colors border-b border-white/5 cursor-pointer ${
-              currentRoute === 'about' ? 'text-saharaGold font-bold' : 'text-white hover:text-saharaGold'
-            }`}
-          >
-            About
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              handleNav('services', '#payment-section');
-            }}
-            className={`text-sm py-2 transition-colors border-b border-white/5 cursor-pointer ${
-              currentRoute === 'services' ? 'text-saharaGold font-bold' : 'text-white hover:text-saharaGold'
-            }`}
-          >
-            Services
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setMobileMenuOpen(false);
-              handleNav('contact');
-            }}
-            className={`text-sm py-2 transition-colors border-b border-white/5 cursor-pointer ${
-              currentRoute === 'contact' ? 'text-saharaGold font-bold' : 'text-white hover:text-saharaGold'
-            }`}
-          >
-            Contact
-          </button>
+          {navLinks.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                handleNav(
+                  item.id,
+                  item.id === 'home' ? '#' : item.id === 'services' ? '#payment-section' : undefined
+                );
+              }}
+              className={`text-sm py-2 transition-colors border-b border-white/5 cursor-pointer ${
+                currentRoute === item.id ? 'text-saharaGold font-bold' : 'text-white hover:text-saharaGold'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
 
           <div className="flex flex-col gap-2 pt-2">
             <button
               type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                openModal('Account Login');
-              }}
+              onClick={handleAdminLoginRedirect}
               className="w-full py-2.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-saharaGold transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <User className="w-3.5 h-3.5" strokeWidth={1.75} />
@@ -253,7 +221,7 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
               }}
               className="w-full py-2.5 rounded-full bg-saharaGold text-obsidian text-xs font-bold hover:bg-saharaGoldLight transition-colors cursor-pointer"
             >
-              Join Us
+              {ctaLabel}
             </button>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { useCMS } from '../context/CMSContext';
 
 // Smooth Exponential Count-Up Component (triggers once when entering viewport)
 function CounterNumber({ to, suffix = '', duration = 2.0 }) {
@@ -125,6 +126,19 @@ const enterprisePartners = [
 ];
 
 export default function SocialProofMarquee() {
+  const { content } = useCMS();
+  const metrics = content?.home?.metrics || {};
+  const stat1Value = Number(metrics.stat1Value ?? 500);
+  const stat1Suffix = metrics.stat1Suffix ?? '+';
+  const stat1Label = metrics.stat1Label || 'Client Engagements';
+  const stat2Value = Number(metrics.stat2Value ?? 98);
+  const stat2Suffix = metrics.stat2Suffix ?? '%';
+  const stat2Label = metrics.stat2Label || 'Client Retention';
+  const stat3Value = Number(metrics.stat3Value ?? 14);
+  const stat3Suffix = metrics.stat3Suffix || ' Days';
+  const stat3Label = metrics.stat3Label || 'Avg Launch Time';
+  const marqueeBadge = metrics.marqueeBadge || 'TRUSTED BY ENTERPRISE LEADERS';
+
   const containerRef = useRef(null);
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -165,51 +179,51 @@ export default function SocialProofMarquee() {
 
           {/* Balanced 3-Column Responsive Grid on Mobile, Flex on Desktop */}
           <div className="grid grid-cols-3 divide-x divide-white/10 sm:divide-x-0 sm:flex sm:items-center sm:justify-between sm:gap-6 relative z-10">
-            {/* Stat 1: 500+ */}
+            {/* Stat 1 */}
             <div className="flex flex-col pr-2 sm:pr-0">
               <span className="text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-[#E69D2B] font-display tracking-tight leading-none">
-                <CounterNumber to={500} suffix="+" duration={2.2} />
+                <CounterNumber to={stat1Value} suffix={stat1Suffix} duration={2.2} />
               </span>
               <span className="text-[10px] xs:text-[11px] sm:text-xs text-[#94A3B8] font-medium block mt-1.5 sm:mt-2 font-inter tracking-tight leading-tight">
-                Executive Placements
+                {stat1Label}
               </span>
             </div>
 
             {/* Desktop Divider 1 */}
             <div className="w-[1px] h-10 bg-white/15 hidden sm:block shrink-0" />
 
-            {/* Stat 2: 98% */}
+            {/* Stat 2 */}
             <div className="flex flex-col px-2 sm:px-0">
               <span className="text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-white font-display tracking-tight leading-none">
-                <CounterNumber to={98} suffix="%" duration={1.9} />
+                <CounterNumber to={stat2Value} suffix={stat2Suffix} duration={1.9} />
               </span>
               <span className="text-[10px] xs:text-[11px] sm:text-xs text-[#94A3B8] font-medium block mt-1.5 sm:mt-2 font-inter tracking-tight leading-tight">
-                90-Day Retention
+                {stat2Label}
               </span>
             </div>
 
             {/* Desktop Divider 2 */}
             <div className="w-[1px] h-10 bg-white/15 hidden sm:block shrink-0" />
 
-            {/* Stat 3: 14 Days */}
+            {/* Stat 3 */}
             <div className="flex flex-col pl-2 sm:pl-0">
               <div className="flex items-baseline gap-1 sm:gap-1.5 whitespace-nowrap leading-none">
                 <span className="text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-extrabold text-[#E69D2B] font-display tracking-tight">
-                  <CounterNumber to={14} suffix="" duration={1.6} />
+                  <CounterNumber to={stat3Value} suffix="" duration={1.6} />
                 </span>
                 <span className="text-base xs:text-xl sm:text-2xl lg:text-[28px] font-extrabold text-[#E69D2B] font-display tracking-tight">
-                  Days
+                  {stat3Suffix.trim()}
                 </span>
               </div>
               <span className="text-[10px] xs:text-[11px] sm:text-xs text-[#94A3B8] font-medium block mt-1.5 sm:mt-2 font-inter tracking-tight leading-tight">
-                Avg Time-to-Fill
+                {stat3Label}
               </span>
             </div>
           </div>
         </motion.div>
 
         {/* ========================================================================= */}
-        {/* 2. RIGHT COLUMN: PREMIUM MONOCHROME LOGO TICKER (ZERO AI SLOP)            */}
+        {/* 2. RIGHT COLUMN: PREMIUM MONOCHROME LOGO TICKER                           */}
         {/* ========================================================================= */}
         <motion.div
           style={{ y: yMarquee }}
@@ -218,7 +232,7 @@ export default function SocialProofMarquee() {
           {/* Subtle Luxury Brand Kicker */}
           <div className="flex items-center gap-2 mb-2.5 sm:mb-4">
             <span className="text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase text-[#B87314] font-sans">
-              TRUSTED BY ENTERPRISE LEADERS
+              {marqueeBadge}
             </span>
           </div>
 

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useScroll } from '../context/ScrollContext';
 import { useCMS } from '../context/CMSContext';
-import saharaMarkImg from '../assets/sahara-mark.png';
+import saharaMarkImg from '../assets/sahara-mark.webp';
 
 export default function ScrollProgressButton() {
   const { lenis, scrollTo } = useScroll();
@@ -429,8 +429,10 @@ export default function ScrollProgressButton() {
                   className="w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center will-change-transform transition-transform duration-150 ease-out"
                 >
                   <img
-                    src={saharaMarkImg}
-                    alt="Sahara Staffing Inc."
+                    src={settings?.brandMarkUrl || saharaMarkImg}
+                    alt={settings?.companyName || 'Sahara Staffing Inc.'}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-contain filter drop-shadow-[0_1.5px_6px_rgba(230,157,43,0.4)] select-none pointer-events-none"
                     draggable={false}
                   />

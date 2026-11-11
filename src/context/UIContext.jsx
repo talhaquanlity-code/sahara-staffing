@@ -3,23 +3,10 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 const UIContext = createContext(null);
 
 export function UIProvider({ children }) {
-  const [modalState, setModalState] = useState({
-    isOpen: false,
-    title: 'Get Started with Sahara',
-  });
-
   const [toastState, setToastState] = useState({
     isOpen: false,
     message: '',
   });
-
-  const openModal = useCallback((title = 'Get Started with Sahara') => {
-    setModalState({ isOpen: true, title });
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalState((prev) => ({ ...prev, isOpen: false }));
-  }, []);
 
   const showToast = useCallback((message) => {
     setToastState({ isOpen: true, message });
@@ -31,9 +18,6 @@ export function UIProvider({ children }) {
   return (
     <UIContext.Provider
       value={{
-        modalState,
-        openModal,
-        closeModal,
         toastState,
         showToast,
       }}

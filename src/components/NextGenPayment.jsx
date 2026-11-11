@@ -2,14 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useUI } from '../context/UIContext';
 import LogoMarquee from './LogoMarquee';
 import ScrollRevealText from './common/ScrollRevealText';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function NextGenPayment() {
-  const { openModal } = useUI();
   const sectionRef = useRef(null);
   const petalsRef = useRef(null);
 
@@ -75,7 +73,9 @@ export default function NextGenPayment() {
 
             <div className="flex flex-wrap items-center gap-3 mt-7">
               <button
-                onClick={() => openModal('Start Banking with Sahara')}
+                onClick={() => {
+                  window.location.hash = 'contact';
+                }}
                 className="btn-shimmer bg-obsidian hover:bg-slateCard text-crispWhite text-xs sm:text-sm font-medium px-6 py-3.5 rounded-full inline-flex items-center gap-2 transition-all shadow-md active:scale-95 group"
               >
                 <span>Start banking</span>
@@ -128,7 +128,9 @@ export default function NextGenPayment() {
 
             <div className="pt-6">
               <button
-                onClick={() => openModal('Manage Corporate Spend')}
+                onClick={() => {
+                  window.location.hash = 'contact';
+                }}
                 className="btn-shimmer bg-obsidian hover:bg-slateCard text-crispWhite text-xs font-medium px-5 py-3 rounded-full inline-flex items-center gap-2 transition-all shadow-sm active:scale-95"
               >
                 <span>Manage expenses</span>

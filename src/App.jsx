@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { UIProvider } from './context/UIContext';
-import { ScrollProvider } from './context/ScrollContext';
+import { ScrollProvider, useScroll } from './context/ScrollContext';
 import { CMSProvider, useCMS } from './context/CMSContext';
+
+gsap.registerPlugin(ScrollTrigger);
 import Header from './components/Header';
 import Hero from './components/Hero';
 import SocialProofMarquee from './components/SocialProofMarquee';
@@ -12,7 +16,6 @@ import Testimonials from './components/Testimonials';
 import FAQ from './components/FAQ';
 import SpeakToExperts from './components/SpeakToExperts';
 import Footer from './components/Footer';
-import Modal from './components/Modal';
 import Toast from './components/Toast';
 import ScrollProgressButton from './components/ScrollProgressButton';
 
@@ -152,33 +155,82 @@ function LuxuryCursor() {
 
 function AppContent() {
   const { settings } = useCMS();
+  const { lenis, resetScrollToTop } = useScroll();
   const [currentRoute, setCurrentRoute] = useState('home'); // 'home' | 'services' | 'about' | 'contact' | 'admin'
   const [contactPrefill, setContactPrefill] = useState(null);
+  const [adminLoginNonce, setAdminLoginNonce] = useState(0);
+  const [routeVisitNonce, setRouteVisitNonce] = useState(0);
+  const activeRouteRef = useRef('home');
 
   // Sync route with URL hash for bookmarking & browser back/forward support
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '').toLowerCase();
       if (['home', 'services', 'about', 'contact', 'admin'].includes(hash)) {
-        setCurrentRoute(hash);
+        if (hash !== activeRouteRef.current) {
+          activeRouteRef.current = hash;
+          resetScrollToTop();
+          setCurrentRoute(hash);
+          setRouteVisitNonce((prev) => prev + 1);
+        }
       }
+    };
+
+    const handleAdminLoginRedirect = () => {
+      try {
+        sessionStorage.removeItem('sahara_admin_session_v2');
+      } catch {}
+      setAdminLoginNonce((prev) => prev + 1);
     };
 
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+    window.addEventListener('sahara:admin-login-redirect', handleAdminLoginRedirect);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('sahara:admin-login-redirect', handleAdminLoginRedirect);
+    };
+  }, [resetScrollToTop]);
+
+  // Ensure every route entry snaps Lenis + browser scroll to top (1st section)
+  // and refreshes GSAP ScrollTrigger bounds cleanly once the new page DOM mounts.
+  useLayoutEffect(() => {
+    resetScrollToTop();
+
+    const rafId = window.requestAnimationFrame(() => {
+      resetScrollToTop();
+      ScrollTrigger.refresh(true);
+    });
+    const t1 = window.setTimeout(() => {
+      lenis?.resize();
+      ScrollTrigger.refresh(true);
+    }, 150);
+    const t2 = window.setTimeout(() => {
+      lenis?.resize();
+      ScrollTrigger.refresh(true);
+    }, 450);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [currentRoute, routeVisitNonce, lenis, resetScrollToTop]);
 
   const navigate = (route, prefill = null) => {
     if (prefill) {
       setContactPrefill(prefill);
     }
+    activeRouteRef.current = route;
+    resetScrollToTop();
     setCurrentRoute(route);
-    window.location.hash = route;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setRouteVisitNonce((prev) => prev + 1);
+    if (window.location.hash.replace('#', '').toLowerCase() !== route) {
+      window.location.hash = route;
+    }
   };
 
-  // Quick keyboard shortcut to access Admin Portal:
+  // Quick keyboard shortcut to access Admin Portal Login Page:
   // Supports TAB + SH (or Tab + S + H, or Tab + Shift + H)
   useEffect(() => {
     let isTabDown = false;
@@ -190,6 +242,10 @@ function AppContent() {
       e.preventDefault();
       e.stopPropagation();
       sequence = '';
+      try {
+        sessionStorage.removeItem('sahara_admin_session_v2');
+      } catch {}
+      setAdminLoginNonce((prev) => prev + 1);
       navigate('admin');
     };
 
@@ -256,17 +312,31 @@ function AppContent() {
 
   return (
     <div className="relative min-h-screen bg-[#EBE7DE] text-obsidian selection:bg-saharaGold selection:text-obsidian">
-      {/* Global Interactive Modal & Toast & Floating Progress Control */}
-      <Modal />
+      {/* Global Toast & Floating Progress Control */}
       <Toast />
       <ScrollProgressButton />
       {settings?.enableCustomCursor && <LuxuryCursor />}
+
+      {/* Optional Global Announcement Banner (Controlled via Admin SettingsWorkspace) */}
+      {settings?.enableAnnouncementBanner &&
+        settings?.announcementBannerText &&
+        currentRoute !== 'admin' && (
+          <div className="relative z-[60] w-full bg-[#080B12] border-b border-white/10 px-4 py-2 text-center text-[11px] sm:text-xs text-white font-sans flex items-center justify-center gap-2">
+            <span
+              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: settings?.primaryAccent || '#E69D2B' }}
+            />
+            <span className="truncate font-medium tracking-wide">
+              {settings.announcementBannerText}
+            </span>
+          </div>
+        )}
 
       {/* ========================================================================= */}
       {/* ROUTE 1: HOMEPAGE                                                         */}
       {/* ========================================================================= */}
       {currentRoute === 'home' && (
-        <>
+        <React.Fragment key={`home-${routeVisitNonce}`}>
           {/* 1. Hero Section (Immersive Full-Bleed Cinematic Experience) */}
           <Hero
             onNavigate={navigate}
@@ -286,7 +356,10 @@ function AppContent() {
 
             {/* 2. Bento Services Grid (Staffing Services Gallery) */}
             <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#FAF9F6] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <BentoGrowthCapital onNavigateService={(slug) => navigate('services')} />
+              <BentoGrowthCapital
+                onNavigateService={(slug) => navigate('services')}
+                onNavigateContact={() => navigate('contact')}
+              />
             </section>
           </main>
 
@@ -304,8 +377,8 @@ function AppContent() {
           {/* ===================================================================== */}
           <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
 
-            {/* 4. Staffing Value & Interactive Sahara Orbit */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+            {/* 4. Staffing Value & Interactive Sahara Orbit (Hidden on mobile to purge redundant standalone CTA box) */}
+            <section className="hidden md:block rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
               <Calculator
                 onNavigateContact={() => navigate('contact')}
                 onProceedToContact={(data) => navigate('contact', data)}
@@ -331,14 +404,17 @@ function AppContent() {
             {/* 8. Global Footer */}
             <Footer onNavigate={navigate} />
           </main>
-        </>
+        </React.Fragment>
       )}
 
       {/* ========================================================================= */}
       {/* ROUTE 2: SERVICES PAGE                                                    */}
       {/* ========================================================================= */}
       {currentRoute === 'services' && (
-        <div className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between">
+        <div
+          key={`services-${routeVisitNonce}`}
+          className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
+        >
           <Header onNavigate={navigate} currentRoute={currentRoute} />
           <ServicesPage
             onNavigateContact={(prefill) => navigate('contact', prefill)}
@@ -354,7 +430,10 @@ function AppContent() {
       {/* ROUTE 3: ABOUT PAGE                                                       */}
       {/* ========================================================================= */}
       {currentRoute === 'about' && (
-        <div className="min-h-screen bg-[#0B0F17] flex flex-col justify-between">
+        <div
+          key={`about-${routeVisitNonce}`}
+          className="min-h-screen bg-[#0B0F17] flex flex-col justify-between"
+        >
           <Header onNavigate={navigate} currentRoute={currentRoute} />
           <AboutPage
             onNavigateContact={() => navigate('contact')}
@@ -370,7 +449,10 @@ function AppContent() {
       {/* ROUTE 4: CONTACT PAGE                                                     */}
       {/* ========================================================================= */}
       {currentRoute === 'contact' && (
-        <div className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between">
+        <div
+          key={`contact-${routeVisitNonce}`}
+          className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
+        >
           <Header onNavigate={navigate} currentRoute={currentRoute} />
           <ContactPage prefillData={contactPrefill} />
           <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
@@ -383,7 +465,7 @@ function AppContent() {
       {/* ROUTE 5: ADMIN PORTAL & EXECUTIVE DASHBOARD                               */}
       {/* ========================================================================= */}
       {currentRoute === 'admin' && (
-        <AdminPage onNavigateHome={() => navigate('home')} />
+        <AdminPage key={adminLoginNonce} onNavigateHome={() => navigate('home')} />
       )}
     </div>
   );

@@ -1,12 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload,
   FileText,
-  CheckCircle2,
   AlertCircle,
-  Copy,
-  Check,
   X,
   ArrowRight,
   Loader2,
@@ -16,11 +13,12 @@ import {
 } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 
-const DISCIPLINES = [
-  'AI & Cloud Engineering',
-  'Executive Leadership',
-  'Strategic Finance',
-  'Product & Full-Stack',
+const DEFAULT_DISCIPLINES = [
+  'Executive & Leadership Search',
+  'IT Staff Augmentation',
+  'Direct Hire & Permanent Placement',
+  'Dedicated Engineering Squads',
+  'Interim Technical Leadership',
 ];
 
 const APPS_SCRIPT_URL =
@@ -38,14 +36,36 @@ const convertFileToBase64 = (file) => {
 
 const isValidLinkedInUrl = (url) => {
   if (!url) return true;
-  const linkedinRegex = /^(https?:\/\/)?([\w-]+\.)*linkedin\.com\/in\/[\w%-]+\/?$/i;
+  const linkedinRegex = /^(https?:\/\/)?([\w-]+\.)*linkedin\.com\/(in|company)\/[\w%-]+\/?$/i;
   return linkedinRegex.test(url.trim());
 };
 
-export default function ContactPage() {
-  const { settings } = useCMS();
+function splitHeadlineHighlight(headline, highlightWord) {
+  const full = String(headline || '');
+  const kw = String(highlightWord || '').trim();
+  if (!kw) return { before: full, highlight: '' };
+  const idx = full.toLowerCase().lastIndexOf(kw.toLowerCase());
+  if (idx === -1) return { before: full, highlight: '' };
+  return {
+    before: full.slice(0, idx).trimEnd(),
+    highlight: full.slice(idx),
+  };
+}
 
-  // Form State
+export default function ContactPage({ prefillData = null }) {
+  const { content, settings } = useCMS();
+  const contactData = content?.contactPage || {};
+  const hero = contactData?.hero || {};
+  const details = contactData?.details || {};
+  const disciplinesList =
+    Array.isArray(contactData?.disciplines) && contactData.disciplines.length > 0
+      ? contactData.disciplines
+      : DEFAULT_DISCIPLINES;
+
+  const companyName = settings?.companyName || 'Sahara Staffing Inc.';
+  const contactEmail = details?.email || 'contact@sahara-staffing.com';
+
+  // Form State (preserve exact state keys used for payload compatibility)
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -56,20 +76,28 @@ export default function ContactPage() {
     privacyAgreed: false,
   });
 
-  // Resume File State
+  useEffect(() => {
+    if (!prefillData) return;
+    const prefilledService = prefillData.serviceArea || prefillData.staffingNeed || '';
+    const prefilledSummary = prefillData.projectSummary || prefillData.hiringRequirements || '';
+    setFormData((prev) => ({
+      ...prev,
+      targetDiscipline: prefilledService || prev.targetDiscipline,
+      careerSummary: prefilledSummary || prev.careerSummary,
+    }));
+  }, [prefillData]);
+
+  // Brief / Supporting Document State
   const [resumeFile, setResumeFile] = useState(null);
-  const [resumeDataUrl, setResumeDataUrl] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
   // Interaction & Submission State
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submittedCandidate, setSubmittedCandidate] = useState(null);
-  const [copiedTrackingId, setCopiedTrackingId] = useState(false);
+  const [submittedRecord, setSubmittedRecord] = useState(null);
   const [submitError, setSubmitError] = useState(null);
 
-  // Field change handler
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -82,7 +110,6 @@ export default function ContactPage() {
     setSubmitError(null);
   };
 
-  // Validate file
   const handleFileSelection = (file) => {
     if (!file) return;
 
@@ -102,24 +129,12 @@ export default function ContactPage() {
       return;
     }
 
-    // 10 MB maximum
     if (file.size > 10 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
         resume: 'File size exceeds 10 MB. Please optimize or compress your document.',
       }));
       return;
-    }
-
-    // Read base64 for PDF preview & persistence
-    if (isPdf) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setResumeDataUrl(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setResumeDataUrl(null);
     }
 
     setResumeFile(file);
@@ -130,7 +145,6 @@ export default function ContactPage() {
     });
   };
 
-  // Drag and drop handlers
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -153,11 +167,9 @@ export default function ContactPage() {
   const removeFile = (e) => {
     e.stopPropagation();
     setResumeFile(null);
-    setResumeDataUrl(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Validate all inputs
   const validate = () => {
     const errs = {};
 
@@ -172,34 +184,28 @@ export default function ContactPage() {
     }
 
     if (!formData.phone.trim()) {
-      errs.phone = 'Please enter your phone number with country code.';
+      errs.phone = 'Please enter your phone number.';
     } else if (formData.phone.trim().length < 7) {
       errs.phone = 'Please enter a complete phone number.';
     }
 
     if (!formData.targetDiscipline) {
-      errs.targetDiscipline = 'Please select your target discipline.';
+      errs.targetDiscipline = 'Please select a service area.';
     }
 
-    if (!formData.linkedinUrl.trim()) {
-      errs.linkedinUrl = 'Please provide your LinkedIn profile URL.';
-    } else if (!isValidLinkedInUrl(formData.linkedinUrl)) {
+    if (formData.linkedinUrl.trim() && !isValidLinkedInUrl(formData.linkedinUrl)) {
       errs.linkedinUrl =
-        'Please enter a valid LinkedIn URL (e.g., https://linkedin.com/in/yourname or https://ae.linkedin.com/in/yourname)';
-    }
-
-    if (!resumeFile) {
-      errs.resume = 'Please attach your PDF or DOCX resume to continue.';
+        'Please enter a valid LinkedIn URL (e.g., https://linkedin.com/in/yourname)';
     }
 
     if (!formData.privacyAgreed) {
-      errs.privacyAgreed = 'You must agree to candidate data storage and review to submit.';
+      errs.privacyAgreed = 'Please accept the consultation data review terms to submit.';
     }
 
     return errs;
   };
 
-  // Form submission
+  // Preserve Apps Script + /api/submit-form.php relay contract verbatim
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -221,7 +227,6 @@ export default function ContactPage() {
     const trackingId = `#SAH-${Math.floor(1000 + Math.random() * 9000)}`;
 
     try {
-      // 1. Convert attached resume file to base64
       let base64String = '';
       if (resumeFile) {
         try {
@@ -231,7 +236,6 @@ export default function ContactPage() {
         }
       }
 
-      // 2. Extract values with resilient fallback key mapping
       const payload = {
         trackingId: trackingId,
         name: formData.name || formData.fullName || formData.full_name || '',
@@ -239,15 +243,13 @@ export default function ContactPage() {
         phone: formData.phone || formData.phoneNumber || '',
         discipline: formData.discipline || formData.targetDiscipline || '',
         linkedin: formData.linkedin || formData.linkedinUrl || '',
-        summary: formData.summary || formData.careerSummary || formData.message || formData.notes || '',
+        summary:
+          formData.summary || formData.careerSummary || formData.message || formData.notes || '',
         fileName: resumeFile ? resumeFile.name : '',
         fileType: resumeFile ? resumeFile.type : '',
         fileData: base64String,
       };
 
-      console.log('Dispatching candidate payload to Apps Script:', payload);
-
-      // 3. CRITICAL: mode: 'no-cors' bypasses Google Workspace enterprise CORS restrictions
       await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -257,7 +259,6 @@ export default function ContactPage() {
         body: JSON.stringify(payload),
       });
 
-      // Dual sync with local PHP endpoints if available
       try {
         const phpPayload = new FormData();
         phpPayload.append('fullName', payload.name);
@@ -279,146 +280,140 @@ export default function ContactPage() {
         created_at: new Date().toISOString(),
       };
 
-      // 4. In no-cors mode, completion guarantees transmission to Google Apps Script
-      setSubmittedCandidate(record);
+      setSubmittedRecord(record);
     } catch (err) {
       console.error('Submission error:', err);
       setSubmitError(
-        'Network connection error. Please try again or contact contact@sahara-staffing.com.'
+        `Network connection error. Please try again or email ${contactEmail}.`
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Copy tracking ID
-  const handleCopyId = () => {
-    if (submittedCandidate?.tracking_id) {
-      navigator.clipboard.writeText(submittedCandidate.tracking_id);
-      setCopiedTrackingId(true);
-      setTimeout(() => setCopiedTrackingId(false), 2400);
-    }
-  };
+  const heroTitleParts = splitHeadlineHighlight(
+    hero.headline || 'Your next milestone starts with a conversation.',
+    hero.highlightWord || 'conversation.'
+  );
+  const checklistSteps =
+    Array.isArray(details?.checklistSteps) && details.checklistSteps.length > 0
+      ? details.checklistSteps
+      : [
+          'Project brief or background document (PDF or DOCX format, max 10 MB)',
+          'Active LinkedIn profile or company overview URL',
+          'Primary service area and business objectives',
+        ];
 
-  // Reset form for another candidate
-  const handleReset = () => {
-    setSubmittedCandidate(null);
-    setFormData({
-      fullName: '',
-      email: '',
-      phone: '',
-      targetDiscipline: '',
-      linkedinUrl: '',
-      careerSummary: '',
-      privacyAgreed: false,
-    });
-    setResumeFile(null);
-    setResumeDataUrl(null);
-    setErrors({});
-  };
+  const selectOptions = Array.from(
+    new Set(
+      [...disciplinesList, formData.targetDiscipline].filter(Boolean)
+    )
+  );
 
   return (
     <div className="w-full bg-[#FAF9F6] text-[#0B0F17]">
-      {/* ========================================================================= */}
-      {/* SPLIT-LAYOUT CANDIDATE INTAKE CONTAINER (~1200px MAX-WIDTH)               */}
-      {/* ========================================================================= */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-10 lg:px-12 pt-20 sm:pt-40 pb-16 sm:pb-32">
         <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-16 items-start">
-          
-          {/* ===================================================================== */}
-          {/* LEFT COLUMN: CANDIDATE INTRO & VERIFIED CONTACT DETAILS (40%)         */}
-          {/* On Mobile: Rendered cleanly under the form (order-2)                  */}
-          {/* On Desktop: Anchored on the left (order-1 lg:col-span-5)              */}
-          {/* ===================================================================== */}
+          {/* LEFT COLUMN: INTRO & CONTACT DETAILS */}
           <div className="order-2 lg:order-1 lg:col-span-5 space-y-6 sm:space-y-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-[#E5E0D5] w-full">
-            {/* Editorial Eyebrow & Title (Desktop Primary, Hidden on Mobile to avoid duplicate hero) */}
             <div className="hidden lg:block">
               <div className="text-[11px] font-bold tracking-[0.2em] text-[#B87314] uppercase mb-3">
-                SAHARA STAFFING INC. / CANDIDATE NETWORK
+                {hero.kicker || 'SAHARA STAFFING INC. / CLIENT CONSULTATION'}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-bold text-[#0B0F17] leading-[1.12] tracking-tight mb-4">
-                Your next opportunity starts with a{' '}
-                <span className="text-[#B87314]">conversation.</span>
+                {heroTitleParts.before}{' '}
+                {heroTitleParts.highlight && (
+                  <span className="text-[#B87314]">{heroTitleParts.highlight}</span>
+                )}
               </h1>
 
               <p className="text-sm sm:text-base text-[#475569] leading-relaxed mb-3">
-                Share your professional background and career goals with Sahara Staffing Inc. Submit
-                your profile for consideration within our talent network.
+                {hero.subtitle ||
+                  'Share your hiring focus, team requirements, and project timeline with Sahara Staffing to begin a precision talent search.'}
               </p>
 
               <p className="text-xs text-[#64748B] leading-relaxed">
-                A thoughtful introduction helps us understand your experience, interests, and the
-                roles you want to pursue.
+                {hero.subnote ||
+                  'A thoughtful overview helps us understand your goals, priorities, and the solutions best aligned with your timeline.'}
               </p>
             </div>
 
-            {/* Verified Contact Details (Direct Executive Email & SLA) */}
-            <div className="pt-2 lg:pt-4 border-t lg:border-t border-[#E5E0D5] space-y-4">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B0F17]">
-                Sahara Executive Office
-              </div>
-
-              <div className="space-y-2.5 text-xs text-[#475569]">
-                <div className="flex items-center gap-2.5">
+            {/* MOBILE COMPACT CONTACT BAR */}
+            <div className="block md:hidden pt-1">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                <a
+                  href={`mailto:${contactEmail}`}
+                  className="inline-flex items-center gap-2 text-[#0B0F17] font-mono font-semibold hover:text-[#B87314] transition-colors"
+                >
                   <Mail className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
-                  <a
-                    href="mailto:contact@sahara-staffing.com"
-                    className="hover:text-[#0B0F17] transition-colors font-mono font-medium"
-                  >
-                    contact@sahara-staffing.com
-                  </a>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <Clock className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
-                  <span>Rapid 2-Hour Response Window (Business Hours)</span>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
-                  <span>Confidential Senior Partner Search Protocol</span>
-                </div>
+                  <span>{contactEmail}</span>
+                </a>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#475569]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                  <span>{details.responseTime || 'Within 2 hours'}</span>
+                </span>
               </div>
             </div>
 
-            {/* Candidate Guidance: Before You Submit */}
-            <div className="pt-4 border-t border-[#E5E0D5] space-y-3">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B0F17]">
-                Before you submit
+            {/* DESKTOP EXECUTIVE DETAILS & CHECKLIST */}
+            <div className="hidden md:block space-y-6 sm:space-y-8">
+              <div className="pt-2 lg:pt-4 border-t border-[#E5E0D5] space-y-4">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B0F17]">
+                  {details.officeTitle || 'Sahara Executive Office'}
+                </div>
+
+                <div className="space-y-2.5 text-xs text-[#475569]">
+                  <div className="flex items-center gap-2.5">
+                    <Mail className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
+                    <a
+                      href={`mailto:${contactEmail}`}
+                      className="hover:text-[#0B0F17] transition-colors font-mono font-medium"
+                    >
+                      {contactEmail}
+                    </a>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    <Clock className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
+                    <span>{details.responseTime || 'Within 2 hours (Business Hours)'}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#B87314] flex-shrink-0" />
+                    <span>{details.protocolNote || 'Confidential Enterprise Consultation Protocol'}</span>
+                  </div>
+                </div>
               </div>
 
-              <p className="text-xs text-[#475569] leading-relaxed">
-                Your current resume, a LinkedIn profile, and a short overview of your professional
-                background and target roles.
-              </p>
+              <div className="pt-4 border-t border-[#E5E0D5] space-y-3">
+                <div className="text-[11px] font-bold uppercase tracking-wider text-[#0B0F17]">
+                  {details.checklistTitle || 'Before you submit'}
+                </div>
 
-              <div className="space-y-2 pt-1 text-xs text-[#64748B]">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[#B87314] text-[11px] font-bold">01</span>
-                  <span>Updated resume (PDF or DOCX format, max 10 MB)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[#B87314] text-[11px] font-bold">02</span>
-                  <span>Active LinkedIn profile URL</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[#B87314] text-[11px] font-bold">03</span>
-                  <span>Target discipline and salary expectations</span>
+                <p className="text-xs text-[#475569] leading-relaxed">
+                  {details.checklistIntro ||
+                    'Your contact information, LinkedIn profile, and a brief overview or project document outlining your goals.'}
+                </p>
+
+                <div className="space-y-2 pt-1 text-xs text-[#64748B]">
+                  {checklistSteps.map((step, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="font-mono text-[#B87314] text-[11px] font-bold">
+                        0{idx + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ===================================================================== */}
-          {/* RIGHT COLUMN: APPLICATION FORM OR SUCCESS STATE (60%)                 */}
-          {/* On Mobile: Prioritized FIRST (order-1) so inputs are immediately seen */}
-          {/* On Desktop: Renders on the right (order-2 lg:col-span-7)              */}
-          {/* ===================================================================== */}
+          {/* RIGHT COLUMN: CONSULTATION FORM OR SUCCESS STATE */}
           <div className="order-1 lg:order-2 lg:col-span-7 w-full">
             <AnimatePresence mode="wait">
-              {!submittedCandidate ? (
-                /* Application Form */
+              {!submittedRecord ? (
                 <motion.form
                   key="intake-form"
                   initial={{ opacity: 0, y: 10 }}
@@ -429,27 +424,27 @@ export default function ContactPage() {
                   noValidate
                   className="space-y-6"
                 >
-                  {/* Mobile-First Header: Friendly, direct, immediate context */}
                   <div className="block lg:hidden pb-2">
                     <div className="text-[10.5px] font-bold tracking-[0.2em] text-[#B87314] uppercase mb-2">
-                      SAHARA STAFFING INC. / CANDIDATE NETWORK
+                      {hero.kicker || 'SAHARA STAFFING INC. / CLIENT CONSULTATION'}
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] leading-tight tracking-tight mb-2">
-                      Your next opportunity starts with a{' '}
-                      <span className="text-[#B87314]">conversation.</span>
+                      {heroTitleParts.before}{' '}
+                      {heroTitleParts.highlight && (
+                        <span className="text-[#B87314]">{heroTitleParts.highlight}</span>
+                      )}
                     </h1>
                     <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed">
-                      Complete your profile below to connect directly with our executive placement partners.
+                      {hero.formSubheading || 'Share your hiring requirements below to connect with our talent search team.'}
                     </p>
                   </div>
 
-                  {/* Desktop Form Heading: Aligned with the top of left column */}
                   <div className="hidden lg:block">
                     <h2 className="text-2xl sm:text-3xl font-bold text-[#0B0F17] tracking-tight">
-                      Introduce yourself.
+                      {hero.formHeading || 'Request Talent.'}
                     </h2>
                     <p className="text-xs sm:text-sm text-[#64748B] mt-1">
-                      Complete your profile and attach your resume.
+                      {hero.formSubheading || 'Share your hiring requirements and attach an optional job description.'}
                     </p>
                   </div>
 
@@ -460,7 +455,7 @@ export default function ContactPage() {
                     </div>
                   )}
 
-                  {/* Paired Row 1: Full Name & Email Address */}
+                  {/* Row 1: Full Name & Work Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div id="field-fullName" className="space-y-1.5">
                       <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
@@ -485,14 +480,14 @@ export default function ContactPage() {
 
                     <div id="field-email" className="space-y-1.5">
                       <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
-                        Email Address <span className="text-[#B87314]">*</span>
+                        Work Email <span className="text-[#B87314]">*</span>
                       </label>
                       <input
                         type="email"
                         disabled={isSubmitting}
                         value={formData.email}
                         onChange={(e) => handleChange('email', e.target.value)}
-                        placeholder="you@example.com"
+                        placeholder="name@organization.com"
                         className={`w-full px-3.5 py-3 rounded-lg border bg-white text-[#0B0F17] text-base sm:text-sm placeholder-[#94A3B8] focus:outline-none transition-colors ${
                           errors.email
                             ? 'border-red-500 focus:border-red-500'
@@ -505,7 +500,7 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  {/* Paired Row 2: Phone & Target Discipline */}
+                  {/* Row 2: Phone & Service Area */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div id="field-phone" className="space-y-1.5">
                       <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
@@ -530,7 +525,7 @@ export default function ContactPage() {
 
                     <div id="field-targetDiscipline" className="space-y-1.5">
                       <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
-                        Target Discipline <span className="text-[#B87314]">*</span>
+                        Hiring Focus / Service Area <span className="text-[#B87314]">*</span>
                       </label>
                       <div className="relative">
                         <select
@@ -543,8 +538,8 @@ export default function ContactPage() {
                               : 'border-[#D4CEBF] focus:border-[#0B0F17]'
                           }`}
                         >
-                          <option value="">Select discipline...</option>
-                          {DISCIPLINES.map((d) => (
+                          <option value="">Select hiring focus...</option>
+                          {selectOptions.map((d) => (
                             <option key={d} value={d}>
                               {d}
                             </option>
@@ -567,7 +562,8 @@ export default function ContactPage() {
                   {/* Row 3: LinkedIn URL */}
                   <div id="field-linkedinUrl" className="space-y-1.5">
                     <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
-                      LinkedIn Profile URL <span className="text-[#B87314]">*</span>
+                      LinkedIn Profile URL{' '}
+                      <span className="text-[#64748B] font-normal lowercase">(optional)</span>
                     </label>
                     <input
                       type="url"
@@ -586,25 +582,27 @@ export default function ContactPage() {
                     )}
                   </div>
 
-                  {/* Row 4: Career Summary & Salary Targets */}
+                  {/* Row 4: Project Scope & Objectives */}
                   <div id="field-careerSummary" className="space-y-1.5">
                     <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
-                      Career Summary &amp; Salary Targets <span className="text-[#64748B] font-normal lowercase">(optional context)</span>
+                      Role Requirements &amp; Project Scope{' '}
+                      <span className="text-[#64748B] font-normal lowercase">(optional context)</span>
                     </label>
                     <textarea
                       rows={3}
                       disabled={isSubmitting}
                       value={formData.careerSummary}
                       onChange={(e) => handleChange('careerSummary', e.target.value)}
-                      placeholder="Summarize your experience, target roles, preferred work models (Remote/Hybrid), and salary expectations..."
+                      placeholder="Describe the role, seniority level, tech stack, and estimated start date..."
                       className="w-full px-3.5 py-3 rounded-lg border border-[#D4CEBF] bg-white text-[#0B0F17] text-base sm:text-sm placeholder-[#94A3B8] focus:border-[#0B0F17] focus:outline-none transition-colors"
                     />
                   </div>
 
-                  {/* Row 5: Resume Upload Area */}
+                  {/* Row 5: Optional Supporting Brief Upload */}
                   <div id="field-resume" className="space-y-1.5">
                     <label className="block text-[11px] font-semibold text-[#0B0F17] uppercase tracking-wider">
-                      Resume Document <span className="text-[#B87314]">*</span>
+                      Job Description / Staffing Brief{' '}
+                      <span className="text-[#64748B] font-normal lowercase">(optional)</span>
                     </label>
 
                     <input
@@ -630,17 +628,19 @@ export default function ContactPage() {
                           dragActive
                             ? 'border-[#B87314] bg-[#B87314]/5'
                             : errors.resume
-                            ? 'border-red-400 bg-red-50/30'
-                            : 'border-[#D4CEBF] bg-white hover:border-[#0B0F17]'
+                              ? 'border-red-400 bg-red-50/30'
+                              : 'border-[#D4CEBF] bg-white hover:border-[#0B0F17]'
                         }`}
                       >
                         <div className="flex flex-col items-center justify-center space-y-1.5">
                           <Upload className="w-5 h-5 text-[#B87314] mb-1" />
                           <p className="text-xs font-semibold text-[#0B0F17]">
-                            Drop your resume here
+                            Drop your document here
                           </p>
                           <p className="text-[11px] text-[#64748B]">
-                            or <span className="underline font-medium text-[#0B0F17]">browse files</span> from your computer
+                            or{' '}
+                            <span className="underline font-medium text-[#0B0F17]">browse files</span>{' '}
+                            from your computer
                           </p>
                           <p className="text-[10.5px] text-[#94A3B8] pt-1">
                             PDF or DOCX &bull; Maximum 10 MB
@@ -656,7 +656,8 @@ export default function ContactPage() {
                               {resumeFile.name}
                             </p>
                             <p className="text-[10.5px] text-[#64748B]">
-                              {(resumeFile.size / 1024 / 1024).toFixed(2)} MB &bull; {resumeFile.name.endsWith('.docx') ? 'DOCX' : 'PDF'}
+                              {(resumeFile.size / 1024 / 1024).toFixed(2)} MB &bull;{' '}
+                              {resumeFile.name.endsWith('.docx') ? 'DOCX' : 'PDF'}
                             </p>
                           </div>
                         </div>
@@ -689,8 +690,8 @@ export default function ContactPage() {
                         className="mt-0.5 w-4 h-4 rounded border-[#D4CEBF] text-[#B87314] focus:ring-[#B87314] cursor-pointer"
                       />
                       <span className="text-xs text-[#475569] leading-relaxed">
-                        I agree to Sahara Staffing Inc. storing and reviewing the information and
-                        resume I submit for candidate consideration, as described in the Privacy Policy.
+                        I agree to {companyName} storing and reviewing the information I submit for
+                        consultation follow-up, as described in the Privacy Policy.
                       </span>
                     </label>
                     {errors.privacyAgreed && (
@@ -710,11 +711,11 @@ export default function ContactPage() {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Submitting Profile...</span>
+                          <span>Submitting Inquiry...</span>
                         </>
                       ) : (
                         <>
-                          <span>Submit Profile to Network</span>
+                          <span>{hero.submitButtonLabel || 'Request Talent ->'}</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -722,7 +723,6 @@ export default function ContactPage() {
                   </div>
                 </motion.form>
               ) : (
-                /* Ultra-clean Executive Confirmation State */
                 <motion.div
                   key="intake-success"
                   initial={{ opacity: 0, y: 16 }}
@@ -730,9 +730,7 @@ export default function ContactPage() {
                   transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   className="max-w-xl mx-auto py-12 px-6 text-center space-y-8"
                 >
-                  {/* Premium Fully Animated Emblem Symbol */}
                   <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-                    {/* Glowing pulse aura */}
                     <motion.div
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: [1, 1.25, 1], opacity: [0.35, 0.15, 0.35] }}
@@ -740,7 +738,6 @@ export default function ContactPage() {
                       className="absolute inset-0 rounded-full bg-[#E69D2B]/20 blur-md pointer-events-none"
                     />
 
-                    {/* Outer Rotating/Expanding Ring */}
                     <motion.svg
                       className="w-20 h-20 absolute inset-0 -rotate-90 pointer-events-none"
                       viewBox="0 0 80 80"
@@ -767,14 +764,12 @@ export default function ContactPage() {
                       />
                     </motion.svg>
 
-                    {/* Inner Badge Background with Animated Scale */}
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', damping: 14, stiffness: 200, delay: 0.15 }}
                       className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1E293B] to-[#0B0F17] border border-[#E69D2B]/40 shadow-[0_8px_24px_rgba(230,157,43,0.25)] flex items-center justify-center relative z-10"
                     >
-                      {/* Animated Gold Checkmark Path */}
                       <svg className="w-7 h-7 text-[#E69D2B]" viewBox="0 0 24 24" fill="none">
                         <motion.path
                           d="M5 13l4.5 4.5L19 7"
@@ -790,7 +785,6 @@ export default function ContactPage() {
                     </motion.div>
                   </div>
 
-                  {/* Typography with Crisp Contrast */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -801,11 +795,12 @@ export default function ContactPage() {
                       Thank You for Reaching Out.
                     </h1>
                     <p className="text-sm sm:text-base text-[#475569] max-w-lg mx-auto leading-relaxed font-normal">
-                      We have received your application and resume. Our executive talent acquisition team will review your credentials and contact you directly if your background matches an active placement.
+                      We have received your inquiry ({submittedRecord?.tracking_id}). Our specialized
+                      recruitment and staffing team will review your requirements and contact you directly within our
+                      partner response window.
                     </p>
                   </motion.div>
 
-                  {/* Clean Action Button: Single Homepage Destination */}
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}

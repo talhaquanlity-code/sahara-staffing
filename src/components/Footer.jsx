@@ -2,27 +2,57 @@ import React from 'react';
 import { Linkedin, Twitter, Instagram, Mail, Github, ArrowRight } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
-import logoImg from '../assets/sahara-logo.png';
+import logoImg from '../assets/sahara-logo.webp';
 
 export default function Footer({ onNavigate }) {
-  const { openModal, showToast } = useUI();
+  const { showToast } = useUI();
   const cms = useCMS();
   const content = cms?.content;
   const settings = cms?.settings;
 
-  // Dynamic social links from CMS content or settings, fallback to LinkedIn + Email
+  const brandLogo = settings?.brandLogoUrl || logoImg;
+  const companyName = settings?.companyName || 'Sahara Staffing Inc.';
+  const footerData = content?.home?.footer || content?.footer || {};
+  const footerCopyright =
+    settings?.footerCopyright ||
+    footerData?.copyright ||
+    '© 2026 Sahara Staffing Inc. All rights reserved.';
+  const brandTagline =
+    footerData?.brandTagline ||
+    'Enterprise Staffing & Executive Search Solutions. Connecting ambitious enterprises with top-tier technical contractors and executive leadership.';
+  const ctaExploreLabel = footerData?.ctaExploreLabel || 'Explore Services';
+  const officeTitle = footerData?.officeTitle || 'STAFFING OPERATIONS';
+  const officeDesc =
+    footerData?.officeDesc ||
+    'Dedicated talent partners for enterprise contractor placement, direct hire, and executive search.';
+
+  const showFooterEmail = settings?.showFooterEmail !== false;
+  const contactEmail =
+    settings?.footerContactEmail ||
+    footerData?.contactEmail ||
+    settings?.recipientEmail ||
+    'contact@sahara-staffing.com';
+
+  // Dynamic social links from settings or CMS content
   const rawSocials =
-    content?.home?.footer?.socialLinks ||
-    content?.footer?.socialLinks ||
-    settings?.footerSocials || [
-      { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
+    settings?.footerSocials ||
+    footerData?.socialLinks || [
+      { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com', enabled: true },
       { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
-      { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
-      { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
-      { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
     ];
 
-  const activeSocials = rawSocials.filter((s) => s.enabled !== false);
+  const activeSocials = rawSocials
+    .map((s) => {
+      const plat = (s.platform || '').toLowerCase();
+      if (plat === 'linkedin' && settings?.footerLinkedinUrl) {
+        return { ...s, url: settings.footerLinkedinUrl };
+      }
+      if (plat === 'email' || plat === 'mail') {
+        return { ...s, url: `mailto:${contactEmail}`, enabled: showFooterEmail && s.enabled !== false };
+      }
+      return s;
+    })
+    .filter((s) => s.enabled !== false);
 
   const getPlatformIcon = (platform) => {
     switch ((platform || '').toLowerCase()) {
@@ -48,7 +78,7 @@ export default function Footer({ onNavigate }) {
       onClick: () => (onNavigate ? onNavigate('home') : (window.location.hash = 'home')),
     },
     {
-      label: 'About',
+      label: 'About Us',
       onClick: () => (onNavigate ? onNavigate('about') : (window.location.hash = 'about')),
     },
     {
@@ -61,12 +91,6 @@ export default function Footer({ onNavigate }) {
     },
   ];
 
-  const contactEmail =
-    content?.home?.footer?.contactEmail ||
-    content?.footer?.contactEmail ||
-    settings?.recipientEmail ||
-    'contact@sahara-staffing.com';
-
   return (
     <footer className="w-full">
       {/* Sleek Dark Card Shell: Compact py-8 px-6 on mobile (< md), spacious on desktop */}
@@ -77,17 +101,24 @@ export default function Footer({ onNavigate }) {
         <div className="block md:hidden text-center space-y-3.5">
           {/* Brand Logo */}
           <div className="flex justify-center">
-            <a href="#" className="inline-block">
+            <button
+              type="button"
+              onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
+              className="inline-block cursor-pointer focus:outline-none"
+              aria-label={`${companyName} Home`}
+            >
               <img
-                src={logoImg}
-                alt="Sahara Staffing Inc."
+                src={brandLogo}
+                alt={companyName}
+                loading="lazy"
+                decoding="async"
                 className="h-6 w-auto object-contain"
               />
-            </a>
+            </button>
           </div>
 
-          {/* Single-Row Horizontal Navigation: Home • About • Services • Contact */}
-          <nav className="flex items-center justify-center gap-2 text-xs font-medium text-white/85">
+          {/* Single-Row Horizontal Navigation */}
+          <nav className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium text-white/85">
             <button
               type="button"
               onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
@@ -101,7 +132,7 @@ export default function Footer({ onNavigate }) {
               onClick={() => (onNavigate ? onNavigate('about') : (window.location.hash = 'about'))}
               className="hover:text-[#E69D2B] transition-colors cursor-pointer"
             >
-              About
+              About Us
             </button>
             <span className="text-white/20">•</span>
             <button
@@ -153,11 +184,11 @@ export default function Footer({ onNavigate }) {
 
           {/* Compact Copyright + Legal Links */}
           <div className="pt-3 border-t border-white/[0.07] flex flex-col items-center gap-1.5 text-[11px] text-[#64748B]">
-            <span>&copy; 2026 Sahara Staffing Inc. All Rights Reserved.</span>
+            <span>{footerCopyright}</span>
             <div className="flex items-center gap-3 text-[11px] text-[#94A3B8]/60">
               <button
                 type="button"
-                onClick={() => openModal('Privacy Policy')}
+                onClick={() => showToast('Privacy Policy: Contact contact@sahara-staffing.com for details.')}
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 Privacy Policy
@@ -165,7 +196,7 @@ export default function Footer({ onNavigate }) {
               <span className="text-white/20">•</span>
               <button
                 type="button"
-                onClick={() => openModal('Terms of Service')}
+                onClick={() => showToast('Terms of Service: Standard enterprise engagement agreements apply.')}
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 Terms of Service
@@ -183,18 +214,24 @@ export default function Footer({ onNavigate }) {
             {/* Left Brand Block */}
             <div className="lg:col-span-5 space-y-3 sm:space-y-3.5">
               {/* Real Official Sahara Staffing Logo */}
-              <a href="#" className="inline-block group">
+              <button
+                type="button"
+                onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
+                className="inline-block group cursor-pointer focus:outline-none text-left"
+                aria-label={`${companyName} Home`}
+              >
                 <img
-                  src={logoImg}
-                  alt="Sahara Staffing Inc."
+                  src={brandLogo}
+                  alt={companyName}
+                  loading="lazy"
+                  decoding="async"
                   className="h-7 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 />
-              </a>
+              </button>
 
-              {/* Premium, Smaller, Clean Brand Tagline */}
+              {/* Brand Tagline */}
               <p className="text-[12px] sm:text-[13px] text-[#94A3B8]/75 leading-[1.65] max-w-[330px] font-normal tracking-[-0.01em]">
-                Connecting elite talent with high-growth enterprises. End-to-end executive search,
-                tech recruitment, and specialized B2B staffing solutions.
+                {brandTagline}
               </p>
 
               <div className="pt-1 flex flex-wrap items-center gap-x-3.5 gap-y-2">
@@ -203,7 +240,7 @@ export default function Footer({ onNavigate }) {
                   onClick={() => (onNavigate ? onNavigate('services') : (window.location.hash = 'services'))}
                   className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12px] font-medium text-[#E69D2B] hover:text-[#F6C467] hover:underline transition-colors group tracking-wide focus:outline-none cursor-pointer"
                 >
-                  <span>Explore Our Services</span>
+                  <span>{ctaExploreLabel}</span>
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                 </button>
                 <span className="text-white/20 hidden sm:inline">•</span>
@@ -267,19 +304,20 @@ export default function Footer({ onNavigate }) {
               </div>
 
               <div className="text-[11px] text-[#64748B] leading-relaxed font-normal tracking-tight flex items-center gap-2">
-                <span>&copy; 2026 Sahara Staffing Inc. All Rights Reserved.</span>
+                <span>{footerCopyright}</span>
                 <button
                   type="button"
                   onClick={() => {
                     try {
                       sessionStorage.removeItem('sahara_admin_session_v2');
                     } catch {}
+                    window.dispatchEvent(new CustomEvent('sahara:admin-login-redirect'));
                     if (onNavigate) onNavigate('admin');
                     else window.location.hash = 'admin';
                   }}
-                  title="Staff Portal"
+                  title="Admin Portal"
                   className="text-[#64748B]/50 hover:text-[#E69D2B] transition-colors p-0.5 cursor-pointer"
-                  aria-label="Staff Access Portal"
+                  aria-label="Admin Access Portal"
                 >
                   &bull;
                 </button>
@@ -290,19 +328,21 @@ export default function Footer({ onNavigate }) {
             <div className="md:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
               <div>
                 <div className="text-[10.5px] font-semibold text-white/90 tracking-[0.08em] uppercase mb-1 sm:mb-1.5">
-                  Executive Inquiries
+                  {officeTitle}
                 </div>
                 <div className="space-y-0.5 text-[11.5px] sm:text-[12px] text-[#94A3B8]/75 leading-relaxed">
-                  <div>
-                    <a
-                      href={`mailto:${contactEmail}`}
-                      className="hover:text-[#E69D2B] transition-colors font-mono"
-                    >
-                      {contactEmail}
-                    </a>
-                  </div>
+                  {showFooterEmail && (
+                    <div>
+                      <a
+                        href={`mailto:${contactEmail}`}
+                        className="hover:text-[#E69D2B] transition-colors font-mono"
+                      >
+                        {contactEmail}
+                      </a>
+                    </div>
+                  )}
                   <div className="text-[#64748B] text-[11px]">
-                    Confidential talent search &amp; intake
+                    {officeDesc}
                   </div>
                 </div>
               </div>
@@ -323,7 +363,7 @@ export default function Footer({ onNavigate }) {
               <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1 text-[11px] sm:text-[11.5px] text-[#94A3B8]/60 md:text-right">
                 <button
                   type="button"
-                  onClick={() => openModal('Privacy Policy')}
+                  onClick={() => showToast('Privacy Policy: Contact contact@sahara-staffing.com for details.')}
                   className="hover:text-white transition-colors focus:outline-none cursor-pointer"
                 >
                   Privacy Policy
@@ -331,7 +371,7 @@ export default function Footer({ onNavigate }) {
                 <span className="text-white/20">•</span>
                 <button
                   type="button"
-                  onClick={() => openModal('Terms of Service')}
+                  onClick={() => showToast('Terms of Service: Standard enterprise engagement agreements apply.')}
                   className="hover:text-white transition-colors focus:outline-none cursor-pointer"
                 >
                   Terms of Service

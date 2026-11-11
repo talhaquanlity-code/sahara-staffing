@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cpu, ShieldCheck, TrendingUp, Code2, ArrowUpRight } from 'lucide-react';
-import { useUI } from '../context/UIContext';
 
 const disciplinesData = [
   {
     id: 'ai-cloud',
     stepNumber: '01',
     icon: Cpu,
-    title: 'AI & Cloud Engineering',
-    description: 'Principal Python, PyTorch, Kubernetes, and Distributed Systems Engineers.',
-    candidateRole: 'Senior AI & Systems Architect',
-    image: '/assets/talent-ai.jpg',
-    metric1Label: 'Avg. Time-to-Fill',
+    title: 'AI & Cloud Architecture',
+    description: 'Principal Python, PyTorch, Kubernetes, and Distributed Systems Solutions.',
+    candidateRole: 'Enterprise AI & Systems Practice',
+    image: '/assets/img 16.webp',
+    metric1Label: 'Avg. Launch Time',
     metric1Val: '10 Days',
-    metric2Label: 'Vetting Pass Rate',
-    metric2Val: 'Top 2.0%',
+    metric2Label: 'Delivery Reliability',
+    metric2Val: '99.2%',
     skills: ['Python', 'PyTorch', 'AWS', 'LLMs', 'Kubernetes'],
   },
   {
@@ -23,47 +22,46 @@ const disciplinesData = [
     stepNumber: '02',
     icon: ShieldCheck,
     title: 'Executive Search',
-    description: 'VP of Engineering, CTO, COO, and Director-level placements.',
-    candidateRole: 'VP of Engineering (Series B - Enterprise)',
-    image: '/assets/talent-exec.jpg',
-    metric1Label: 'Avg. Time-to-Fill',
+    description: 'C-suite technical governance, interim architecture leadership, and executive placement.',
+    candidateRole: 'Executive Search & Leadership',
+    image: '/assets/img 5.webp',
+    metric1Label: 'Avg. Launch Time',
     metric1Val: '14 Days',
-    metric2Label: '90-Day Retention',
+    metric2Label: 'Client Retention',
     metric2Val: '98%',
-    skills: ['Tech Strategy', 'Scale-Up', 'Board Advisory', 'Org Design'],
+    skills: ['Tech Strategy', 'Scale-Up', 'Executive Search', 'Org Design'],
   },
   {
     id: 'finance-ops',
     stepNumber: '03',
     icon: TrendingUp,
-    title: 'Finance & Leadership',
-    description: 'CFOs, Controllers, FP&A Directors, and Audit-readiness leads.',
-    candidateRole: 'Director of Strategic Finance & FP&A',
-    image: '/assets/talent-finance.jpg',
-    metric1Label: 'Avg. Time-to-Fill',
+    title: 'Finance & Operations',
+    description: 'Strategic finance systems, FP&A frameworks, and audit-readiness automation.',
+    candidateRole: 'Strategic Finance & Operations',
+    image: '/assets/img 17.webp',
+    metric1Label: 'Avg. Launch Time',
     metric1Val: '12 Days',
-    metric2Label: 'Vetting Pass Rate',
-    metric2Val: 'Top 3.0%',
-    skills: ['M&A', 'FP&A', 'Audit Prep', 'US GAAP', 'Venture Debt'],
+    metric2Label: 'Accuracy Benchmark',
+    metric2Val: '99.5%',
+    skills: ['M&A', 'FP&A', 'Audit Prep', 'US GAAP', 'Analytics'],
   },
   {
     id: 'product-fullstack',
     stepNumber: '04',
     icon: Code2,
-    title: 'Product & Full-Stack',
-    description: 'Lead React, Node.js, and Enterprise SaaS Product Managers.',
-    candidateRole: 'Lead Full-Stack React Architect',
-    image: '/assets/talent-product.jpg',
-    metric1Label: 'Avg. Time-to-Fill',
+    title: 'Product & Engineering',
+    description: 'Lead React, Node.js, and Enterprise SaaS Delivery Frameworks.',
+    candidateRole: 'Full-Stack Architecture Practice',
+    image: '/assets/img 5.webp',
+    metric1Label: 'Avg. Launch Time',
     metric1Val: '8 Days',
-    metric2Label: 'Vetting Pass Rate',
-    metric2Val: 'Top 2.5%',
+    metric2Label: 'Client Satisfaction',
+    metric2Val: '98.5%',
     skills: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'Next.js'],
   },
 ];
 
 export default function TalentPool() {
-  const { openModal } = useUI();
   const [activeRoleIndex, setActiveRoleIndex] = useState(0);
 
   const activeRole = disciplinesData[activeRoleIndex];
@@ -84,18 +82,18 @@ export default function TalentPool() {
           {/* Header Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0B0F17] border border-[#E69D2B]/40 text-white text-xs font-bold shadow-md mb-4">
             <span className="w-2 h-2 rounded-full bg-[#E69D2B]" />
-            <span className="tracking-widest uppercase">SAHARA TALENT POOL</span>
+            <span className="tracking-widest uppercase">SAHARA PRACTICES</span>
           </div>
 
           {/* Title */}
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B0F17] tracking-tight mb-4 leading-[1.12]">
-            Pre-Vetted Specialists Ready for Immediate Deployment
+            Specialized Capabilities Ready for Immediate Deployment
           </h2>
 
           {/* Subtitle */}
           <p className="text-slate-600 text-sm sm:text-base max-w-2xl font-normal leading-relaxed">
-            Explore our core recruitment disciplines. Hover over any domain to preview active candidate
-            profiles and placement SLAs.
+            Explore our core enterprise practices. Hover over any domain to preview active capability
+            frameworks and delivery SLAs.
           </p>
         </motion.div>
 
@@ -124,7 +122,8 @@ export default function TalentPool() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
                 className="object-cover object-top w-full h-full absolute inset-0"
-                loading="eager"
+                loading="lazy"
+                decoding="async"
               />
             </AnimatePresence>
 
@@ -134,14 +133,16 @@ export default function TalentPool() {
             {/* Top-Left Live Availability Badge */}
             <div className="absolute top-6 left-6 z-20 bg-[#0B0F17]/85 backdrop-blur-md border border-white/15 rounded-full px-3.5 py-1.5 flex items-center gap-2 text-xs text-white font-semibold shadow-lg">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Vetted &amp; Available Now</span>
+              <span>Ready for Deployment</span>
             </div>
 
             {/* Top-Right Quick CTA Pill */}
             <button
-              onClick={() => openModal(`Interview Candidate: ${activeRole.candidateRole}`)}
+              onClick={() => {
+                window.location.hash = 'contact';
+              }}
               className="absolute top-6 right-6 z-20 w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-[#E69D2B] hover:text-[#0B0F17] transition-all duration-200 cursor-pointer shadow-md"
-              title="Request Candidate Profile"
+              title="Inquire About Practice"
             >
               <ArrowUpRight className="w-4 h-4" />
             </button>
@@ -254,7 +255,7 @@ export default function TalentPool() {
                         isActive ? 'text-[#E69D2B] translate-x-1' : 'text-slate-300'
                       }`}
                     >
-                      →
+                      â†’
                     </span>
                   </div>
                 </div>

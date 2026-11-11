@@ -96,11 +96,11 @@ function EditableSection({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-4 left-4 z-40 flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0B0F17]/95 border border-[#E69D2B] text-white shadow-2xl pointer-events-none"
+            className="absolute top-3 left-3 z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0B0F17]/95 border border-[#E69D2B] text-white shadow-2xl pointer-events-none"
           >
             <span className="w-2 h-2 rounded-full bg-[#E69D2B] animate-pulse" />
             <span className="text-xs font-bold font-mono text-[#E69D2B]">
-              ✏️ Edit Block {blockNumber}: {blockTitle}
+              âœï¸ Edit Block {blockNumber}: {blockTitle}
             </span>
             <span className="text-[10px] text-white/70 font-sans hidden sm:inline">
               (Click to edit)
@@ -194,7 +194,7 @@ function MobilePreviewIframe({ children }) {
   return (
     <iframe
       ref={iframeRef}
-      title="Sahara Staffing Mobile Live Viewport"
+      title="Sahara Staffing Inc. Mobile Live Viewport"
       className="w-full h-full border-0 block bg-[#0B0F17] rounded-[38px] overflow-y-auto"
       style={{ border: 'none' }}
     >
@@ -208,38 +208,42 @@ function MobilePreviewIframe({ children }) {
 // ---------------------------------------------------------------------------
 const SECTION_PILLS = {
   home: [
-    { id: 'home-block-01', num: '01', label: 'Hero', anchor: '#hero-section' },
+    { id: 'home-block-01', num: '01', label: 'Hero & Navbar', anchor: '#hero-section' },
     { id: 'home-block-02', num: '02', label: 'Partners & Metrics', anchor: '#metrics-section' },
     { id: 'home-block-03', num: '03', label: 'Bento Solutions', anchor: '#capital-section' },
-    { id: 'home-block-04', num: '04', label: 'Kinetic Pipeline', anchor: '#process-story' },
-    { id: 'home-block-05', num: '05', label: 'Hiring Estimator', anchor: '#staffing-momentum' },
+    { id: 'home-block-04', num: '04', label: 'Scroll-Hijacked Narrative', anchor: '#process-story' },
+    { id: 'home-block-05', num: '05', label: 'Value Estimator', anchor: '#staffing-momentum' },
     { id: 'home-block-06', num: '06', label: 'Testimonials', anchor: '#testimonials-section' },
     { id: 'home-block-07', num: '07', label: 'FAQ', anchor: '#faq-section' },
     { id: 'home-block-08', num: '08', label: 'CTA & Footer', anchor: '#footer-section' },
   ],
   about: [
     { id: 'about-block-01', num: '01', label: 'About Hero', anchor: '#about-hero' },
-    { id: 'about-block-02', num: '02', label: 'Benchmarks', anchor: '#about-benchmarks' },
-    { id: 'about-block-03', num: '03', label: 'Discipline Matrix', anchor: '#about-mindset' },
-    { id: 'about-block-04', num: '04', label: 'Scale Stats', anchor: '#about-stats' },
+    { id: 'about-block-02', num: '02', label: 'Perspective & Values', anchor: '#about-benchmarks' },
+    { id: 'about-block-03', num: '03', label: 'Mindset Chapters', anchor: '#about-mindset' },
+    { id: 'about-block-04', num: '04', label: 'Scale Stats & Philosophy', anchor: '#about-stats' },
     { id: 'about-block-05', num: '05', label: 'Final CTA', anchor: '#about-final-cta' },
   ],
   services: [
     { id: 'services-block-01', num: '01', label: 'Services Hero', anchor: '#services-hero' },
-    { id: 'services-block-02', num: '02', label: 'Capabilities', anchor: '#services-capabilities' },
-    { id: 'services-block-03', num: '03', label: 'Vetting', anchor: '#services-vetting' },
-    { id: 'services-block-04', num: '04', label: 'Engagement', anchor: '#services-models' },
-    { id: 'services-block-05', num: '05', label: 'SLA Guarantee', anchor: '#services-sla' },
+    { id: 'services-block-02', num: '02', label: 'Service Cards', anchor: '#services-capabilities' },
+    { id: 'services-block-03', num: '03', label: 'Our Approach', anchor: '#services-sla' },
+    { id: 'services-block-04', num: '04', label: 'Closing CTA', anchor: '#services-sla' },
   ],
   contact: [
     { id: 'contact-block-01', num: '01', label: 'Contact Intake', anchor: '#contact-workspace' },
   ],
   settings: [
-    { id: 'global-settings', num: '⚙️', label: 'Site Utilities', anchor: '#global-settings' },
+    { id: 'global-settings', num: 'âš™ï¸', label: 'Site Utilities', anchor: '#global-settings' },
   ],
 };
 
-export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
+export default function CMSWorkspace({
+  onToggleSidebar,
+  onOpenMobileMenu,
+  sidebarCollapsed,
+  onOpenAdditionalSettings,
+}) {
   const {
     draftContent,
     content: publishedContent,
@@ -258,6 +262,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
   // 'home' | 'about' | 'services' | 'contact' | 'settings'
   // =========================================================================
   const [activePageTab, setActivePageTab] = useState('home');
+  const [expandedStageIdx, setExpandedStageIdx] = useState(0);
 
   // Set of currently expanded block IDs inside the drawer
   const [expandedBlocks, setExpandedBlocks] = useState(() => new Set(['home-block-01']));
@@ -277,25 +282,30 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
   const contentRef = useRef(null);
   const drawerScrollRef = useRef(null);
   const [stageWidth, setStageWidth] = useState(1100);
+  const [stageHeight, setStageHeight] = useState(760);
   const [contentHeight, setContentHeight] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [previewKey, setPreviewKey] = useState(0);
   const [dragOverKey, setDragOverKey] = useState(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState(null);
 
-  // Track Center Stage width for dynamic 1440px desktop scaling math
+  // Track Center Stage dimensions for responsive Desktop & Mobile chassis scaling
   useEffect(() => {
     if (!stageRef.current) return;
-    const updateWidth = () => {
+    const updateSize = () => {
       if (stageRef.current) {
         setStageWidth(stageRef.current.clientWidth);
+        setStageHeight(stageRef.current.clientHeight);
       }
     };
-    updateWidth();
+    updateSize();
     const ro = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.contentRect.width > 0) {
           setStageWidth(entry.contentRect.width);
+        }
+        if (entry.contentRect.height > 0) {
+          setStageHeight(entry.contentRect.height);
         }
       }
     });
@@ -303,8 +313,13 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
     return () => ro.disconnect();
   }, [isDrawerOpen]);
 
-  // Scaled desktop math: Fits true 1440px desktop frame neatly into stage
-  const desktopScale = Math.min(1, Math.max(0.42, (stageWidth - 36) / 1440));
+  // Scaled desktop math: Fits true 1440px desktop frame cleanly inside stage at any viewport width
+  const desktopScale = Math.min(1, Math.max(0.24, (stageWidth - 48) / 1440));
+  // Scaled mobile phone chassis math: Fits the entire 395x790 phone mockup visibly inside stage
+  const mobileScale = Math.min(
+    1,
+    Math.max(0.45, Math.min((stageWidth - 36) / 395, (stageHeight - 80) / 790))
+  );
 
   // Track rendered content height
   useEffect(() => {
@@ -445,26 +460,24 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
   const getBlockTitle = (blockId) => {
     switch (blockId) {
-      case 'home-block-01': return 'Block 01: Hero Section';
+      case 'home-block-01': return 'Block 01: Hero & Navigation';
       case 'home-block-02': return 'Block 02: Partners & Metrics Strip';
       case 'home-block-03': return 'Block 03: Bento Solutions Grid';
-      case 'home-block-04': return 'Block 04: Kinetic Vetting Pipeline';
-      case 'home-block-05': return 'Block 05: Executive Hiring Estimator';
+      case 'home-block-04': return 'Block 04: Scroll-Hijacked Narrative';
+      case 'home-block-05': return 'Block 05: Talent Solutions Estimator';
       case 'home-block-06': return 'Block 06: Testimonials Carousel';
       case 'home-block-07': return 'Block 07: Frequently Asked Questions';
       case 'home-block-08': return 'Block 08: Bottom CTA & Footer';
       case 'about-block-01': return 'Block 01: About Hero Section';
-      case 'about-block-02': return 'Block 02: Operating Benchmarks';
-      case 'about-block-03': return 'Block 03: Discipline Matrix';
-      case 'about-block-04': return 'Block 04: Hard Scale Stats';
+      case 'about-block-02': return 'Block 02: Perspective & Core Values';
+      case 'about-block-03': return 'Block 03: Mindset Chapters';
+      case 'about-block-04': return 'Block 04: Hard Scale Stats & Philosophy';
       case 'about-block-05': return 'Block 05: Final CTA';
       case 'services-block-01': return 'Block 01: Services Hero Section';
-      case 'services-block-02': return 'Block 02: Service Capabilities Grid';
-      case 'services-block-03': return 'Block 03: Vetting Process';
-      case 'services-block-04': return 'Block 04: Engagement Models';
-      case 'services-block-05': return 'Block 05: SLA Guarantee';
-      case 'contact-block-01': return 'Block 01: Contact Form & Intake';
-      case 'global-settings': return 'Global Site Utility Toggles';
+      case 'services-block-02': return 'Block 02: Service Cards Manager';
+      case 'services-block-03': return 'Block 03: Our Approach';
+      case 'services-block-04': return 'Block 04: Closing CTA';
+      case 'contact-block-01': return 'Block 01: Contact Form & Consultation Intake';
       default: return 'Section Settings';
     }
   };
@@ -474,16 +487,11 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
     if (previewScrollRef.current) {
       previewScrollRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    // Set default active block for selected page
     let defaultBlock = 'home-block-01';
     if (activePageTab === 'home') defaultBlock = 'home-block-01';
     else if (activePageTab === 'about') defaultBlock = 'about-block-01';
     else if (activePageTab === 'services') defaultBlock = 'services-block-01';
     else if (activePageTab === 'contact') defaultBlock = 'contact-block-01';
-    else if (activePageTab === 'settings') {
-      defaultBlock = 'global-settings';
-      setIsDrawerOpen(true);
-    }
     setActiveBlock(defaultBlock);
     setExpandedBlocks(new Set([defaultBlock]));
   }, [activePageTab]);
@@ -612,7 +620,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       type="text"
                       value={btn.label || ''}
                       onChange={(e) => onUpdate(idx, 'label', e.target.value)}
-                      placeholder={isPrimary ? 'Request Talent' : 'Explore Open Roles'}
+                      placeholder={isPrimary ? 'Get Started' : 'Explore Services'}
                       className="w-full px-2.5 py-1.5 rounded-lg bg-[#0E131F] border border-[#1E293B] text-white text-xs font-inter focus:border-[#E69D2B] focus:outline-none"
                     />
                   </div>
@@ -626,12 +634,12 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       onChange={(e) => onUpdate(idx, 'destination', e.target.value)}
                       className="w-full px-2.5 py-1.5 rounded-lg bg-[#0E131F] border border-[#1E293B] text-white text-xs font-inter focus:border-[#E69D2B] focus:outline-none cursor-pointer"
                     >
-                      <option value="/contact">/contact — Talent Request &amp; Contact</option>
-                      <option value="/services">/services — Practice Chapters</option>
-                      <option value="/about">/about — Company &amp; Mindset</option>
-                      <option value="#calculator">#calculator — Retainer Calculator</option>
-                      <option value="#vetting">#vetting — 5-Stage Diligence</option>
-                      <option value="#testimonials">#testimonials — Client Success</option>
+                      <option value="/contact">/contact — Consultation &amp; Contact</option>
+                      <option value="/services">/services — Services &amp; Solutions</option>
+                      <option value="/about">/about â€” Company &amp; Mindset</option>
+                      <option value="#calculator">#calculator â€” Retainer Calculator</option>
+                      <option value="#vetting">#vetting â€” 5-Stage Diligence</option>
+                      <option value="#testimonials">#testimonials â€” Client Success</option>
                     </select>
                   </div>
                 </div>
@@ -748,7 +756,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       {/* ===================================================================== */}
       {/* 1. HOMEPAGE VIEWPORT (EXACT MATCH OF REAL SITE DOM & ARCHITECTURE)   */}
       {/* ===================================================================== */}
-      {(activePageTab === 'home' || activePageTab === 'settings') && (
+      {activePageTab === 'home' && (
         <>
           {/* Block 01: Hero Section (Embeds 3-Part Glassmorphic Header) */}
           <EditableSection
@@ -804,11 +812,11 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
             </EditableSection>
           </main>
 
-          {/* Block 04: Kinetic Vetting Pipeline (Full-Width Cinematic Stage) */}
+          {/* Block 04: Scroll-Hijacked Narrative (Full-Width Cinematic Stage) */}
           <EditableSection
             blockId="home-block-04"
             blockNumber="04"
-            blockTitle="Kinetic Vetting Pipeline"
+            blockTitle="Scroll-Hijacked Narrative"
             activeBlock={activeBlock}
             isDrawerOpen={isDrawerOpen}
             onSelectBlock={openBlockDrawer}
@@ -821,13 +829,13 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
             </div>
           </EditableSection>
 
-          {/* Architectural Bento Canvas — Lower Block */}
+          {/* Architectural Bento Canvas */}
           <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
-            {/* Block 05: Executive Hiring Estimator */}
+            {/* Block 05: Talent Solutions Estimator */}
             <EditableSection
               blockId="home-block-05"
               blockNumber="05"
-              blockTitle="Executive Hiring Estimator"
+              blockTitle="Talent Solutions Estimator"
               activeBlock={activeBlock}
               isDrawerOpen={isDrawerOpen}
               onSelectBlock={openBlockDrawer}
@@ -1007,62 +1015,55 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       </AnimatePresence>
 
       {/* ===================================================================== */}
-      {/* 1. TOP PAGE TAB NAVIGATION STRIP (Matches Image 3)                    */}
+      {/* 1. COMPACT TOP EDITOR BAR (Whiteboard Top Bar: Controls & Publish)     */}
       {/* ===================================================================== */}
-      <header className="sticky top-0 z-40 w-full px-4 sm:px-6 py-2.5 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-4 shrink-0 select-none shadow-md">
-        {/* Left: Sidebar Toggle + Minimal Animated Page Route Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+      <header className="sticky top-0 z-30 w-full px-4 sm:px-6 py-2.5 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-4 shrink-0 select-none shadow-md">
+        {/* Left: Sidebar Toggle + Workspace Title */}
+        <div className="flex items-center gap-3 min-w-0">
+          {onOpenMobileMenu && (
+            <button
+              type="button"
+              onClick={onOpenMobileMenu}
+              className="lg:hidden w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              aria-label="Open navigation menu"
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          )}
           {onToggleSidebar && (
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] flex items-center justify-center transition-colors cursor-pointer shrink-0"
-              title={sidebarCollapsed ? "Expand sidebar (260px)" : "Collapse sidebar (68px)"}
+              className="hidden lg:flex w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] items-center justify-center transition-colors cursor-pointer shrink-0"
+              title={sidebarCollapsed ? 'Expand sidebar overlay (260px)' : 'Collapse sidebar rail (68px)'}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
           )}
 
-          {/* Minimal Animated Page Route Tabs */}
-          {[
-            { id: 'home', label: 'Home Page', icon: Home },
-            { id: 'about', label: 'About Page', icon: Info },
-            { id: 'services', label: 'Services Page', icon: Briefcase },
-            { id: 'contact', label: 'Contact Page', icon: PhoneCall },
-            { id: 'settings', label: 'Global Settings', icon: SettingsIcon },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activePageTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setActivePageTab(tab.id);
-                  if (tab.id === 'settings') {
-                    setActiveBlock('global-settings');
-                  }
-                }}
-                className={`relative px-4 py-2 rounded-xl font-sans text-xs font-bold transition-all cursor-pointer select-none flex items-center gap-2 shrink-0 ${
-                  isActive ? 'text-[#0B0F17]' : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="activeCmsTab"
-                    className="absolute inset-0 bg-[#E69D2B] rounded-xl shadow-md z-0"
-                    transition={{ type: 'spring', bounce: 0.18, duration: 0.35 }}
-                  />
-                )}
-                <Icon className={`w-3.5 h-3.5 relative z-10 ${isActive ? 'text-[#0B0F17]' : 'text-[#E69D2B]'}`} />
-                <span className="relative z-10">{tab.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex items-center gap-2.5 truncate">
+            <span className="text-xs sm:text-sm font-bold text-white tracking-tight truncate">
+              Visual Site Editor
+            </span>
+            <span className="hidden sm:inline-block text-[10.5px] font-mono text-[#E69D2B] bg-[#E69D2B]/10 border border-[#E69D2B]/25 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              {activePageTab}
+            </span>
+          </div>
         </div>
 
-        {/* Right: Expand/Collapse Blocks + Save & Publish CTA */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Right: Additional Settings Shortcut + Expand/Collapse + Publish CTA */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {onOpenAdditionalSettings && (
+            <button
+              type="button"
+              onClick={onOpenAdditionalSettings}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-[#E69D2B]/15 text-[11px] text-[#E69D2B] border border-[#E69D2B]/25 transition-colors cursor-pointer font-semibold"
+              title="Open Additional Settings (Logos, Theme, Cursor, SEO, Socials, Copyright)"
+            >
+              <SettingsIcon className="w-3.5 h-3.5" />
+              <span>Additional Settings</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={expandAllBlocks}
@@ -1108,16 +1109,27 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
       </header>
 
       {/* ===================================================================== */}
-      {/* 2. MASTER SPLIT-SCREEN WORKSPACE (MATCHING IMAGE 3 EXACTLY)          */}
+      {/* 2. MASTER SPLIT-SCREEN WORKSPACE (WHITEBOARD SKETCH ARCHITECTURE)     */}
+      {/* Left: Spacious Blocks Panel | Right: Rounded Pages Pill + Live Preview */}
       {/* ===================================================================== */}
-      <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row overflow-hidden relative p-3 sm:p-4 gap-3 bg-[#080B12]">
+      <div className="flex-1 min-h-0 w-full flex flex-col lg:flex-row overflow-hidden relative p-3 sm:p-4 gap-4 bg-[#080B12]">
         {/* =================================================================== */}
-        {/* ZONE A: LEFT SECTION BLOCK ACCORDIONS LIST                         */}
+        {/* ZONE A: LEFT "BLOCKS" PANEL (Spacious, Un-squeezed Accordion Editor) */}
         {/* =================================================================== */}
         <div
           data-lenis-prevent
-          className="w-full lg:w-[460px] xl:w-[490px] 2xl:w-[520px] shrink-0 h-full flex flex-col bg-[#0B0F17] rounded-2xl border border-white/5 overflow-hidden shadow-xl"
+          className="w-full lg:w-[44%] xl:w-[45%] min-w-0 lg:min-w-[380px] max-w-full lg:max-w-[580px] shrink-0 h-full flex flex-col bg-[#0B0F17] rounded-2xl border border-white/10 overflow-hidden shadow-xl"
         >
+          {/* Clean Blocks Header Strip */}
+          <div className="px-4 py-2.5 border-b border-white/10 bg-[#0E131F]/70 flex items-center justify-between shrink-0 select-none">
+            <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#E69D2B] uppercase">
+              Blocks
+            </span>
+            <span className="text-[11px] font-mono text-[#64748B] uppercase">
+              {`${activePageTab} Page`}
+            </span>
+          </div>
+
           {/* Scrollable Block Accordions */}
           <div
             className="flex-1 overflow-y-auto px-4 py-4 space-y-3.5 custom-scrollbar"
@@ -1221,6 +1233,46 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       />
                     </div>
 
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Hero Bottom Caption
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.hero?.bottomCaption || ''}
+                          onChange={(e) => {
+                            const updated = { ...(draftContent.home?.hero || draftContent.hero), bottomCaption: e.target.value };
+                            updateDraft('home.hero', updated);
+                            updateDraft('hero', updated);
+                          }}
+                          className="w-full px-3 py-2 rounded-lg bg-[#131926] border border-[#1E293B] text-white focus:border-[#E69D2B] focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Navbar Action Button Label
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.navbar?.ctaLabel || 'Join'}
+                          onChange={(e) => updateDraft('navbar', { ...(draftContent.navbar || {}), ctaLabel: e.target.value })}
+                          className="w-full px-3 py-2 rounded-lg bg-[#131926] border border-[#1E293B] text-[#E69D2B] font-semibold focus:border-[#E69D2B] focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    {renderImageDropzone({
+                      title: 'Hero Background Photography',
+                      currentValue: draftContent.images?.heroBg || '/assets/hero-2.webp',
+                      defaultValue: '/assets/hero-2.webp',
+                      fieldKey: 'home-hero-bg',
+                      onReset: () =>
+                        updateDraft('images', { ...(draftContent.images || {}), heroBg: '/assets/hero-2.webp' }),
+                      onUpdate: (newUrl) =>
+                        updateDraft('images', { ...(draftContent.images || {}), heroBg: newUrl }),
+                    })}
+
                     {/* Button Manager */}
                     {renderStrictButtonManager({
                       buttons: draftContent.home?.hero?.buttons || draftContent.hero?.buttons || [],
@@ -1232,7 +1284,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         const newBtn = {
                           id: 'btn-' + Date.now(),
                           enabled: true,
-                          label: isFirst ? 'Request Talent' : 'Explore Open Roles',
+                          label: isFirst ? 'Get Started' : 'Explore Services',
                           destination: isFirst ? '/contact' : '/services',
                           variant: isFirst ? 'primary' : 'secondary',
                         };
@@ -1307,7 +1359,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
-                          Stat 1 (Placements)
+                          Stat 1 (Engagements)
                         </label>
                         <input
                           type="number"
@@ -1315,7 +1367,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                           onChange={(e) => updateDraft('home.metrics', { ...draftContent.home?.metrics, stat1Value: Number(e.target.value) })}
                           className="w-full px-2.5 py-1.5 rounded-lg bg-[#131926] border border-[#1E293B] text-[#E69D2B] font-bold"
                         />
-                        <span className="text-[10px] text-[#64748B] block mt-0.5">500+ Placements</span>
+                        <span className="text-[10px] text-[#64748B] block mt-0.5">500+ Engagements</span>
                       </div>
 
                       <div>
@@ -1377,6 +1429,47 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
                 {isBlockExpanded('home-block-03') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
+                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B]">
+                        Section Header &amp; CTA
+                      </div>
+                      <input
+                        type="text"
+                        value={draftContent.home?.bentoSection?.eyebrow || 'CAPABILITIES MATRIX'}
+                        onChange={(e) =>
+                          updateDraft('home.bentoSection', {
+                            ...(draftContent.home?.bentoSection || {}),
+                            eyebrow: e.target.value,
+                          })
+                        }
+                        placeholder="Section Eyebrow"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] text-xs"
+                      />
+                      <input
+                        type="text"
+                        value={draftContent.home?.bentoSection?.headline || ''}
+                        onChange={(e) =>
+                          updateDraft('home.bentoSection', {
+                            ...(draftContent.home?.bentoSection || {}),
+                            headline: e.target.value,
+                          })
+                        }
+                        placeholder="Section Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold text-xs"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.home?.bentoSection?.subtitle || ''}
+                        onChange={(e) =>
+                          updateDraft('home.bentoSection', {
+                            ...(draftContent.home?.bentoSection || {}),
+                            subtitle: e.target.value,
+                          })
+                        }
+                        placeholder="Section Subtitle"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white text-xs"
+                      />
+                    </div>
                     {(draftContent.home?.bento || draftContent.services || []).map((card, idx) => (
                       <div key={card.id || idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-3">
                         <div className="flex items-center justify-between">
@@ -1461,7 +1554,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 04: KINETIC VETTING PIPELINE */}
+              {/* BLOCK 04: SCROLL-HIJACKED SECTION (MULTI-STAGE ACCORDION EDITOR) */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
@@ -1474,10 +1567,10 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                     </span>
                     <div>
                       <h3 className="text-sm font-bold text-white font-sans">
-                        Block 04: Kinetic Vetting Pipeline (5 Stages)
+                        Block 04: Scroll-Hijacked Narrative (4 Stages)
                       </h3>
                       <p className="text-[11px] text-[#64748B]">
-                        5-Stage Diligence Milestones, Narrative Descriptions, and Step Photos
+                        Accordion Stage Editor for Stage 1–4 Headings, Descriptions, Badges &amp; Photos
                       </p>
                     </div>
                   </div>
@@ -1488,61 +1581,270 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                   )}
                 </button>
 
-                {isBlockExpanded('home-block-04') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
-                    {(draftContent.home?.vetting || draftContent.vettingStages || []).map((stage, idx) => (
-                      <div key={idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-[#E69D2B] text-xs">
-                            {stage.order || `0${idx + 1}`}
-                          </span>
+                {isBlockExpanded('home-block-04') && (() => {
+                  const scrollCfg = draftContent.home?.scrollHijackSection || {
+                    enabled: true,
+                    kicker: 'The Sahara Approach',
+                    stages: [],
+                  };
+                  const stages = [0, 1, 2, 3].map((i) => ({
+                    id: i + 1,
+                    badge: `STAGE 0${i + 1}`,
+                    title: '',
+                    description: '',
+                    image: '/assets/hero-2.webp',
+                    ...(scrollCfg.stages?.[i] || {}),
+                  }));
+
+                  const updateScrollCfg = (partial) => {
+                    updateDraft('home.scrollHijackSection', { ...scrollCfg, ...partial });
+                  };
+
+                  const updateStage = (idx, partial) => {
+                    const nextStages = stages.map((st, i) => (i === idx ? { ...st, ...partial } : st));
+                    updateScrollCfg({ stages: nextStages });
+                  };
+
+                  return (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                      {/* Enable Toggle + Section Kicker */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center p-3 rounded-xl bg-[#131926] border border-[#1E293B]">
+                        <label className="flex items-center justify-between gap-2 cursor-pointer">
+                          <span className="text-xs font-semibold text-white">Enable Scroll-Hijacked Section</span>
+                          <input
+                            type="checkbox"
+                            checked={scrollCfg.enabled !== false}
+                            onChange={(e) => updateScrollCfg({ enabled: e.target.checked })}
+                            className="w-4 h-4 accent-[#E69D2B] cursor-pointer"
+                          />
+                        </label>
+                        <div>
+                          <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                            Top Section Kicker
+                          </label>
                           <input
                             type="text"
-                            value={stage.name}
-                            onChange={(e) => {
-                              const list = [...(draftContent.home?.vetting || draftContent.vettingStages)];
-                              list[idx] = { ...list[idx], name: e.target.value };
-                              updateDraft('home.vetting', list);
-                              updateDraft('vettingStages', list);
-                            }}
-                            className="flex-1 px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold text-xs"
+                            value={scrollCfg.kicker || ''}
+                            onChange={(e) => updateScrollCfg({ kicker: e.target.value })}
+                            placeholder="The Sahara Approach"
+                            className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white text-xs"
                           />
                         </div>
+                      </div>
 
-                        <textarea
-                          rows={2}
-                          value={stage.description}
-                          onChange={(e) => {
-                            const list = [...(draftContent.home?.vetting || draftContent.vettingStages)];
-                            list[idx] = { ...list[idx], description: e.target.value };
-                            updateDraft('home.vetting', list);
-                            updateDraft('vettingStages', list);
-                          }}
-                          className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white text-xs leading-relaxed"
-                        />
+                      {/* Stage 1-4 Individual Accordion Editor */}
+                      <div className="space-y-2.5">
+                        {stages.map((stage, idx) => {
+                          const isOpen = expandedStageIdx === idx;
+                          return (
+                            <div
+                              key={stage.id || idx}
+                              className="rounded-xl bg-[#131926] border border-[#1E293B] overflow-hidden"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => setExpandedStageIdx(isOpen ? -1 : idx)}
+                                className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-white/[0.02] cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="font-mono font-bold text-[#E69D2B] text-xs shrink-0">
+                                    0{idx + 1}
+                                  </span>
+                                  <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-[#E69D2B]/15 text-[#E69D2B] shrink-0">
+                                    {stage.badge || `STAGE 0${idx + 1}`}
+                                  </span>
+                                  <span className="text-white font-semibold text-xs truncate">
+                                    {stage.title || `Stage ${idx + 1}`}
+                                  </span>
+                                </div>
+                                {isOpen ? (
+                                  <ChevronUp className="w-4 h-4 text-[#94A3B8] shrink-0" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4 text-[#94A3B8] shrink-0" />
+                                )}
+                              </button>
 
-                        {renderImageDropzone({
-                          title: `Stage ${stage.order || `0${idx + 1}`} Photography`,
-                          currentValue: stage.image || draftContent.images?.vettingSteps?.[idx],
-                          fieldKey: `vetting-${idx}`,
-                          onUpdate: (newUrl) => {
-                            const list = [...(draftContent.home?.vetting || draftContent.vettingStages)];
-                            list[idx] = { ...list[idx], image: newUrl };
-                            updateDraft('home.vetting', list);
-                            updateDraft('vettingStages', list);
+                              {isOpen && (
+                                <div className="p-3.5 pt-2 border-t border-[#1E293B] space-y-3">
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                                    <div>
+                                      <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">
+                                        Stage Badge
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={stage.badge || ''}
+                                        onChange={(e) => updateStage(idx, { badge: e.target.value })}
+                                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-mono text-xs"
+                                      />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                      <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">
+                                        Stage Heading
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={stage.title || ''}
+                                        onChange={(e) => updateStage(idx, { title: e.target.value })}
+                                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold text-xs"
+                                      />
+                                    </div>
+                                  </div>
 
-                            const steps = [...(draftContent.images?.vettingSteps || [])];
-                            steps[idx] = newUrl;
-                            updateDraft('images', { ...(draftContent.images || {}), vettingSteps: steps });
-                          },
+                                  <div>
+                                    <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">
+                                      Stage Description
+                                    </label>
+                                    <textarea
+                                      rows={2}
+                                      value={stage.description || ''}
+                                      onChange={(e) => updateStage(idx, { description: e.target.value })}
+                                      className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white text-xs leading-relaxed"
+                                    />
+                                  </div>
+
+                                  {renderImageDropzone({
+                                    title: `Stage 0${idx + 1} Background Image`,
+                                    currentValue: stage.image,
+                                    defaultValue: '/assets/hero-2.webp',
+                                    fieldKey: `scroll-stage-${idx}`,
+                                    onReset: () => updateStage(idx, { image: '/assets/hero-2.webp' }),
+                                    onUpdate: (newUrl) => updateStage(idx, { image: newUrl }),
+                                  })}
+
+                                  {/* Stage 2 Spotlight Card Fields */}
+                                  {idx === 1 && (
+                                    <div className="p-3 rounded-lg bg-[#0B0F17] border border-white/5 space-y-2.5">
+                                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B]">
+                                        Stage 02 Spotlight Profile Card
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                          type="text"
+                                          value={stage.spotlight?.name || ''}
+                                          onChange={(e) =>
+                                            updateStage(idx, {
+                                              spotlight: { ...(stage.spotlight || {}), name: e.target.value },
+                                            })
+                                          }
+                                          placeholder="Name"
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                        />
+                                        <input
+                                          type="text"
+                                          value={stage.spotlight?.role || ''}
+                                          onChange={(e) =>
+                                            updateStage(idx, {
+                                              spotlight: { ...(stage.spotlight || {}), role: e.target.value },
+                                            })
+                                          }
+                                          placeholder="Role"
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B] text-xs"
+                                        />
+                                      </div>
+                                      <textarea
+                                        rows={2}
+                                        value={stage.spotlight?.bio || ''}
+                                        onChange={(e) =>
+                                          updateStage(idx, {
+                                            spotlight: { ...(stage.spotlight || {}), bio: e.target.value },
+                                          })
+                                        }
+                                        placeholder="Profile bio..."
+                                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                      />
+                                      {renderImageDropzone({
+                                        title: 'Spotlight Portrait Image',
+                                        currentValue: stage.spotlight?.image || '/assets/img 7.webp',
+                                        defaultValue: '/assets/img 7.webp',
+                                        fieldKey: 'scroll-stage-2-spotlight',
+                                        onReset: () =>
+                                          updateStage(idx, {
+                                            spotlight: { ...(stage.spotlight || {}), image: '/assets/img 7.webp' },
+                                          }),
+                                        onUpdate: (newUrl) =>
+                                          updateStage(idx, {
+                                            spotlight: { ...(stage.spotlight || {}), image: newUrl },
+                                          }),
+                                      })}
+                                    </div>
+                                  )}
+
+                                  {/* Stage 3 Side Callout Fields */}
+                                  {idx === 2 && (
+                                    <div className="p-3 rounded-lg bg-[#0B0F17] border border-white/5 space-y-2">
+                                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B]">
+                                        Stage 03 Side Callout
+                                      </div>
+                                      <textarea
+                                        rows={2}
+                                        value={stage.sideNote || ''}
+                                        onChange={(e) => updateStage(idx, { sideNote: e.target.value })}
+                                        placeholder="Right-hand side note..."
+                                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={stage.sideAccent || ''}
+                                        onChange={(e) => updateStage(idx, { sideAccent: e.target.value })}
+                                        placeholder="Amber accent tagline"
+                                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B] text-xs"
+                                      />
+                                    </div>
+                                  )}
+
+                                  {/* Stage 4 Action Buttons */}
+                                  {idx === 3 && (
+                                    <div className="p-3 rounded-lg bg-[#0B0F17] border border-white/5 space-y-2">
+                                      <div className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B]">
+                                        Stage 04 Action Buttons
+                                      </div>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                          type="text"
+                                          value={stage.primaryCtaLabel || ''}
+                                          onChange={(e) => updateStage(idx, { primaryCtaLabel: e.target.value })}
+                                          placeholder="Primary CTA Label"
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                        />
+                                        <select
+                                          value={stage.primaryCtaRoute || 'contact'}
+                                          onChange={(e) => updateStage(idx, { primaryCtaRoute: e.target.value })}
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                        >
+                                          <option value="contact">Contact Page</option>
+                                          <option value="services">Services Page</option>
+                                        </select>
+                                        <input
+                                          type="text"
+                                          value={stage.secondaryCtaLabel || ''}
+                                          onChange={(e) => updateStage(idx, { secondaryCtaLabel: e.target.value })}
+                                          placeholder="Secondary CTA Label"
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                        />
+                                        <select
+                                          value={stage.secondaryCtaRoute || 'services'}
+                                          onChange={(e) => updateStage(idx, { secondaryCtaRoute: e.target.value })}
+                                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white text-xs"
+                                        >
+                                          <option value="services">Services Page</option>
+                                          <option value="contact">Contact Page</option>
+                                        </select>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
                         })}
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  );
+                })()}
               </div>
 
-              {/* BLOCK 05: EXECUTIVE HIRING ESTIMATOR */}
+              {/* BLOCK 05: TALENT SOLUTIONS ESTIMATOR */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
@@ -1555,10 +1857,10 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                     </span>
                     <div>
                       <h3 className="text-sm font-bold text-white font-sans">
-                        Block 05: Executive Hiring Estimator (Orbit &amp; Multipliers)
+                        Block 05: Talent Solutions Estimator (Orbit &amp; Benchmarks)
                       </h3>
                       <p className="text-[11px] text-[#64748B]">
-                        Talent Solutions Copy, Orbit Heading, and SLA Multipliers
+                        Enterprise Overview Copy, Orbit Heading, and Delivery Multipliers
                       </p>
                     </div>
                   </div>
@@ -1577,7 +1879,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       </label>
                       <input
                         type="text"
-                        value={draftContent.home?.calculator?.eyebrow || 'SAHARA STAFFING INC. / TALENT SOLUTIONS'}
+                        value={draftContent.home?.calculator?.eyebrow || 'SAHARA STAFFING INC. / TALENT OVERVIEW'}
                         onChange={(e) => updateDraft('home.calculator', { ...draftContent.home?.calculator, eyebrow: e.target.value })}
                         className="w-full px-3 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
@@ -1589,16 +1891,41 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       </label>
                       <input
                         type="text"
-                        value={draftContent.home?.calculator?.headline || 'Talent That Moves Business Forward.'}
+                        value={draftContent.home?.calculator?.headline || 'Solutions That Move Business Forward.'}
                         onChange={(e) => updateDraft('home.calculator', { ...draftContent.home?.calculator, headline: e.target.value })}
                         className="w-full px-3 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
                       />
                     </div>
 
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Center Orbit Label
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.calculator?.orbitLabel || 'Sahara Talent Orbit'}
+                          onChange={(e) => updateDraft('home.calculator', { ...draftContent.home?.calculator, orbitLabel: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Orbit Summary Line 2
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.calculator?.bottomLine2 || 'Technical Contracting & Executive Search'}
+                          onChange={(e) => updateDraft('home.calculator', { ...draftContent.home?.calculator, bottomLine2: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-3 gap-3">
                       <div>
                         <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
-                          Direct Hire Fee %
+                          Direct Scope %
                         </label>
                         <input
                           type="number"
@@ -1633,7 +1960,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
                     {renderStrictButtonManager({
                       buttons: draftContent.home?.calculator?.buttons || [
-                        { id: 'btn-calc-1', enabled: true, label: 'Find Your Talent →', destination: '/contact', variant: 'primary' },
+                        { id: 'btn-calc-1', enabled: true, label: 'Explore Solutions →', destination: '/contact', variant: 'primary' },
                       ],
                       sectionName: 'Estimator Section',
                       onAdd: () => {
@@ -1641,7 +1968,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         if (current.length >= 2) return;
                         updateDraft('home.calculator', {
                           ...draftContent.home?.calculator,
-                          buttons: [...current, { id: 'calc-' + Date.now(), enabled: true, label: 'Contact Advisory', destination: '/contact', variant: 'secondary' }],
+                          buttons: [...current, { id: 'calc-' + Date.now(), enabled: true, label: 'Discuss Hiring', destination: '/contact', variant: 'secondary' }],
                         });
                       },
                       onRemove: (idx) => {
@@ -1692,6 +2019,32 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
                 {isBlockExpanded('home-block-06') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
+                      <input
+                        type="text"
+                        value={draftContent.home?.testimonialsSection?.eyebrow || 'TRUSTED BY GLOBAL LEADERSHIP'}
+                        onChange={(e) =>
+                          updateDraft('home.testimonialsSection', {
+                            ...(draftContent.home?.testimonialsSection || {}),
+                            eyebrow: e.target.value,
+                          })
+                        }
+                        placeholder="Section Eyebrow"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] text-xs"
+                      />
+                      <input
+                        type="text"
+                        value={draftContent.home?.testimonialsSection?.headline || 'Measured by outcomes. Backed by partners.'}
+                        onChange={(e) =>
+                          updateDraft('home.testimonialsSection', {
+                            ...(draftContent.home?.testimonialsSection || {}),
+                            headline: e.target.value,
+                          })
+                        }
+                        placeholder="Section Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold text-xs"
+                      />
+                    </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[10.5px] font-bold text-[#E69D2B] uppercase tracking-wider font-mono">
                         Active Reviews ({draftContent.testimonials?.length || 0})
@@ -1703,7 +2056,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                             id: 'test-' + Date.now(),
                             name: 'Executive Partner',
                             title: 'VP of Technology at High-Growth Enterprise',
-                            quote: '“Sahara Staffing transformed our hiring velocity with exceptionally vetted candidates.”',
+                            quote: 'â€œSahara Staffing transformed our hiring velocity with exceptionally vetted candidates.â€',
                             image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
                             avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80',
                           };
@@ -1833,8 +2186,8 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         onClick={() => {
                           const newFaq = {
                             id: 'faq-' + Date.now(),
-                            question: 'What is the Sahara 90-day retention guarantee?',
-                            answer: 'If any placed candidate departs within 90 days, we deliver an immediate, fully vetted replacement with zero additional placement fee.',
+                            question: 'How does the Sahara 90-day continuity commitment work?',
+                            answer: 'Every staffing placement includes transparent onboarding milestones and a 90-day continuity performance guarantee.',
                           };
                           const updated = [...(draftContent.faqs || []), newFaq];
                           updateDraft('faqs', updated);
@@ -1906,7 +2259,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         Block 08: Bottom CTA &amp; Footer
                       </h3>
                       <p className="text-[11px] text-[#64748B]">
-                        Speak to Experts Headline, Contact Info, and Copyright
+                        Closing CTA Headline, Tagline, Office Details &amp; Contact Email
                       </p>
                     </div>
                   </div>
@@ -1925,27 +2278,77 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       </label>
                       <input
                         type="text"
-                        value={draftContent.home?.footer?.headline || 'Speak to our staffing experts'}
+                        value={draftContent.home?.footer?.headline || 'Ready for Strategic Scale?'}
                         onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, headline: e.target.value })}
                         className="w-full px-3 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
-                        Official Contact Email
+                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                        Footer Brand Tagline
                       </label>
-                      <input
-                        type="text"
-                        value={draftContent.home?.footer?.contactEmail || 'contact@sahara-staffing.com'}
-                        onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, contactEmail: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-mono"
+                      <textarea
+                        rows={2}
+                        value={draftContent.home?.footer?.brandTagline || ''}
+                        onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, brandTagline: e.target.value })}
+                        className="w-full px-3 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Office Title
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.footer?.officeTitle || 'Global Executive Office'}
+                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, officeTitle: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Official Contact Email
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.footer?.contactEmail || 'contact@sahara-staffing.com'}
+                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, contactEmail: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-mono"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Office Subtitle
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.footer?.officeDesc || ''}
+                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, officeDesc: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase tracking-wider mb-1 font-mono">
+                          Footer Solutions Link Label
+                        </label>
+                        <input
+                          type="text"
+                          value={draftContent.home?.footer?.ctaExploreLabel || 'View Solutions'}
+                          onChange={(e) => updateDraft('home.footer', { ...draftContent.home?.footer, ctaExploreLabel: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
                     </div>
 
                     {renderStrictButtonManager({
                       buttons: draftContent.home?.footer?.buttons || [
-                        { id: 'btn-foot-1', enabled: true, label: 'Talk to staffing →', destination: '/contact', variant: 'primary' },
+                        { id: 'btn-foot-1', enabled: true, label: 'Get Started →', destination: '/contact', variant: 'primary' },
                       ],
                       sectionName: 'Footer CTA',
                       onAdd: () => {
@@ -1971,6 +2374,21 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         updateDraft('home.footer', { ...draftContent.home?.footer, buttons: current });
                       },
                     })}
+
+                    {onOpenAdditionalSettings && (
+                      <div className="p-3 rounded-lg bg-[#0B0F17] border border-white/5 flex items-center justify-between gap-2">
+                        <span className="text-[11px] text-[#94A3B8]">
+                          Social media links &amp; footer copyright text are managed in Additional Settings.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={onOpenAdditionalSettings}
+                          className="px-2.5 py-1 rounded bg-[#1E293B] hover:bg-[#E69D2B] hover:text-[#0B0F17] text-[#E69D2B] text-[10.5px] font-semibold shrink-0 cursor-pointer transition-colors"
+                        >
+                          Open Settings
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1978,7 +2396,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
           )}
 
           {/* ================================================================= */}
-          {/* TAB B: ABOUT PAGE (6 SECTION BLOCKS)                              */}
+          {/* TAB B: ABOUT PAGE (COMPLETE DYNAMIC EDITORS)                      */}
           {/* ================================================================= */}
           {activePageTab === 'about' && (
             <div className="space-y-3">
@@ -1997,7 +2415,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       <h3 className="text-sm font-bold text-white font-sans">
                         Block 01: About Hero Section
                       </h3>
-                      <p className="text-[11px] text-[#64748B]">Kicker, Headline, Narrative, and CTAs</p>
+                      <p className="text-[11px] text-[#64748B]">Kicker, Headline, Badges, Hero Portrait &amp; CTAs</p>
                     </div>
                   </div>
                   {isBlockExpanded('about-block-01') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
@@ -2014,14 +2432,25 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
                     </div>
-                    <div>
-                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
-                      <input
-                        type="text"
-                        value={draftContent.about?.hero?.headline || 'A Modern Search Firm Built on Precision and Relationships.'}
-                        onChange={(e) => updateDraft('about.hero', { ...draftContent.about?.hero, headline: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
+                        <input
+                          type="text"
+                          value={draftContent.about?.hero?.headline || 'Strategy Built on Precision'}
+                          onChange={(e) => updateDraft('about.hero', { ...draftContent.about?.hero, headline: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Highlight Word</label>
+                        <input
+                          type="text"
+                          value={draftContent.about?.hero?.highlightWord || 'Precision'}
+                          onChange={(e) => updateDraft('about.hero', { ...draftContent.about?.hero, highlightWord: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Subtitle</label>
@@ -2032,6 +2461,34 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
                     </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Image Badge Left</label>
+                        <input
+                          type="text"
+                          value={draftContent.about?.hero?.heroImageBadgeLeft || 'People-Centered Strategy'}
+                          onChange={(e) => updateDraft('about.hero', { ...draftContent.about?.hero, heroImageBadgeLeft: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Image Badge Right</label>
+                        <input
+                          type="text"
+                          value={draftContent.about?.hero?.heroImageBadgeRight || 'Sahara Staffing Inc.'}
+                          onChange={(e) => updateDraft('about.hero', { ...draftContent.about?.hero, heroImageBadgeRight: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                        />
+                      </div>
+                    </div>
+                    {renderImageDropzone({
+                      title: 'About Hero Portrait Image',
+                      currentValue: draftContent.about?.hero?.heroImage || '/assets/img 14.webp',
+                      defaultValue: '/assets/img 14.webp',
+                      fieldKey: 'about-hero-img',
+                      onReset: () => updateDraft('about.hero', { ...draftContent.about?.hero, heroImage: '/assets/img 14.webp' }),
+                      onUpdate: (newUrl) => updateDraft('about.hero', { ...draftContent.about?.hero, heroImage: newUrl }),
+                    })}
                     {renderStrictButtonManager({
                       buttons: draftContent.about?.hero?.buttons || [],
                       sectionName: 'About Hero',
@@ -2040,7 +2497,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         if (current.length >= 2) return;
                         updateDraft('about.hero', {
                           ...draftContent.about?.hero,
-                          buttons: [...current, { id: 'about-' + Date.now(), enabled: true, label: 'Get In Touch →', destination: '/contact', variant: 'primary' }],
+                          buttons: [...current, { id: 'about-' + Date.now(), enabled: true, label: 'Get Started', destination: '/contact', variant: 'primary' }],
                         });
                       },
                       onRemove: (idx) => updateDraft('about.hero', { ...draftContent.about?.hero, buttons: (draftContent.about?.hero?.buttons || []).filter((_, i) => i !== idx) }),
@@ -2059,7 +2516,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 02: OPERATING BENCHMARKS */}
+              {/* BLOCK 02: PERSPECTIVE, HUMAN MOMENT & CORE VALUES */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
@@ -2071,19 +2528,108 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       02
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 02: Operating Benchmarks</h3>
-                      <p className="text-[11px] text-[#64748B]">Our Principles: People First, Clarity, Connections</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 02: Perspective Story &amp; Core Values</h3>
+                      <p className="text-[11px] text-[#64748B]">Story Paragraphs, Editorial Feature Image &amp; Core Values List</p>
                     </div>
                   </div>
                   {isBlockExpanded('about-block-02') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
                 {isBlockExpanded('about-block-02') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
+                  <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                    {/* Perspective Story Copy */}
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B] block">Story Perspective Band</span>
+                      <input
+                        type="text"
+                        value={draftContent.about?.perspective?.headline || ''}
+                        onChange={(e) => updateDraft('about.perspective', { ...draftContent.about?.perspective, headline: e.target.value })}
+                        placeholder="Perspective Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.about?.perspective?.paragraph1 || ''}
+                        onChange={(e) => updateDraft('about.perspective', { ...draftContent.about?.perspective, paragraph1: e.target.value })}
+                        placeholder="Story Paragraph 1"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.about?.perspective?.paragraph2 || ''}
+                        onChange={(e) => updateDraft('about.perspective', { ...draftContent.about?.perspective, paragraph2: e.target.value })}
+                        placeholder="Story Paragraph 2"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                    </div>
+
+                    {/* Human Moment Feature Photo */}
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B] block">Cinematic Statement Card</span>
+                      <input
+                        type="text"
+                        value={draftContent.about?.humanMoment?.headline || ''}
+                        onChange={(e) => updateDraft('about.humanMoment', { ...draftContent.about?.humanMoment, headline: e.target.value })}
+                        placeholder="Statement Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.about?.humanMoment?.description || ''}
+                        onChange={(e) => updateDraft('about.humanMoment', { ...draftContent.about?.humanMoment, description: e.target.value })}
+                        placeholder="Statement Description"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                      {renderImageDropzone({
+                        title: 'Statement Feature Photography',
+                        currentValue: draftContent.about?.humanMoment?.image || '/assets/img 4.webp',
+                        defaultValue: '/assets/img 4.webp',
+                        fieldKey: 'about-human-moment-img',
+                        onReset: () => updateDraft('about.humanMoment', { ...draftContent.about?.humanMoment, image: '/assets/img 4.webp' }),
+                        onUpdate: (newUrl) => updateDraft('about.humanMoment', { ...draftContent.about?.humanMoment, image: newUrl }),
+                      })}
+                    </div>
+
+                    {/* Core Values Header & Items */}
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B] block">Core Values Section Header</span>
+                      <input
+                        type="text"
+                        value={draftContent.about?.principlesSection?.headline || 'A more thoughtful approach.'}
+                        onChange={(e) => updateDraft('about.principlesSection', { ...draftContent.about?.principlesSection, headline: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.about?.principlesSection?.subtitle || ''}
+                        onChange={(e) => updateDraft('about.principlesSection', { ...draftContent.about?.principlesSection, subtitle: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10.5px] font-bold text-[#E69D2B] uppercase tracking-wider font-mono">
+                        Core Values ({(draftContent.about?.benchmarks || []).length})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const current = draftContent.about?.benchmarks || [];
+                          updateDraft('about.benchmarks', [
+                            ...current,
+                            { num: `0${current.length + 1}`, title: 'New Core Value', desc: 'Guiding principle description.' },
+                          ]);
+                        }}
+                        className="px-2.5 py-1 rounded bg-[#1E293B] hover:bg-[#E69D2B] text-white hover:text-[#0B0F17] font-semibold text-[10.5px] inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus className="w-3 h-3" /> Add Core Value
+                      </button>
+                    </div>
+
                     {(draftContent.about?.benchmarks || []).map((b, idx) => (
                       <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B] space-y-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-[#E69D2B] font-bold">{b.num}</span>
+                          <span className="font-mono text-[#E69D2B] font-bold">{b.num || `0${idx + 1}`}</span>
                           <input
                             type="text"
                             value={b.title}
@@ -2094,6 +2640,20 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                             }}
                             className="flex-1 px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold"
                           />
+                          {(draftContent.about?.benchmarks || []).length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateDraft(
+                                  'about.benchmarks',
+                                  (draftContent.about?.benchmarks || []).filter((_, i) => i !== idx)
+                                )
+                              }
+                              className="p-1 text-slate-400 hover:text-red-400 cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </div>
                         <textarea
                           rows={2}
@@ -2111,7 +2671,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 03: DISCIPLINE MATRIX */}
+              {/* BLOCK 03: MINDSET CHAPTERS */}
               <div id="editor-about-block-03" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
                 <button
                   type="button"
@@ -2123,8 +2683,8 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       03
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 03: Discipline Matrix (Mindset Chapters)</h3>
-                      <p className="text-[11px] text-[#64748B]">Story chapters with full-resolution replaceable imagery</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 03: Mindset Chapters &amp; Imagery</h3>
+                      <p className="text-[11px] text-[#64748B]">Story chapters, section headers &amp; chapter photography</p>
                     </div>
                   </div>
                   {isBlockExpanded('about-block-03') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
@@ -2132,7 +2692,23 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
 
                 {isBlockExpanded('about-block-03') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-3.5 text-xs">
-                    {/* Block 03 Layout Switcher Engine */}
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
+                      <input
+                        type="text"
+                        value={draftContent.about?.mindsetSection?.headline || 'A disciplined approach to every engagement.'}
+                        onChange={(e) => updateDraft('about.mindsetSection', { ...draftContent.about?.mindsetSection, headline: e.target.value })}
+                        placeholder="Mindset Section Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
+                      />
+                      <textarea
+                        rows={2}
+                        value={draftContent.about?.mindsetSection?.subtitle || ''}
+                        onChange={(e) => updateDraft('about.mindsetSection', { ...draftContent.about?.mindsetSection, subtitle: e.target.value })}
+                        placeholder="Mindset Section Subtitle"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                    </div>
+
                     <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase font-mono">
                         Mindset Narrative Layout Engine
@@ -2147,7 +2723,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                               : 'text-[#94A3B8] hover:text-white'
                           }`}
                         >
-                          <span>⚡ Sticky Hijack</span>
+                          <span>Sticky Hijack</span>
                         </button>
                         <button
                           type="button"
@@ -2158,16 +2734,34 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                               : 'text-[#94A3B8] hover:text-white'
                           }`}
                         >
-                          <span>📇 Static Cards</span>
+                          <span>Static Cards</span>
                         </button>
                       </div>
                     </div>
 
                     {(draftContent.about?.chapters || []).map((ch, idx) => (
                       <div key={idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-[#E69D2B] font-bold">{ch.badge}</span>
-                          <span className="text-[10px] text-white/50">{ch.tag}</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            value={ch.badge || ''}
+                            onChange={(e) => {
+                              const list = [...(draftContent.about?.chapters || [])];
+                              list[idx] = { ...list[idx], badge: e.target.value };
+                              updateDraft('about.chapters', list);
+                            }}
+                            className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-mono text-[11px]"
+                          />
+                          <input
+                            type="text"
+                            value={ch.tag || ''}
+                            onChange={(e) => {
+                              const list = [...(draftContent.about?.chapters || [])];
+                              list[idx] = { ...list[idx], tag: e.target.value };
+                              updateDraft('about.chapters', list);
+                            }}
+                            className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white/80 text-[11px]"
+                          />
                         </div>
                         <input
                           type="text"
@@ -2205,7 +2799,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 )}
               </div>
 
-              {/* BLOCK 04: HARD SCALE STATS */}
+              {/* BLOCK 04: HARD SCALE STATS & PHILOSOPHY PIPELINE */}
               <div id="editor-about-block-04" className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg scroll-mt-4">
                 <button
                   type="button"
@@ -2217,39 +2811,68 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       04
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Hard Scale Stats</h3>
-                      <p className="text-[11px] text-[#64748B]">Enterprise proof points and placement volume</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Scale Stats &amp; Philosophy Radar</h3>
+                      <p className="text-[11px] text-[#64748B]">Metrics cards and Philosophy Radar Quote</p>
                     </div>
                   </div>
                   {isBlockExpanded('about-block-04') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
                 {isBlockExpanded('about-block-04') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-3 text-xs">
-                    {(draftContent.about?.stats || []).map((s, idx) => (
-                      <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B] space-y-1">
+                  <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                    <div className="grid grid-cols-2 gap-3">
+                      {(draftContent.about?.stats || []).map((s, idx) => (
+                        <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B] space-y-1">
+                          <input
+                            type="text"
+                            value={s.value}
+                            onChange={(e) => {
+                              const list = [...(draftContent.about?.stats || [])];
+                              list[idx] = { ...list[idx], value: e.target.value };
+                              updateDraft('about.stats', list);
+                            }}
+                            className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-bold text-sm"
+                          />
+                          <input
+                            type="text"
+                            value={s.label}
+                            onChange={(e) => {
+                              const list = [...(draftContent.about?.stats || [])];
+                              list[idx] = { ...list[idx], label: e.target.value };
+                              updateDraft('about.stats', list);
+                            }}
+                            className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white text-[11px]"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#E69D2B] block">Philosophy Radar Quote</span>
+                      <input
+                        type="text"
+                        value={draftContent.about?.pipeline?.quotePrefix || ''}
+                        onChange={(e) => updateDraft('about.pipeline', { ...draftContent.about?.pipeline, quotePrefix: e.target.value })}
+                        placeholder="Quote Prefix"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
-                          value={s.value}
-                          onChange={(e) => {
-                            const list = [...(draftContent.about?.stats || [])];
-                            list[idx] = { ...list[idx], value: e.target.value };
-                            updateDraft('about.stats', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-bold text-sm"
+                          value={draftContent.about?.pipeline?.quoteHighlight || ''}
+                          onChange={(e) => updateDraft('about.pipeline', { ...draftContent.about?.pipeline, quoteHighlight: e.target.value })}
+                          placeholder="Gold Highlight Phrase"
+                          className="px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B]"
                         />
                         <input
                           type="text"
-                          value={s.label}
-                          onChange={(e) => {
-                            const list = [...(draftContent.about?.stats || [])];
-                            list[idx] = { ...list[idx], label: e.target.value };
-                            updateDraft('about.stats', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white text-[11px]"
+                          value={draftContent.about?.pipeline?.quoteSuffix || ''}
+                          onChange={(e) => updateDraft('about.pipeline', { ...draftContent.about?.pipeline, quoteSuffix: e.target.value })}
+                          placeholder="Quote Suffix"
+                          className="px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
                         />
                       </div>
-                    ))}
+                    </div>
                   </div>
                 )}
               </div>
@@ -2276,10 +2899,19 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 {isBlockExpanded('about-block-05') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
                     <div>
+                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Closing Eyebrow</label>
+                      <input
+                        type="text"
+                        value={draftContent.about?.finalCta?.eyebrow || 'SAHARA STAFFING INC.'}
+                        onChange={(e) => updateDraft('about.finalCta', { ...draftContent.about?.finalCta, eyebrow: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                      />
+                    </div>
+                    <div>
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Closing Headline</label>
                       <input
                         type="text"
-                        value={draftContent.about?.finalCta?.headline || 'Let’s find the right people for your team.'}
+                        value={draftContent.about?.finalCta?.headline || 'Let’s build the momentum behind your next stage.'}
                         onChange={(e) => updateDraft('about.finalCta', { ...draftContent.about?.finalCta, headline: e.target.value })}
                         className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
@@ -2288,20 +2920,20 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Closing Subtitle</label>
                       <textarea
                         rows={2}
-                        value={draftContent.about?.finalCta?.subtitle || "Tell us about your business and your hiring needs. Let's start a conversation."}
+                        value={draftContent.about?.finalCta?.subtitle || 'From exploratory strategy sessions to immediate enterprise execution, Sahara is your long-term partner.'}
                         onChange={(e) => updateDraft('about.finalCta', { ...draftContent.about?.finalCta, subtitle: e.target.value })}
                         className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
                     </div>
                     {renderImageDropzone({
                       title: 'Final CTA Background Image Override',
-                      currentValue: draftContent.about?.finalCta?.backgroundImage || '/assets/card1-staffing.jpg',
-                      defaultValue: '/assets/card1-staffing.jpg',
+                      currentValue: draftContent.about?.finalCta?.backgroundImage || '/assets/hero-2.webp',
+                      defaultValue: '/assets/hero-2.webp',
                       fieldKey: 'about-final-cta-bg',
                       onReset: () => {
                         updateDraft('about.finalCta', {
                           ...draftContent.about?.finalCta,
-                          backgroundImage: '/assets/card1-staffing.jpg',
+                          backgroundImage: '/assets/hero-2.webp',
                         });
                       },
                       onUpdate: (newUrl) => {
@@ -2319,7 +2951,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         if (current.length >= 2) return;
                         updateDraft('about.finalCta', {
                           ...draftContent.about?.finalCta,
-                          buttons: [...current, { id: 'cta-' + Date.now(), enabled: true, label: 'Discuss Your Hiring Needs →', destination: '/contact', variant: 'primary' }],
+                          buttons: [...current, { id: 'cta-' + Date.now(), enabled: true, label: 'Get Started', destination: '/contact', variant: 'primary' }],
                         });
                       },
                       onRemove: (idx) => updateDraft('about.finalCta', { ...draftContent.about?.finalCta, buttons: (draftContent.about?.finalCta?.buttons || []).filter((_, i) => i !== idx) }),
@@ -2341,7 +2973,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
           )}
 
           {/* ================================================================= */}
-          {/* TAB C: SERVICES PAGE (5 SECTION BLOCKS)                           */}
+          {/* TAB C: SERVICES PAGE (FULL DYNAMIC SECTIONS & CARDS MANAGER)      */}
           {/* ================================================================= */}
           {activePageTab === 'services' && (
             <div className="space-y-3">
@@ -2358,7 +2990,7 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                     </span>
                     <div>
                       <h3 className="text-sm font-bold text-white font-sans">Block 01: Services Hero</h3>
-                      <p className="text-[11px] text-[#64748B]">Panoramic Banner, Kicker, and Headline</p>
+                      <p className="text-[11px] text-[#64748B]">Kicker, Headline, Quote, Pillars &amp; Panoramic Banner</p>
                     </div>
                   </div>
                   {isBlockExpanded('services-block-01') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
@@ -2370,31 +3002,78 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Kicker Eyebrow</label>
                       <input
                         type="text"
-                        value={draftContent.servicesPage?.hero?.kicker || 'SPECIALIZED RECRUITMENT SOLUTIONS'}
+                        value={draftContent.servicesPage?.hero?.kicker || 'SAHARA STAFFING INC. / OUR SERVICES'}
                         onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, kicker: e.target.value })}
                         className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
+                        <input
+                          type="text"
+                          value={draftContent.servicesPage?.hero?.headline || 'Execution is the difference.'}
+                          onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, headline: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Highlight Word</label>
+                        <input
+                          type="text"
+                          value={draftContent.servicesPage?.hero?.highlightWord || 'difference.'}
+                          onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, highlightWord: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
-                      <input
-                        type="text"
-                        value={draftContent.servicesPage?.hero?.headline || 'Exceptional Talent. Built Around Your Business.'}
-                        onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, headline: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Supporting Quote</label>
+                      <textarea
+                        rows={2}
+                        value={draftContent.servicesPage?.hero?.quote || ''}
+                        onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, quote: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                       />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Banner Caption</label>
+                        <input
+                          type="text"
+                          value={draftContent.servicesPage?.hero?.panoramicCaption || ''}
+                          onChange={(e) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, panoramicCaption: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Service Pillars (comma-separated)</label>
+                        <input
+                          type="text"
+                          value={(draftContent.servicesPage?.hero?.pillars || ['Executive Search', 'Staff Augmentation', 'Dedicated Squads']).join(', ')}
+                          onChange={(e) =>
+                            updateDraft('servicesPage.hero', {
+                              ...draftContent.servicesPage?.hero,
+                              pillars: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
+                            })
+                          }
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
                     </div>
                     {renderImageDropzone({
                       title: 'Panoramic Hero Header Banner',
-                      currentValue: draftContent.servicesPage?.hero?.panoramicImage || '/assets/card1-staffing.jpg',
+                      currentValue: draftContent.servicesPage?.hero?.panoramicImage || '/assets/img 23.webp',
+                      defaultValue: '/assets/img 23.webp',
                       fieldKey: 'services-panoramic',
+                      onReset: () => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, panoramicImage: '/assets/img 23.webp' }),
                       onUpdate: (newUrl) => updateDraft('servicesPage.hero', { ...draftContent.servicesPage?.hero, panoramicImage: newUrl }),
                     })}
                   </div>
                 )}
               </div>
 
-              {/* BLOCK 02: SERVICE CAPABILITIES GRID */}
+              {/* BLOCK 02: SERVICE CARDS & CAPABILITIES */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
@@ -2406,49 +3085,225 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       02
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 02: Service Capabilities Grid</h3>
-                      <p className="text-[11px] text-[#64748B]">Permanent, Contract, Retained, and RPO</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 02: Service Cards &amp; Capabilities</h3>
+                      <p className="text-[11px] text-[#64748B]">Section Header, Subheader, Service Cards, Images &amp; CTAs</p>
                     </div>
                   </div>
                   {isBlockExpanded('services-block-02') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
-                {isBlockExpanded('services-block-02') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3.5 text-xs">
-                    {(draftContent.servicesPage?.capabilities || []).map((cap, idx) => (
-                      <div key={idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
-                        <span className="font-mono text-[#E69D2B] font-bold">{cap.badge}</span>
-                        <input
-                          type="text"
-                          value={cap.title}
-                          onChange={(e) => {
-                            const list = [...(draftContent.servicesPage?.capabilities || [])];
-                            list[idx] = { ...list[idx], title: e.target.value };
-                            updateDraft('servicesPage.capabilities', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
-                        />
-                        <textarea
-                          rows={2}
-                          value={cap.description}
-                          onChange={(e) => {
-                            const list = [...(draftContent.servicesPage?.capabilities || [])];
-                            list[idx] = { ...list[idx], description: e.target.value };
-                            updateDraft('servicesPage.capabilities', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
-                        />
+                {isBlockExpanded('services-block-02') && (() => {
+                  const capSec = draftContent.servicesPage?.capabilitiesSection || {
+                    sectionHeader: 'Core Service Pillars',
+                    sectionSubheader: '',
+                    items: [],
+                  };
+                  const items = Array.isArray(capSec.items) ? capSec.items : [];
+                  const updateCapSec = (partial) => updateDraft('servicesPage.capabilitiesSection', { ...capSec, ...partial });
+
+                  return (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-4 text-xs">
+                      <div className="p-3 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
+                        <div>
+                          <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Section Header</label>
+                          <input
+                            type="text"
+                            value={capSec.sectionHeader || ''}
+                            onChange={(e) => updateCapSec({ sectionHeader: e.target.value })}
+                            className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Section Subheader</label>
+                          <textarea
+                            rows={2}
+                            value={capSec.sectionSubheader || ''}
+                            onChange={(e) => updateCapSec({ sectionSubheader: e.target.value })}
+                            className="w-full px-2.5 py-1.5 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                          />
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10.5px] font-bold text-[#E69D2B] uppercase tracking-wider font-mono">
+                          Service Cards ({items.length})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextNum = `0${items.length + 1}`;
+                            updateCapSec({
+                              items: [
+                                ...items,
+                                {
+                                  id: `cap-${Date.now()}`,
+                                  number: nextNum,
+                                  badge: 'NEW SERVICE PILLAR',
+                                  title: 'Strategic Execution',
+                                  highlightWord: 'at scale.',
+                                  description: 'Tailored enterprise solutions designed around measurable objectives.',
+                                  ctaLabel: 'Inquire About Solution',
+                                  ctaDestination: '/contact',
+                                  image: '/assets/img 8.webp',
+                                  fallbackImage: '/assets/hero-2.webp',
+                                  alt: 'Sahara Staffing Inc. service card',
+                                  theme: items.length % 2 === 0 ? 'dark' : 'light',
+                                },
+                              ],
+                            });
+                          }}
+                          className="px-2.5 py-1 rounded bg-[#1E293B] hover:bg-[#E69D2B] text-white hover:text-[#0B0F17] font-semibold text-[10.5px] inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" /> Add Service Card
+                        </button>
+                      </div>
+
+                      {items.map((item, idx) => (
+                        <div key={item.id || idx} className="p-3.5 rounded-xl bg-[#131926] border border-[#1E293B] space-y-2.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-mono text-[#E69D2B] font-bold">
+                              {item.number || `0${idx + 1}`} — {item.badge || 'Service Card'}
+                            </span>
+                            {items.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => updateCapSec({ items: items.filter((_, i) => i !== idx) })}
+                                className="text-slate-400 hover:text-red-400 p-1 cursor-pointer"
+                                title="Remove Service Card"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-2">
+                            <input
+                              type="text"
+                              value={item.number || ''}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], number: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              placeholder="01"
+                              className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-mono"
+                            />
+                            <input
+                              type="text"
+                              value={item.badge || ''}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], badge: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              placeholder="BADGE LABEL"
+                              className="col-span-2 px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <input
+                              type="text"
+                              value={item.title || ''}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], title: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              placeholder="Card Title"
+                              className="sm:col-span-2 px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white font-medium"
+                            />
+                            <input
+                              type="text"
+                              value={item.highlightWord || ''}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], highlightWord: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              placeholder="Highlight Word"
+                              className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B]"
+                            />
+                          </div>
+
+                          <textarea
+                            rows={2}
+                            value={item.description || ''}
+                            onChange={(e) => {
+                              const list = [...items];
+                              list[idx] = { ...list[idx], description: e.target.value };
+                              updateCapSec({ items: list });
+                            }}
+                            className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                          />
+
+                          <div className="grid grid-cols-3 gap-2">
+                            <input
+                              type="text"
+                              value={item.ctaLabel || ''}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], ctaLabel: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              placeholder="CTA Label"
+                              className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                            />
+                            <select
+                              value={item.ctaDestination || '/contact'}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], ctaDestination: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                            >
+                              <option value="/contact">/contact</option>
+                              <option value="/about">/about</option>
+                              <option value="/services">/services</option>
+                            </select>
+                            <select
+                              value={item.theme || 'dark'}
+                              onChange={(e) => {
+                                const list = [...items];
+                                list[idx] = { ...list[idx], theme: e.target.value };
+                                updateCapSec({ items: list });
+                              }}
+                              className="px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                            >
+                              <option value="dark">Dark Surface</option>
+                              <option value="light">Warm Cream</option>
+                            </select>
+                          </div>
+
+                          {renderImageDropzone({
+                            title: `Card 0${idx + 1} Image`,
+                            currentValue: item.image || '/assets/img 15.webp',
+                            defaultValue: '/assets/img 15.webp',
+                            fieldKey: `srv-cap-${idx}`,
+                            onReset: () => {
+                              const list = [...items];
+                              list[idx] = { ...list[idx], image: '/assets/img 15.webp' };
+                              updateCapSec({ items: list });
+                            },
+                            onUpdate: (newUrl) => {
+                              const list = [...items];
+                              list[idx] = { ...list[idx], image: newUrl };
+                              updateCapSec({ items: list });
+                            },
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
-              {/* BLOCK 03: VETTING PROCESS */}
+              {/* BLOCK 03: THE SAHARA APPROACH */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
-                  onClick={() => handleBlockToggle('services-block-03', '#services-vetting')}
+                  onClick={() => handleBlockToggle('services-block-03', '#services-sla')}
                   className="w-full flex items-center justify-between text-left cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-3">
@@ -2456,30 +3311,95 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       03
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 03: Vetting Process Benchmarks</h3>
-                      <p className="text-[11px] text-[#64748B]">Assurance Kicker, Headline, and Criteria</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 03: Our Approach (3-Step Methodology)</h3>
+                      <p className="text-[11px] text-[#64748B]">Eyebrow, Headline, Continuity Badge &amp; Delivery Steps</p>
                     </div>
                   </div>
                   {isBlockExpanded('services-block-03') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
-                {isBlockExpanded('services-block-03') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
-                    <input
-                      type="text"
-                      value={draftContent.servicesPage?.vetting?.headline || 'A 5-Stage Vetting Pipeline Built for Certainty.'}
-                      onChange={(e) => updateDraft('servicesPage.vetting', { ...draftContent.servicesPage?.vetting, headline: e.target.value })}
-                      className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
-                    />
-                  </div>
-                )}
+                {isBlockExpanded('services-block-03') && (() => {
+                  const app = draftContent.servicesPage?.approach || {};
+                  const steps = Array.isArray(app.steps) ? app.steps : [];
+                  const updateApp = (partial) => updateDraft('servicesPage.approach', { ...app, ...partial });
+
+                  return (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
+                      <input
+                        type="text"
+                        value={app.eyebrow || 'THE SAHARA APPROACH'}
+                        onChange={(e) => updateApp({ eyebrow: e.target.value })}
+                        placeholder="Eyebrow"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          value={app.headline || ''}
+                          onChange={(e) => updateApp({ headline: e.target.value })}
+                          placeholder="Headline"
+                          className="sm:col-span-2 px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        />
+                        <input
+                          type="text"
+                          value={app.highlightWord || ''}
+                          onChange={(e) => updateApp({ highlightWord: e.target.value })}
+                          placeholder="Highlight Word"
+                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                        />
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={app.subtitle || ''}
+                        onChange={(e) => updateApp({ subtitle: e.target.value })}
+                        placeholder="Methodology Subtitle"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                      />
+                      <input
+                        type="text"
+                        value={app.guaranteeBadge || ''}
+                        onChange={(e) => updateApp({ guaranteeBadge: e.target.value })}
+                        placeholder="Continuity Commitment Badge"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                      />
+
+                      {steps.map((st, idx) => (
+                        <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B] space-y-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[#E69D2B] font-bold">{st.num || `0${idx + 1}`}</span>
+                            <input
+                              type="text"
+                              value={st.title || ''}
+                              onChange={(e) => {
+                                const list = [...steps];
+                                list[idx] = { ...list[idx], title: e.target.value };
+                                updateApp({ steps: list });
+                              }}
+                              className="flex-1 px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white font-semibold"
+                            />
+                          </div>
+                          <textarea
+                            rows={2}
+                            value={st.desc || ''}
+                            onChange={(e) => {
+                              const list = [...steps];
+                              list[idx] = { ...list[idx], desc: e.target.value };
+                              updateApp({ steps: list });
+                            }}
+                            className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
-              {/* BLOCK 04: ENGAGEMENT MODELS */}
+              {/* BLOCK 04: CLOSING CTA */}
               <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
                 <button
                   type="button"
-                  onClick={() => handleBlockToggle('services-block-04', '#services-models')}
+                  onClick={() => handleBlockToggle('services-block-04', '#services-sla')}
                   className="w-full flex items-center justify-between text-left cursor-pointer select-none"
                 >
                   <div className="flex items-center gap-3">
@@ -2487,84 +3407,66 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       04
                     </span>
                     <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Engagement Models</h3>
-                      <p className="text-[11px] text-[#64748B]">Retained, Contingency, Fractional, and RPO</p>
+                      <h3 className="text-sm font-bold text-white font-sans">Block 04: Closing Call to Action</h3>
+                      <p className="text-[11px] text-[#64748B]">Closing Headline, Quote &amp; Primary Action Button</p>
                     </div>
                   </div>
                   {isBlockExpanded('services-block-04') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
                 </button>
 
-                {isBlockExpanded('services-block-04') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
-                    {(draftContent.servicesPage?.engagementModels || []).map((m, idx) => (
-                      <div key={idx} className="p-3 rounded-lg bg-[#131926] border border-[#1E293B]">
+                {isBlockExpanded('services-block-04') && (() => {
+                  const cta = draftContent.servicesPage?.closingCta || {};
+                  const updateCta = (partial) => updateDraft('servicesPage.closingCta', { ...cta, ...partial });
+
+                  return (
+                    <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
+                      <input
+                        type="text"
+                        value={cta.eyebrow || ''}
+                        onChange={(e) => updateCta({ eyebrow: e.target.value })}
+                        placeholder="Eyebrow"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                      />
+                      <input
+                        type="text"
+                        value={cta.headline || ''}
+                        onChange={(e) => updateCta({ headline: e.target.value })}
+                        placeholder="Headline"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                      />
+                      <textarea
+                        rows={2}
+                        value={cta.quote || ''}
+                        onChange={(e) => updateCta({ quote: e.target.value })}
+                        placeholder="Closing Quote"
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                      />
+                      <div className="grid grid-cols-2 gap-2">
                         <input
                           type="text"
-                          value={m.name}
-                          onChange={(e) => {
-                            const list = [...(draftContent.servicesPage?.engagementModels || [])];
-                            list[idx] = { ...list[idx], name: e.target.value };
-                            updateDraft('servicesPage.engagementModels', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-[#E69D2B] font-semibold text-xs mb-1"
+                          value={cta.ctaLabel || 'Get in Touch'}
+                          onChange={(e) => updateCta({ ctaLabel: e.target.value })}
+                          placeholder="Button Label"
+                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-semibold"
                         />
-                        <input
-                          type="text"
-                          value={m.desc}
-                          onChange={(e) => {
-                            const list = [...(draftContent.servicesPage?.engagementModels || [])];
-                            list[idx] = { ...list[idx], desc: e.target.value };
-                            updateDraft('servicesPage.engagementModels', list);
-                          }}
-                          className="w-full px-2 py-1 rounded bg-[#0E131F] border border-[#1E293B] text-white text-xs"
-                        />
+                        <select
+                          value={cta.ctaDestination || '/contact'}
+                          onChange={(e) => updateCta({ ctaDestination: e.target.value })}
+                          className="px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        >
+                          <option value="/contact">/contact</option>
+                          <option value="/about">/about</option>
+                        </select>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* BLOCK 05: SLA GUARANTEE */}
-              <div className="bg-[#1E293B]/60 rounded-2xl p-5 mb-4 border-0 shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => handleBlockToggle('services-block-05', '#services-sla')}
-                  className="w-full flex items-center justify-between text-left cursor-pointer select-none"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-7 h-7 rounded-lg bg-[#E69D2B]/15 flex items-center justify-center font-mono text-xs font-bold text-[#E69D2B]">
-                      05
-                    </span>
-                    <div>
-                      <h3 className="text-sm font-bold text-white font-sans">Block 05: SLA Guarantee</h3>
-                      <p className="text-[11px] text-[#64748B]">90-Day Unconditional Replacement Terms</p>
                     </div>
-                  </div>
-                  {isBlockExpanded('services-block-05') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
-                </button>
-
-                {isBlockExpanded('services-block-05') && (
-                  <div className="mt-4 pt-4 border-t border-white/5 space-y-3 text-xs">
-                    <input
-                      type="text"
-                      value={draftContent.servicesPage?.slaGuarantee?.headline || 'The Sahara 90-Day Unconditional Guarantee'}
-                      onChange={(e) => updateDraft('servicesPage.slaGuarantee', { ...draftContent.servicesPage?.slaGuarantee, headline: e.target.value })}
-                      className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
-                    />
-                    <textarea
-                      rows={2}
-                      value={draftContent.servicesPage?.slaGuarantee?.terms || ''}
-                      onChange={(e) => updateDraft('servicesPage.slaGuarantee', { ...draftContent.servicesPage?.slaGuarantee, terms: e.target.value })}
-                      className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
-                    />
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
           )}
 
           {/* ================================================================= */}
-          {/* TAB D: CONTACT PAGE (1 SECTION BLOCK)                             */}
+          {/* TAB D: CONTACT PAGE (COMPLETE CONSULTATION & INTAKE MANAGER)      */}
           {/* ================================================================= */}
           {activePageTab === 'contact' && (
             <div className="space-y-3">
@@ -2580,9 +3482,9 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                     </span>
                     <div>
                       <h3 className="text-sm font-bold text-white font-sans">
-                        Block 01: Contact Form &amp; Candidate Intake Manager
+                        Block 01: Contact Form &amp; Consultation Intake Manager
                       </h3>
-                      <p className="text-[11px] text-[#64748B]">Intake routing, Direct Contact info, and SLAs</p>
+                      <p className="text-[11px] text-[#64748B]">Headline, Intake Routing, Direct Contact Info &amp; Service Areas</p>
                     </div>
                   </div>
                   {isBlockExpanded('contact-block-01') ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
@@ -2591,13 +3493,34 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                 {isBlockExpanded('contact-block-01') && (
                   <div className="mt-4 pt-4 border-t border-white/5 space-y-3.5 text-xs">
                     <div>
-                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
+                      <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Kicker Eyebrow</label>
                       <input
                         type="text"
-                        value={draftContent.contactPage?.hero?.headline || 'Let’s Discuss Your Talent Objectives.'}
-                        onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, headline: e.target.value })}
-                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        value={draftContent.contactPage?.hero?.kicker || 'SAHARA STAFFING INC. / CLIENT CONSULTATION'}
+                        onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, kicker: e.target.value })}
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
                       />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Headline</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.hero?.headline || 'Your next milestone starts with a conversation.'}
+                          onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, headline: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Highlight Word</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.hero?.highlightWord || 'conversation.'}
+                          onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, highlightWord: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B]"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -2610,7 +3533,37 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                       />
                     </div>
 
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Form Heading</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.hero?.formHeading || 'Get in touch.'}
+                          onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, formHeading: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white font-medium"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Submit Button Label</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.hero?.submitButtonLabel || 'Submit Inquiry'}
+                          onChange={(e) => updateDraft('contactPage.hero', { ...draftContent.contactPage?.hero, submitButtonLabel: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-[#E69D2B] font-semibold"
+                        />
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Office Title</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.details?.officeTitle || 'Sahara Executive Office'}
+                          onChange={(e) => updateDraft('contactPage.details', { ...draftContent.contactPage?.details, officeTitle: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
                       <div>
                         <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Routing Email</label>
                         <input
@@ -2624,11 +3577,37 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                         <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Response Time SLA</label>
                         <input
                           type="text"
-                          value={draftContent.contactPage?.details?.responseTime || 'Within 2 hours'}
+                          value={draftContent.contactPage?.details?.responseTime || 'Within 2 hours (Business Hours)'}
                           onChange={(e) => updateDraft('contactPage.details', { ...draftContent.contactPage?.details, responseTime: e.target.value })}
                           className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
                         />
                       </div>
+                      <div>
+                        <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">Security Protocol Note</label>
+                        <input
+                          type="text"
+                          value={draftContent.contactPage?.details?.protocolNote || 'Confidential Enterprise Consultation Protocol'}
+                          onChange={(e) => updateDraft('contactPage.details', { ...draftContent.contactPage?.details, protocolNote: e.target.value })}
+                          className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[9.5px] font-semibold text-[#94A3B8] uppercase mb-1 font-mono">
+                        Service Area Dropdown Options (comma-separated)
+                      </label>
+                      <input
+                        type="text"
+                        value={(draftContent.contactPage?.disciplines || []).join(', ')}
+                        onChange={(e) =>
+                          updateDraft(
+                            'contactPage.disciplines',
+                            e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                          )
+                        }
+                        className="w-full px-2.5 py-1.5 rounded bg-[#131926] border border-[#1E293B] text-white"
+                      />
                     </div>
                   </div>
                 )}
@@ -2636,272 +3615,118 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
             </div>
           )}
 
-          {/* ================================================================= */}
-          {/* TAB E: GLOBAL SITE SETTINGS                                       */}
-          {/* ================================================================= */}
-          {activePageTab === 'settings' && (
-            <div className="bg-[#1E293B]/60 rounded-2xl p-6 mb-4 border-0 shadow-lg space-y-5 text-xs">
-              <div className="border-b border-white/5 pb-3">
-                <h3 className="text-sm font-bold text-white font-sans flex items-center gap-2">
-                  <SettingsIcon className="w-4 h-4 text-[#E69D2B]" />
-                  <span>Global Site Utility Toggles</span>
-                </h3>
-                <p className="text-[11px] text-[#94A3B8] mt-0.5 font-inter">
-                  Manage the smooth fluid animated cursor pointer and the floating back-to-top button.
-                </p>
-              </div>
-
-              {/* Utility Toggle 1: Custom Luxury Cursor */}
-              <div className="p-4 rounded-xl bg-[#0B0F17]/80 flex items-start justify-between gap-4 transition-all">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <MousePointer className="w-4 h-4 text-[#E69D2B]" />
-                    <span className="text-xs font-bold text-white font-sans">
-                      Smooth Fluid Animated Cursor Pointer
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                    Activates a fluid LERP-animated trailing gold cursor with velocity stretch, organic glow, and magnetic hover expansion.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateSettings({ enableCustomCursor: !settings.enableCustomCursor })}
-                  className="cursor-pointer text-[#E69D2B] mt-1 shrink-0 transition-transform active:scale-95"
-                  title="Toggle animated cursor pointer"
-                >
-                  {settings.enableCustomCursor ? (
-                    <ToggleRight className="w-7 h-7 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft className="w-7 h-7 text-[#64748B]" />
-                  )}
-                </button>
-              </div>
-
-              {/* Utility Toggle 2: Back-to-Top Button */}
-              <div className="p-4 rounded-xl bg-[#0B0F17]/80 flex items-start justify-between gap-4 transition-all">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <ArrowUpCircle className="w-4 h-4 text-[#E69D2B]" />
-                    <span className="text-xs font-bold text-white font-sans">
-                      Floating &lsquo;Back to Top&rsquo; Button
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                    Displays the circular SVG progress ring and one-click back-to-top return button in the bottom-right corner.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateSettings({ enableBackToTop: !settings.enableBackToTop })}
-                  className="cursor-pointer text-[#E69D2B] mt-1 shrink-0 transition-transform active:scale-95"
-                  title="Toggle back to top button"
-                >
-                  {settings.enableBackToTop ? (
-                    <ToggleRight className="w-7 h-7 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft className="w-7 h-7 text-[#64748B]" />
-                  )}
-                </button>
-              </div>
-
-              {/* Utility Toggle 3: Sticky Navbar */}
-              <div className="p-4 rounded-xl bg-[#0B0F17]/80 flex items-start justify-between gap-4 transition-all">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#E69D2B]" />
-                    <span className="text-xs font-bold text-white font-sans">
-                      Sticky Navigation Bar
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                    Fixes the glassmorphic navbar to the top during scroll. Non-sticky by default.
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => updateSettings({ stickyNavbar: !settings.stickyNavbar })}
-                  className="cursor-pointer text-[#E69D2B] mt-1 shrink-0 transition-transform active:scale-95"
-                  title="Toggle sticky navigation bar"
-                >
-                  {settings.stickyNavbar ? (
-                    <ToggleRight className="w-7 h-7 text-emerald-400" />
-                  ) : (
-                    <ToggleLeft className="w-7 h-7 text-[#64748B]" />
-                  )}
-                </button>
-              </div>
-
-              {/* Dynamic Footer Social Links Manager */}
-              <div className="p-4 rounded-xl bg-[#0B0F17]/80 border border-white/5 space-y-4">
-                <div className="border-b border-white/5 pb-2.5">
-                  <div className="flex items-center gap-2">
-                    <LinkIcon className="w-4 h-4 text-[#E69D2B]" />
-                    <span className="text-xs font-bold text-white font-sans">
-                      Footer Social Links Manager
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#94A3B8] leading-relaxed mt-0.5">
-                    Toggle visibility and edit URLs for public footer icons. LinkedIn &amp; Email active by default.
-                  </p>
-                </div>
-
-                <div className="space-y-2.5">
-                  {(draftContent.home?.footer?.socialLinks || [
-                    { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
-                    { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
-                    { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
-                    { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
-                    { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
-                  ]).map((soc, idx) => (
-                    <div
-                      key={soc.id || idx}
-                      className="p-3 rounded-lg bg-[#131926] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5"
-                    >
-                      <div className="flex items-center gap-2.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const currentSocials = [
-                              ...(draftContent.home?.footer?.socialLinks || [
-                                { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
-                                { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
-                                { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
-                                { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
-                                { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
-                              ]),
-                            ];
-                            currentSocials[idx] = { ...currentSocials[idx], enabled: !currentSocials[idx].enabled };
-                            const updatedFooter = { ...draftContent.home?.footer, socialLinks: currentSocials };
-                            updateDraft('home.footer', updatedFooter);
-                            updateSettings({ footerSocials: currentSocials });
-                          }}
-                          className="cursor-pointer text-[#E69D2B] shrink-0"
-                          title={`Toggle ${soc.label}`}
-                        >
-                          {soc.enabled ? (
-                            <ToggleRight className="w-6 h-6 text-emerald-400" />
-                          ) : (
-                            <ToggleLeft className="w-6 h-6 text-[#64748B]" />
-                          )}
-                        </button>
-                        <div>
-                          <span className="font-bold text-white text-xs">{soc.label}</span>
-                          <span className="text-[10px] text-[#64748B] block font-mono">
-                            {soc.enabled ? 'Active on Footer' : 'Hidden'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex-1 max-w-sm">
-                        <input
-                          type="text"
-                          value={soc.url || ''}
-                          onChange={(e) => {
-                            const currentSocials = [
-                              ...(draftContent.home?.footer?.socialLinks || [
-                                { id: 'soc-1', platform: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com', enabled: true },
-                                { id: 'soc-2', platform: 'email', label: 'Email', url: 'mailto:contact@sahara-staffing.com', enabled: true },
-                                { id: 'soc-3', platform: 'twitter', label: 'X (Twitter)', url: 'https://x.com', enabled: false },
-                                { id: 'soc-4', platform: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: false },
-                                { id: 'soc-5', platform: 'github', label: 'GitHub', url: 'https://github.com', enabled: false },
-                              ]),
-                            ];
-                            currentSocials[idx] = { ...currentSocials[idx], url: e.target.value };
-                            const updatedFooter = { ...draftContent.home?.footer, socialLinks: currentSocials };
-                            updateDraft('home.footer', updatedFooter);
-                            updateSettings({ footerSocials: currentSocials });
-                          }}
-                          placeholder="https://..."
-                          className="w-full px-2.5 py-1.5 rounded bg-[#0B0F17] border border-[#1E293B] text-white font-mono text-[11px] focus:border-[#E69D2B] focus:outline-none"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
           </div>
         </div>
 
         {/* =================================================================== */}
-        {/* AMBER VERTICAL DIVIDER / SCROLL INDICATOR TRACK (MATCHING IMAGE 3)  */}
-        {/* =================================================================== */}
-        <div className="hidden lg:flex flex-col items-center justify-between py-4 w-3 shrink-0 text-[#E69D2B] select-none opacity-80">
-          <span className="text-[10px] leading-none font-bold">▲</span>
-          <div className="w-[2px] flex-1 my-1.5 bg-[#E69D2B] rounded-full shadow-[0_0_8px_rgba(230,157,43,0.4)]" />
-          <span className="text-[10px] leading-none font-bold">▼</span>
-        </div>
+        {/* ZONE B: RIGHT COLUMN — ROUNDED PAGES PILL + LIVE PREVIEW VIEWPORT   */}
+        <div className="flex-1 min-w-0 h-full flex flex-col gap-3">
+          {/* Top Pill Bar: Pages Navigation (Matches Whiteboard Rounded Pill) */}
+          <div className="bg-[#0E131F] border border-white/10 rounded-full p-1.5 flex items-center gap-1 overflow-x-auto no-scrollbar shadow-lg shrink-0 select-none">
+            {[
+              { id: 'home', label: 'Home Page', icon: Home },
+              { id: 'about', label: 'About Page', icon: Info },
+              { id: 'services', label: 'Services Page', icon: Briefcase },
+              { id: 'contact', label: 'Contact Page', icon: PhoneCall },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activePageTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActivePageTab(tab.id)}
+                  className={`relative flex-1 justify-center px-3 py-2 rounded-full font-sans text-xs font-bold transition-all cursor-pointer select-none flex items-center gap-1.5 whitespace-nowrap ${
+                    isActive ? 'text-[#0B0F17]' : 'text-[#94A3B8] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeCmsTab"
+                      className="absolute inset-0 bg-[#E69D2B] rounded-full shadow-md z-0"
+                      transition={{ type: 'spring', bounce: 0.18, duration: 0.35 }}
+                    />
+                  )}
+                  <Icon
+                    className={`w-3.5 h-3.5 relative z-10 shrink-0 ${
+                      isActive ? 'text-[#0B0F17]' : 'text-[#E69D2B]'
+                    }`}
+                  />
+                  <span className="relative z-10">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* =================================================================== */}
-        {/* ZONE B: RIGHT STICKY LIVE PREVIEW VIEWPORT (MATCHING IMAGE 3)       */}
-        {/* =================================================================== */}
-        <div
-          ref={stageRef}
-          className="flex-1 h-full min-h-0 flex flex-col relative overflow-hidden bg-[#070A10] border border-white/10 rounded-2xl shadow-2xl"
-        >
-          {/* Top Browser Chrome Bar */}
-          <div className="h-12 px-4 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-3 shrink-0 select-none">
-            {/* Left: Lock + URL + Reload */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#131926] border border-white/5 text-xs font-mono text-[#94A3B8]">
-                <Lock className="w-3.5 h-3.5 text-[#E69D2B] shrink-0" />
-                <span className="text-white/80">saharastaffing.com</span>
-                <span className="text-[#E69D2B] font-semibold">
-                  {activePageTab === 'home' ? '/preview' : `/preview/${activePageTab}`}
-                </span>
+          {/* Below Pages Pill: Live Preview Window */}
+          <div
+            ref={stageRef}
+            className="flex-1 min-h-0 flex flex-col relative overflow-hidden bg-[#070A10] border border-white/10 rounded-2xl shadow-2xl"
+          >
+            {/* Top Browser Chrome Bar */}
+            <div className="h-12 px-3 sm:px-4 bg-[#0E131F] border-b border-white/10 flex items-center justify-between gap-2 shrink-0 select-none">
+              {/* Left: Lock + URL + Reload (Truncates cleanly, never squeezes Mobile button) */}
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#131926] border border-white/5 text-xs font-mono text-[#94A3B8] min-w-0">
+                  <Lock className="w-3.5 h-3.5 text-[#E69D2B] shrink-0" />
+                  <span className="text-white/80 truncate hidden sm:inline">saharaenterprise.com</span>
+                  <span className="text-[#E69D2B] font-semibold truncate">
+                    {activePageTab === 'home' ? '/preview' : `/preview/${activePageTab}`}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsRefreshing(true);
+                      setPreviewKey((k) => k + 1);
+                      setTimeout(() => setIsRefreshing(false), 400);
+                    }}
+                    className="p-0.5 rounded hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] transition-colors cursor-pointer ml-1 shrink-0"
+                    title="Reload Preview Canvas"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#E69D2B]' : ''}`} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: Device Switcher (Desktop / Mobile) â€” Never clipped */}
+              <div className="flex items-center gap-1.5 bg-[#131926] p-1 rounded-xl border border-white/5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsRefreshing(true);
-                    setPreviewKey((k) => k + 1);
-                    setTimeout(() => setIsRefreshing(false), 400);
-                  }}
-                  className="p-0.5 rounded hover:bg-white/10 text-[#94A3B8] hover:text-[#E69D2B] transition-colors cursor-pointer ml-1"
-                  title="Reload Preview Canvas"
+                  onClick={() => setViewportMode('desktop')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                    viewportMode === 'desktop'
+                      ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
+                      : 'text-[#94A3B8] hover:text-white'
+                  }`}
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#E69D2B]' : ''}`} />
+                  <Monitor className="w-3.5 h-3.5 shrink-0" />
+                  <span>Desktop</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setViewportMode('mobile')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                    viewportMode === 'mobile'
+                      ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
+                      : 'text-[#94A3B8] hover:text-white'
+                  }`}
+                >
+                  <Smartphone className="w-3.5 h-3.5 shrink-0" />
+                  <span>Mobile</span>
                 </button>
               </div>
             </div>
-
-            {/* Right: Device Switcher (Desktop / Mobile) - Matches Image 3! */}
-            <div className="flex items-center gap-2 bg-[#131926] p-1 rounded-xl border border-white/5">
-              <button
-                type="button"
-                onClick={() => setViewportMode('desktop')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  viewportMode === 'desktop'
-                    ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
-                    : 'text-[#94A3B8] hover:text-white'
-                }`}
-              >
-                <Monitor className="w-3.5 h-3.5" />
-                <span>Desktop</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setViewportMode('mobile')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  viewportMode === 'mobile'
-                    ? 'bg-[#E69D2B] text-[#0B0F17] shadow-md'
-                    : 'text-[#94A3B8] hover:text-white'
-                }`}
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span>Mobile</span>
-              </button>
-            </div>
-          </div>
 
           {/* Independent Vertical Scroll Viewport */}
           <div
             ref={previewScrollRef}
             data-lenis-prevent
-            className="flex-1 h-full overflow-y-auto overflow-x-hidden overscroll-contain relative custom-scrollbar p-3 sm:p-5"
+            className={`flex-1 h-full relative custom-scrollbar ${
+              viewportMode === 'mobile'
+                ? 'overflow-hidden flex items-center justify-center p-3'
+                : 'overflow-y-auto overflow-x-hidden overscroll-contain p-3 sm:p-5'
+            }`}
             style={{ scrollbarWidth: 'thin', scrollbarColor: '#E69D2B #131926' }}
           >
             <CMSPreviewProvider content={draftContent} settings={settings} key={previewKey}>
@@ -2934,32 +3759,53 @@ export default function CMSWorkspace({ onToggleSidebar, sidebarCollapsed }) {
                   </div>
                 </div>
               ) : (
-                /* AUTHENTIC 375PX MOBILE PHONE CHASSIS */
-                <div className="py-6 px-4 flex justify-center items-start min-h-full">
-                  <div className="w-[390px] h-[812px] max-h-[calc(100vh-170px)] mx-auto rounded-[48px] border-[10px] border-[#1E293B] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.1)] bg-[#0B0F17] relative flex flex-col overflow-hidden">
-                    <div className="absolute top-2.5 inset-x-0 z-30 flex justify-center pointer-events-none">
-                      <div className="w-24 h-4 bg-[#0B0F17] border border-white/10 rounded-full flex items-center justify-center gap-1.5 shadow-md">
+                /* AUTHENTIC 375PX MOBILE PHONE CHASSIS â€” SCALED TO FIT WHOLE PHONE IN VIEW */
+                <div
+                  className="relative shrink-0 mx-auto"
+                  style={{
+                    width: `${395 * mobileScale}px`,
+                    height: `${790 * mobileScale}px`,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '395px',
+                      height: '790px',
+                      transform: `scale(${mobileScale})`,
+                      transformOrigin: 'top left',
+                    }}
+                    className="rounded-[48px] border-[10px] border-[#1E293B] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.1)] bg-[#0B0F17] flex flex-col overflow-hidden"
+                  >
+                    {/* Dedicated Top Status Bezel with Dynamic Island (Prevents navbar overlap) */}
+                    <div className="h-7 shrink-0 bg-[#0B0F17] flex items-center justify-center pointer-events-none">
+                      <div className="w-24 h-4 bg-[#05070B] border border-white/10 rounded-full flex items-center justify-center gap-1.5 shadow-inner">
                         <div className="w-2 h-2 rounded-full bg-[#1E293B]" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#131926] border border-white/5" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#131926] border border-white/10" />
                       </div>
                     </div>
-                    <div className="w-full h-full flex-1 pt-1 pb-1">
+
+                    {/* True 375px Scrollable Mobile Viewport */}
+                    <div className="w-full flex-1 min-h-0 overflow-hidden bg-[#0B0F17]">
                       <MobilePreviewIframe>
                         <CMSPreviewProvider content={draftContent} settings={settings}>
                           {renderPreviewContent()}
                         </CMSPreviewProvider>
                       </MobilePreviewIframe>
                     </div>
-                    <div className="absolute bottom-1.5 inset-x-0 z-30 flex justify-center pointer-events-none">
-                      <div className="w-32 h-1 bg-white/30 rounded-full" />
+
+                    {/* Dedicated Bottom Home Indicator Bezel */}
+                    <div className="h-5 shrink-0 bg-[#0B0F17] flex items-center justify-center pointer-events-none">
+                      <div className="w-28 h-1 bg-white/30 rounded-full" />
                     </div>
                   </div>
                 </div>
               )}
             </CMSPreviewProvider>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+

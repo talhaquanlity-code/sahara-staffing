@@ -15,8 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import logoImg from '../assets/sahara-logo.png';
-import markImg from '../assets/sahara-mark.png';
+import logoImg from '../assets/sahara-logo.webp';
+import markImg from '../assets/sahara-mark.webp';
 import CMSWorkspace from '../components/admin/CMSWorkspace';
 import SettingsWorkspace from '../components/admin/SettingsWorkspace';
 
@@ -36,7 +36,7 @@ export default function AdminPage({ onNavigateHome }) {
   // Active Workspace: 'cms' (default) | 'settings'
   const [activeWorkspace, setActiveWorkspace] = useState('cms');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   // Login Form State
   const [email, setEmail] = useState('');
@@ -59,7 +59,7 @@ export default function AdminPage({ onNavigateHome }) {
 
     await new Promise((resolve) => setTimeout(resolve, 400));
 
-    if (cleanEmail === 'contact@sahara-staffing.com' && password === 'GO-Sahara01') {
+    if (cleanEmail === 'contact@sahara-staffing.com' && password === 'Sahara@123') {
       const newSession = {
         email: 'contact@sahara-staffing.com',
         role: 'administrator',
@@ -120,7 +120,7 @@ export default function AdminPage({ onNavigateHome }) {
                 Executive Administrative Portal
               </h1>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
-                Restricted access. Authorized staffing personnel only.
+                Restricted access. Authorized administrators only.
               </p>
             </div>
 
@@ -209,12 +209,14 @@ export default function AdminPage({ onNavigateHome }) {
   return (
     <div data-lenis-prevent className="min-h-screen lg:h-screen lg:overflow-hidden bg-[#0B0F17] text-white flex">
       {/* ===================================================================== */}
-      {/* 1. COLLAPSIBLE LEFT SIDEBAR (260px Expanded <-> 68px Compact Rail)   */}
+      {/* 1. COLLAPSIBLE LEFT SIDEBAR (Overlaps Blocks when Expanded, 0 Squeeze) */}
       {/* ===================================================================== */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 ${
-          sidebarCollapsed ? 'lg:w-[68px]' : 'lg:w-[260px]'
-        } w-[260px] bg-[#0E131F] border-r border-[#1E293B]/60 flex flex-col justify-between transition-all duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 ${
+          sidebarCollapsed
+            ? 'lg:w-[68px]'
+            : 'lg:w-[260px] lg:shadow-[18px_0_48px_rgba(0,0,0,0.75)]'
+        } w-[260px] bg-[#0E131F] border-r border-[#1E293B]/70 flex flex-col justify-between transition-all duration-300 ease-in-out ${
           mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -229,7 +231,7 @@ export default function AdminPage({ onNavigateHome }) {
             {!sidebarCollapsed && (
               <div className="truncate">
                 <div className="text-xs font-bold text-white tracking-wide uppercase">
-                  Sahara Staffing
+                  Sahara Staffing Inc.
                 </div>
                 <div className="text-[10px] text-[#E69D2B] font-mono">Executive Admin</div>
               </div>
@@ -274,6 +276,7 @@ export default function AdminPage({ onNavigateHome }) {
             onClick={() => {
               setActiveWorkspace('cms');
               setMobileSidebarOpen(false);
+              setSidebarCollapsed(true);
             }}
             title="Site Content CMS & Live Customizer"
             className={`relative w-full ${
@@ -292,14 +295,15 @@ export default function AdminPage({ onNavigateHome }) {
             {!sidebarCollapsed && <span className="truncate">Site Content CMS</span>}
           </button>
 
-          {/* Item 2: Settings */}
+          {/* Item 2: Additional Settings */}
           <button
             type="button"
             onClick={() => {
               setActiveWorkspace('settings');
               setMobileSidebarOpen(false);
+              setSidebarCollapsed(true);
             }}
-            title="Brand & Notifications"
+            title="Additional Settings"
             className={`relative w-full ${
               sidebarCollapsed ? 'px-0 justify-center h-10' : 'px-3.5 py-2.5'
             } text-xs flex items-center gap-3 transition-colors text-left cursor-pointer rounded-r-lg ${
@@ -313,7 +317,7 @@ export default function AdminPage({ onNavigateHome }) {
                 activeWorkspace === 'settings' ? 'text-white' : 'text-[#94A3B8]'
               }`}
             />
-            {!sidebarCollapsed && <span className="truncate">Brand &amp; Notifications</span>}
+            {!sidebarCollapsed && <span className="truncate">Additional Settings</span>}
           </button>
         </nav>
 
@@ -371,22 +375,24 @@ export default function AdminPage({ onNavigateHome }) {
         </div>
       </aside>
 
-      {/* Mobile Backdrop */}
+      {/* Mobile & Desktop Expanded Backdrop */}
       {mobileSidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
           onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+      {!sidebarCollapsed && (
+        <div
+          className="hidden lg:block fixed inset-0 z-40 bg-black/35 backdrop-blur-[1px] transition-opacity"
+          onClick={() => setSidebarCollapsed(true)}
         />
       )}
 
       {/* ===================================================================== */}
-      {/* 2. MAIN WORKSPACE CANVAS (FULL-CANVAS VISUAL STAGE)                    */}
+      {/* 2. MAIN WORKSPACE CANVAS (Permanent 68px rail clearance -> ZERO squeeze) */}
       {/* ===================================================================== */}
-      <div
-        className={`flex-1 ${
-          sidebarCollapsed ? 'lg:pl-[68px]' : 'lg:pl-[260px]'
-        } flex flex-col min-w-0 lg:h-screen lg:overflow-hidden transition-all duration-300 ease-in-out`}
-      >
+      <div className="flex-1 lg:pl-[68px] flex flex-col min-w-0 lg:h-screen lg:overflow-hidden">
         {/* Top Operational Bar (Hidden or Compact during full CMS visual editing) */}
         {activeWorkspace !== 'cms' && (
           <header className="h-[72px] bg-[#0B0F17] border-b border-[#1E293B]/60 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20 shrink-0">
@@ -400,7 +406,7 @@ export default function AdminPage({ onNavigateHome }) {
               </button>
 
               <span className="text-xs text-[#94A3B8] font-medium hidden sm:inline">
-                Sahara Staffing Inc. / Executive Command
+                Sahara Staffing Inc. / Additional Settings
               </span>
             </div>
 
@@ -433,7 +439,9 @@ export default function AdminPage({ onNavigateHome }) {
           {activeWorkspace === 'cms' && (
             <CMSWorkspace
               onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onOpenMobileMenu={() => setMobileSidebarOpen(true)}
               sidebarCollapsed={sidebarCollapsed}
+              onOpenAdditionalSettings={() => setActiveWorkspace('settings')}
             />
           )}
 

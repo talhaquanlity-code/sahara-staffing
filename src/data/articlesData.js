@@ -1,29 +1,26 @@
 export const articlesData = [
   {
     id: 1,
-    title: 'How to Prepare Your Organization for Executive Scale',
-    category: 'Executive Scale',
+    title: 'Executive Sourcing: Finding Passive Leadership in Competitive Markets',
+    category: 'Executive Search',
     readTime: '4 min read',
     date: 'Oct 2026',
-    image:
-      'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=80',
+    image: '/assets/img 10.webp',
   },
   {
     id: 2,
-    title: 'Scaling During Seasonal Peaks: An Executive Staffing Playbook',
-    category: 'Talent Playbook',
+    title: 'Scaling Technical Squads: IT Staff Augmentation vs. In-House Sourcing',
+    category: 'Talent Strategy',
     readTime: '6 min read',
     date: 'Sep 2026',
-    image:
-      'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=900&q=80',
+    image: '/assets/img 12.webp',
   },
   {
     id: 3,
-    title: 'Smart Ways to Deploy Strategic Hiring & Build Core Teams',
-    category: 'Hiring Strategy',
+    title: 'The 4-Stage Vetting Standard: How to Guarantee Technical Precision',
+    category: 'Recruitment',
     readTime: '5 min read',
     date: 'Aug 2026',
-    image:
-      'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80',
+    image: '/assets/img 16.webp',
   },
 ];

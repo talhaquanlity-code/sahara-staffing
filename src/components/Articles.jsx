@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useUI } from '../context/UIContext';
 import { articlesData } from '../data/articlesData';
 import ScrollRevealText from './common/ScrollRevealText';
 
@@ -29,7 +28,6 @@ const popupVariants = {
 };
 
 export default function Articles() {
-  const { openModal } = useUI();
   const sectionRef = useRef(null);
 
   return (
@@ -61,7 +59,9 @@ export default function Articles() {
         <motion.button
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
-          onClick={() => openModal('All Sahara Articles')}
+          onClick={() => {
+            window.location.hash = 'services';
+          }}
           className="group inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/90 hover:bg-white text-xs sm:text-sm font-bold text-[#0B0F17] shadow-sm hover:shadow-md border border-slate-200 transition-all duration-300 shrink-0 self-start sm:self-auto"
         >
           <span>View All Insights</span>
@@ -95,7 +95,9 @@ export default function Articles() {
             variants={popupVariants}
             whileHover={{ y: -8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            onClick={() => openModal(`Article: ${article.title}`)}
+            onClick={() => {
+              window.location.hash = 'services';
+            }}
             className="article-card will-change-transform group cursor-pointer rounded-[28px] overflow-hidden relative aspect-[4/3.2] bg-[#0B0F17] shadow-lg hover:shadow-2xl border border-slate-200/40 select-none flex flex-col justify-between"
           >
             {/* Shimmer Light Sweep on Hover */}
@@ -107,6 +109,7 @@ export default function Articles() {
               alt={article.title}
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
               loading="lazy"
+              decoding="async"
             />
 
             {/* Dark Editorial Gradient Overlay */}
@@ -115,7 +118,7 @@ export default function Articles() {
             {/* Top Bar: Category Pill & Floating Arrow Action */}
             <div className="relative z-20 p-6 flex items-center justify-between">
               <span className="bg-black/45 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider border border-white/15 group-hover:bg-[#E69D2B] group-hover:text-[#0B0F17] group-hover:border-[#E69D2B] transition-all duration-300">
-                {article.category || 'Executive Hiring'}
+                {article.category || 'Executive Search'}
               </span>
 
               {/* Glass Arrow Button that Rotates 45deg on Hover */}

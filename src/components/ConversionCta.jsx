@@ -1,11 +1,9 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { useUI } from '../context/UIContext';
 import SaharaLogo from './SaharaLogo';
 
 export default function ConversionCta({ onNavigateContact, onNavigateServices }) {
-  const { openModal } = useUI();
   const sectionRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -55,7 +53,7 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           className="text-[#B87314] text-xs font-bold tracking-[0.25em] uppercase font-sans mb-3 block"
         >
-          LET'S BUILD A STRONGER TEAM
+          ENTERPRISE TALENT ACQUISITION
         </motion.span>
 
         {/* Oversized Confident Headline with Blur Reveal */}
@@ -64,9 +62,9 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-          className="text-3xl sm:text-5xl lg:text-6xl font-black text-[#0B0F17] tracking-tight leading-[1.08] mb-6 max-w-3xl"
+          className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#0B0F17] tracking-tight leading-tight mb-6 max-w-2xl"
         >
-          Your Next Great Hire Starts with a Conversation.
+          Your Next Critical Hire Starts with a Conversation.
         </motion.h2>
 
         {/* Supporting Text */}
@@ -77,8 +75,8 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
           className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl font-normal font-inter mb-10"
         >
-          Tell us what your business needs, and let's explore the right recruitment approach
-          together with clarity, purpose, and dedication.
+          Tell us what your organization needs, and let's deploy specialized technical talent
+          and executive leadership with precision and speed.
         </motion.p>
 
         {/* Dual Actions */}
@@ -92,11 +90,11 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           <button
             onClick={() => {
               if (onNavigateContact) onNavigateContact();
-              else openModal('Discuss Your Hiring Needs');
+              else window.location.hash = 'contact';
             }}
             className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-[#0B0F17] hover:bg-[#1E293B] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 cursor-pointer"
           >
-            <span>Discuss Your Hiring Needs</span>
+            <span>Request Talent</span>
             <ArrowRight className="w-4 h-4 text-[#E69D2B]" />
           </button>
 
@@ -110,7 +108,7 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
             }}
             className="w-full sm:w-auto min-h-[48px] justify-center bg-white/90 backdrop-blur-sm border border-slate-300 hover:border-[#0B0F17] text-[#0B0F17] font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full hover:bg-white transition-all duration-200 active:scale-95 cursor-pointer shadow-xs inline-flex items-center"
           >
-            Explore Our Services
+            Explore Services
           </button>
         </motion.div>
       </motion.div>

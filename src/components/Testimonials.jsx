@@ -7,55 +7,37 @@ const testimonials = [
     id: 1,
     name: 'Michael Carter',
     role: 'VP of Engineering at CloudScale',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+    avatar: '/assets/testimonial-marcus.webp',
     quote:
-      "Sahara has been a total game-changer for our engineering organization. Their technical vetting delivered two principal distributed systems architects within 9 days. The candidates hit the ground running on day one.",
+      'Sahara transformed our technical delivery. Their senior systems architects aligned our distributed infrastructure within two weeks and elevated reliability from day one.',
   },
   {
     id: 2,
     name: 'Elena Rostova',
-    role: 'Chief People Officer at FinPulse Global',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80',
+    role: 'Chief Operating Officer at FinPulse Global',
+    avatar: '/assets/testimonial-elena.webp',
     quote:
-      "I've worked with dozens of executive recruitment agencies, and Sahara stands in a league of its own. Transparent SLAs, zero unqualified resume spams, and a genuine 90-day retention guarantee we can trust.",
+      'I have worked with many consulting firms, and Sahara stands apart. Clear operational milestones, direct partner communication, and execution we can rely on.',
   },
   {
     id: 3,
-    name: 'John Spencer',
-    role: 'Director of Platform at GlobeSync',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-    quote:
-      "Finding verified Kubernetes and infrastructure specialists used to stall our roadmap for quarters. With Sahara's 5-stage vetting framework, we closed our top candidate in just one week.",
-  },
-  {
-    id: 4,
-    name: 'David Lin',
-    role: 'Founder & CEO at Omniverse AI',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&q=80',
-    quote:
-      "As a fast-growing startup, we can't afford hiring mistakes. Sahara understands technical nuances and cultural alignment. Their team feels like a natural extension of our leadership council.",
-  },
-  {
-    id: 5,
     name: 'Sarah Jenkins',
-    role: 'VP of Product at Horizon SaaS',
-    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&q=80',
+    role: 'VP of Strategy at Horizon SaaS',
+    avatar: '/assets/testimonial-sarah.webp',
     quote:
-      "From scoping the role to the final offer letter, Sahara executed with supreme speed and precision. The candidate caliber exceeded our board's expectations.",
-  },
-  {
-    id: 6,
-    name: 'Marcus Vance',
-    role: 'Chief Technology Officer at Continiom',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
-    quote:
-      "Sahara completely eliminated recruitment friction. We scaled our core data engineering squad by 4 senior hires within 3 weeks without sacrificing technical standards.",
+      'Scaling our cloud operations used to stall quarterly roadmaps. With Sahara’s structured delivery framework, we modernized core workflows ahead of schedule.',
   },
 ];
 
 export default function Testimonials() {
   const { content } = useCMS();
   const cmsTestimonials = content?.testimonials;
+  const sectionMeta = content?.home?.testimonialsSection || {};
+  const kicker = sectionMeta.kicker || 'CLIENT PERSPECTIVES';
+  const headline = sectionMeta.headline || 'Trusted by High-Growth Enterprises.';
+  const subtitle =
+    sectionMeta.subtitle ||
+    'Hear how engineering leaders and executives scale their organizations alongside Sahara Staffing Inc.';
 
   const displayTestimonials = (Array.isArray(cmsTestimonials) && cmsTestimonials.length > 0)
     ? cmsTestimonials.map((t, idx) => ({
@@ -107,18 +89,17 @@ export default function Testimonials() {
         >
           {/* Subtle Sahara Kicker */}
           <span className="text-[#B87314] text-xs font-bold uppercase tracking-[0.2em] font-sans mb-2.5 sm:mb-3 block">
-            CLIENT SUCCESS STORIES
+            {kicker}
           </span>
 
           {/* Headline */}
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B0F17] tracking-tight mb-3 sm:mb-4">
-            What Our Clients Are Saying
+            {headline}
           </h2>
 
           {/* Subtitle */}
           <p className="text-slate-600 text-xs sm:text-base leading-relaxed font-normal font-inter">
-            Our enterprise partners rely on Sahara to recruit mission-critical specialists and build
-            high-performing teams with speed and certainty.
+            {subtitle}
           </p>
         </motion.div>
       </motion.div>
@@ -166,6 +147,7 @@ export default function Testimonials() {
                     alt={item.name}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-[#E69D2B]/20 shrink-0"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="min-w-0">
                     <div className="font-bold text-[#0B0F17] text-xs sm:text-sm font-sans truncate">
@@ -210,6 +192,7 @@ export default function Testimonials() {
                     alt={item.name}
                     className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-[#E69D2B]/20 shrink-0"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="min-w-0">
                     <div className="font-bold text-[#0B0F17] text-xs sm:text-sm font-sans truncate">

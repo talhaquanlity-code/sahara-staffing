@@ -1,48 +1,43 @@
 import React, { useRef, useState } from 'react';
 import { motion, useSpring, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
 
 // ---------------------------------------------------------------------------
 // STAFFING SOLUTIONS DATA
 // ---------------------------------------------------------------------------
-const staffingSolutions = [
+const solutionCards = [
   {
     id: '01',
-    tag: '01 - CONTRACT & INTERIM',
-    title: 'Flexible Staffing',
-    subtitle: 'Rapid deployment of specialized contract talent, fractional engineering, and interim leadership.',
-    image: '/assets/card1-female-clean.jpg',
-    fallbackImage: '/assets/card1-exec-clean.jpg',
-    modalTitle: 'Flexible Staffing Solutions',
+    tag: '01 - EXECUTIVE SEARCH',
+    title: 'Executive & Leadership Search',
+    subtitle: 'Targeted executive search and board-level placement engineered to secure proven leadership for long-term growth.',
+    image: '/assets/img 16.webp',
+    fallbackImage: '/assets/hero-1.webp',
   },
   {
     id: '02',
-    tag: '02 - LEADERSHIP & C-SUITE',
-    title: 'Executive Search',
-    subtitle: 'Direct-hire placement for VP and C-suite leaders who redefine markets and scale valuation.',
-    image: '/assets/card2-talent.jpg',
-    fallbackImage: '/assets/talent-exec.jpg',
-    modalTitle: 'Executive Search & Leadership',
+    tag: '02 - WORKFORCE AUGMENTATION',
+    title: 'IT Staff Augmentation',
+    subtitle: 'Deploy specialized technical contractors and project teams to scale capacity on demand.',
+    image: '/assets/img 5.webp',
+    fallbackImage: '/assets/img 6.webp',
   },
   {
     id: '03',
-    tag: '03 - TECHNICAL DILIGENCE',
-    title: 'Specialized Technical Teams',
-    subtitle: 'Top 2% vetted AI architects, systems leads, and principal engineers ready for immediate sprint integration.',
-    image: '/assets/talent-ai.jpg',
-    fallbackImage: '/assets/card1-exec-clean.jpg',
-    modalTitle: 'Specialized Technical Teams',
+    tag: '03 - PERMANENT PLACEMENT',
+    title: 'Direct Hire Placement',
+    subtitle: 'Rigorously vetted professionals aligned with your organization\'s technical stack and company culture.',
+    image: '/assets/img 8.webp',
+    fallbackImage: '/assets/img 10.webp',
   },
   {
     id: '04',
-    tag: '04 - ENTERPRISE RPO',
-    title: 'Workforce Solutions',
-    subtitle: 'End-to-end recruitment process outsourcing engineered for fast-growing ventures and enterprise scale.',
-    image: '/assets/card3-workforce.jpg',
-    fallbackImage: '/assets/service-workforce.jpg',
-    modalTitle: 'Enterprise RPO & Workforce Solutions',
+    tag: '04 - DEDICATED SQUADS',
+    title: 'Specialized Technical Teams',
+    subtitle: 'Rapid deployment of vetted technical squads, senior engineers, and specialized contributors ready for immediate sprint integration.',
+    image: '/assets/img 9.webp',
+    fallbackImage: '/assets/img 12.webp',
   },
 ];
 
@@ -136,13 +131,18 @@ function BentoCard({
           className="relative w-full h-full rounded-[28px] sm:rounded-[32px] overflow-hidden border border-slate-200/90 hover:border-[#E69D2B]/70 bg-[#0B0F17] transition-colors duration-500 shadow-xl flex flex-col justify-between p-7 sm:p-8"
         >
           {/* Hardware-Accelerated Parallax Image Background (Oversized for Scroll Parallax) */}
-          <div className="absolute inset-[-10%] z-0 overflow-hidden pointer-events-none">
+          <div
+            className="absolute inset-[-10%] z-0 overflow-hidden pointer-events-none will-change-transform"
+            style={{ transform: 'translateZ(0)' }}
+          >
             <motion.img
               src={image}
               onError={(e) => {
                 if (fallbackImage) e.currentTarget.src = fallbackImage;
               }}
               alt={title}
+              loading="lazy"
+              decoding="async"
               style={{
                 x: mouseImgX,
                 y: imgScrollY,
@@ -198,50 +198,31 @@ function BentoCard({
 // ---------------------------------------------------------------------------
 // MAIN BENTO GROWTH CAPITAL SECTION WITH SCROLL PARALLAX
 // ---------------------------------------------------------------------------
-export default function BentoGrowthCapital({ onNavigateService }) {
-  const { openModal } = useUI();
+export default function BentoGrowthCapital({ onNavigateService, onNavigateContact }) {
   const { content } = useCMS();
   const cmsImages = content?.images || {};
-  const cmsServices = content?.services || [];
+  const cmsBento = content?.home?.bento || content?.services || [];
+  const sectionMeta = content?.home?.bentoSection || {};
 
-  const activeStaffingSolutions = [
-    {
-      id: '01',
-      tag: cmsServices[0]?.badge || '01 - CONTRACT & INTERIM',
-      title: cmsServices[0]?.title || 'Flexible Staffing',
-      subtitle: cmsServices[0]?.description || staffingSolutions[0].subtitle,
-      image: cmsImages.bentoCard1 || cmsServices[0]?.image || staffingSolutions[0].image,
-      fallbackImage: staffingSolutions[0].fallbackImage,
-      modalTitle: 'Flexible Staffing Solutions',
-    },
-    {
-      id: '02',
-      tag: cmsServices[1]?.badge || '02 - LEADERSHIP & C-SUITE',
-      title: cmsServices[1]?.title || 'Executive Search',
-      subtitle: cmsServices[1]?.description || staffingSolutions[1].subtitle,
-      image: cmsImages.bentoCard2 || cmsServices[1]?.image || staffingSolutions[1].image,
-      fallbackImage: staffingSolutions[1].fallbackImage,
-      modalTitle: 'Executive Search & Leadership',
-    },
-    {
-      id: '03',
-      tag: cmsServices[2]?.badge || '03 - TECHNICAL DILIGENCE',
-      title: cmsServices[2]?.title || 'Specialized Technical Teams',
-      subtitle: cmsServices[2]?.description || staffingSolutions[2].subtitle,
-      image: cmsImages.bentoCard3 || cmsServices[2]?.image || staffingSolutions[2].image,
-      fallbackImage: staffingSolutions[2].fallbackImage,
-      modalTitle: 'Specialized Technical Teams',
-    },
-    {
-      id: '04',
-      tag: cmsServices[3]?.badge || '04 - ENTERPRISE RPO',
-      title: cmsServices[3]?.title || 'Workforce Solutions',
-      subtitle: cmsServices[3]?.description || staffingSolutions[3].subtitle,
-      image: cmsImages.bentoCard4 || cmsServices[3]?.image || staffingSolutions[3].image,
-      fallbackImage: staffingSolutions[3].fallbackImage,
-      modalTitle: 'Enterprise RPO & Workforce Solutions',
-    },
-  ];
+  const activeSolutions = [0, 1, 2, 3].map((idx) => ({
+    id: `0${idx + 1}`,
+    tag: cmsBento[idx]?.badge || solutionCards[idx].tag,
+    title: cmsBento[idx]?.title || solutionCards[idx].title,
+    subtitle: cmsBento[idx]?.description || solutionCards[idx].subtitle,
+    image:
+      cmsImages[`bentoCard${idx + 1}`] ||
+      cmsBento[idx]?.image ||
+      solutionCards[idx].image,
+    fallbackImage: solutionCards[idx].fallbackImage,
+  }));
+
+  const sectionKicker = sectionMeta.kicker || 'CORE TALENT PILLARS';
+  const sectionHeadline = sectionMeta.headline || 'Flexible Staffing & Precision Talent Placement.';
+  const sectionHighlight = sectionMeta.highlightWord || 'Precision';
+  const sectionSubtitle =
+    sectionMeta.subtitle ||
+    'Deploy specialized technical contractors and executive leadership engineered for mission-critical growth.';
+  const sectionCtaLabel = sectionMeta.ctaLabel || 'Explore Services';
 
   const sectionRef = useRef(null);
   const carouselRef = useRef(null);
@@ -252,7 +233,7 @@ export default function BentoGrowthCapital({ onNavigateService }) {
     const { scrollLeft, clientWidth } = carouselRef.current;
     const cardWidth = 300;
     const index = Math.round(scrollLeft / (cardWidth + 14));
-    setActiveSlide(Math.min(activeStaffingSolutions.length - 1, Math.max(0, index)));
+    setActiveSlide(Math.min(activeSolutions.length - 1, Math.max(0, index)));
   };
 
   const scrollToSlide = (idx) => {
@@ -287,6 +268,16 @@ export default function BentoGrowthCapital({ onNavigateService }) {
     }
   };
 
+  const handleCardClick = () => {
+    if (onNavigateService) {
+      onNavigateService('services');
+    } else if (onNavigateContact) {
+      onNavigateContact();
+    } else {
+      window.location.hash = 'services';
+    }
+  };
+
   return (
     <section
       ref={sectionRef}
@@ -307,26 +298,33 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           {/* Left Column */}
           <div className="max-w-2xl space-y-2.5 opacity-100 transform-none">
             <span className="text-[#B87314] text-xs font-bold tracking-wider uppercase font-sans">
-              STAFFING SOLUTIONS
+              {sectionKicker}
             </span>
 
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-[-0.03em] text-[#0B0F17] leading-[1.15] sm:leading-[1.1] font-sans">
-              Exceptional <span className="text-[#B87314]">Talent.</span> Built Around Your Business.
+              {sectionHighlight && sectionHeadline.includes(sectionHighlight) ? (
+                <>
+                  {sectionHeadline.split(sectionHighlight)[0]}
+                  <span className="text-[#B87314]">{sectionHighlight}</span>
+                  {sectionHeadline.split(sectionHighlight).slice(1).join(sectionHighlight)}
+                </>
+              ) : (
+                sectionHeadline
+              )}
             </h2>
           </div>
 
           {/* Right Column */}
           <div className="flex flex-col items-start lg:items-end gap-3.5 sm:gap-4 opacity-100 transform-none">
             <p className="text-slate-600 text-xs sm:text-sm max-w-sm lg:text-right leading-relaxed font-sans">
-              Connect with pre-vetted professionals and build stronger teams through recruitment
-              solutions designed around your business.
+              {sectionSubtitle}
             </p>
 
             <button
               onClick={handleServicesClick}
               className="bg-[#0B0F17] hover:bg-[#E69D2B] hover:text-[#0B0F17] text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs font-semibold transition-all duration-300 shadow-md inline-flex items-center gap-2 cursor-pointer active:scale-95 group font-sans"
             >
-              <span>Explore Our Services</span>
+              <span>{sectionCtaLabel}</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </button>
           </div>
@@ -345,10 +343,10 @@ export default function BentoGrowthCapital({ onNavigateService }) {
               touchAction: 'pan-x pan-y',
             }}
           >
-            {activeStaffingSolutions.map((item) => (
+            {activeSolutions.map((item) => (
               <div
                 key={item.id}
-                onClick={() => openModal(item.modalTitle)}
+                onClick={handleCardClick}
                 style={{ touchAction: 'pan-x pan-y' }}
                 className="w-[84vw] max-w-[320px] h-[390px] shrink-0 snap-center rounded-[24px] overflow-hidden border border-slate-200/90 bg-[#0B0F17] shadow-xl relative flex flex-col justify-between p-6 select-none cursor-pointer active:scale-[0.98] transition-transform duration-200 opacity-100 transform-none"
               >
@@ -360,6 +358,8 @@ export default function BentoGrowthCapital({ onNavigateService }) {
                       if (item.fallbackImage) e.currentTarget.src = item.fallbackImage;
                     }}
                     alt={item.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17] via-[#0B0F17]/65 to-[#0B0F17]/25" />
@@ -391,11 +391,11 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           {/* Pagination Dot Indicators & Hint */}
           <div className="flex items-center justify-between pt-3 px-1">
             <div className="flex items-center gap-1.5">
-              {activeStaffingSolutions.map((_, idx) => (
+              {activeSolutions.map((_, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  aria-label={`Go to staffing solution ${idx + 1}`}
+                  aria-label={`Go to solution ${idx + 1}`}
                   onClick={() => scrollToSlide(idx)}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
                     activeSlide === idx
@@ -425,17 +425,17 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           {/* CARD 1: VERTICAL 1 (LEFT FLANK - 3 COLS)                              */}
           {/* --------------------------------------------------------------------- */}
           <BentoCard
-            tag={activeStaffingSolutions[0].tag}
-            title={activeStaffingSolutions[0].title}
-            subtitle={activeStaffingSolutions[0].subtitle}
-            image={activeStaffingSolutions[0].image}
-            fallbackImage={activeStaffingSolutions[0].fallbackImage}
+            tag={activeSolutions[0].tag}
+            title={activeSolutions[0].title}
+            subtitle={activeSolutions[0].subtitle}
+            image={activeSolutions[0].image}
+            fallbackImage={activeSolutions[0].fallbackImage}
             orientation="vertical"
             scrollYProgress={scrollYProgress}
             scrollParallaxRange={['-10%', '10%']}
             columnY={yCard1}
             className="lg:col-span-3 h-[480px] sm:h-[510px] lg:h-[540px]"
-            onClick={() => openModal(activeStaffingSolutions[0].modalTitle)}
+            onClick={handleCardClick}
           />
 
           {/* --------------------------------------------------------------------- */}
@@ -447,30 +447,30 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           >
             {/* HORIZONTAL CARD 1 (TOP) */}
             <BentoCard
-              tag={activeStaffingSolutions[1].tag}
-              title={activeStaffingSolutions[1].title}
-              subtitle={activeStaffingSolutions[1].subtitle}
-              image={activeStaffingSolutions[1].image}
-              fallbackImage={activeStaffingSolutions[1].fallbackImage}
+              tag={activeSolutions[1].tag}
+              title={activeSolutions[1].title}
+              subtitle={activeSolutions[1].subtitle}
+              image={activeSolutions[1].image}
+              fallbackImage={activeSolutions[1].fallbackImage}
               orientation="horizontal"
               scrollYProgress={scrollYProgress}
               scrollParallaxRange={['-7%', '7%']}
               className="h-[260px]"
-              onClick={() => openModal(activeStaffingSolutions[1].modalTitle)}
+              onClick={handleCardClick}
             />
 
             {/* HORIZONTAL CARD 2 (BOTTOM) */}
             <BentoCard
-              tag={activeStaffingSolutions[2].tag}
-              title={activeStaffingSolutions[2].title}
-              subtitle={activeStaffingSolutions[2].subtitle}
-              image={activeStaffingSolutions[2].image}
-              fallbackImage={activeStaffingSolutions[2].fallbackImage}
+              tag={activeSolutions[2].tag}
+              title={activeSolutions[2].title}
+              subtitle={activeSolutions[2].subtitle}
+              image={activeSolutions[2].image}
+              fallbackImage={activeSolutions[2].fallbackImage}
               orientation="horizontal"
               scrollYProgress={scrollYProgress}
               scrollParallaxRange={['-7%', '7%']}
               className="h-[260px]"
-              onClick={() => openModal(activeStaffingSolutions[2].modalTitle)}
+              onClick={handleCardClick}
             />
           </motion.div>
 
@@ -478,17 +478,17 @@ export default function BentoGrowthCapital({ onNavigateService }) {
           {/* CARD 4: VERTICAL 2 (RIGHT FLANK - 3 COLS)                             */}
           {/* --------------------------------------------------------------------- */}
           <BentoCard
-            tag={activeStaffingSolutions[3].tag}
-            title={activeStaffingSolutions[3].title}
-            subtitle={activeStaffingSolutions[3].subtitle}
-            image={activeStaffingSolutions[3].image}
-            fallbackImage={activeStaffingSolutions[3].fallbackImage}
+            tag={activeSolutions[3].tag}
+            title={activeSolutions[3].title}
+            subtitle={activeSolutions[3].subtitle}
+            image={activeSolutions[3].image}
+            fallbackImage={activeSolutions[3].fallbackImage}
             orientation="vertical"
             scrollYProgress={scrollYProgress}
             scrollParallaxRange={['-12%', '12%']}
             columnY={yCard4}
             className="lg:col-span-3 h-[480px] sm:h-[510px] lg:h-[540px]"
-            onClick={() => openModal(activeStaffingSolutions[3].modalTitle)}
+            onClick={handleCardClick}
           />
         </motion.div>
 
@@ -496,3 +496,4 @@ export default function BentoGrowthCapital({ onNavigateService }) {
     </section>
   );
 }
+

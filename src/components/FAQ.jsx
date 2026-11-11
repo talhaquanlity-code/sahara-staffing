@@ -8,12 +8,23 @@ import ScrollRevealText from './common/ScrollRevealText';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function FAQ() {
-  const { content } = useCMS();
-  const faqList = content?.faqs && content.faqs.length > 0 ? content.faqs : fallbackFaqData;
+  const { content, isLivePreview } = useCMS();
+  const faqMeta = content?.home?.faqSection || {};
+  const faqHeadline = faqMeta.headline || 'Frequently Asked Questions';
+  const faqSubtitle =
+    faqMeta.subtitle ||
+    'Clear answers to the most common questions about our recruitment process, candidate vetting, and placement guarantees.';
+  const itemsToRender =
+    content?.faqs && content.faqs.length > 0 ? content.faqs : fallbackFaqData;
   const [openIndex, setOpenIndex] = useState(0); // 1st item open by default
   const faqRef = useRef(null);
 
   useEffect(() => {
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isLivePreview || prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
       mm.add('(min-width: 768px)', () => {
@@ -36,7 +47,7 @@ export default function FAQ() {
     }, faqRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isLivePreview]);
 
   const toggleFaq = (index) => {
     setOpenIndex(openIndex === index ? -1 : index);
@@ -49,21 +60,19 @@ export default function FAQ() {
           {/* Left Column: Title & Subtitle */}
           <div className="lg:col-span-5">
             <h2 className="text-xl font-bold text-white mb-2 md:text-5xl md:font-semibold md:tracking-[-0.03em] md:leading-[1.08] md:text-saharaGold">
-              Frequently
-              <br className="hidden sm:inline" />{' '}
-              Asked Questions
+              {faqHeadline}
             </h2>
             <p className="text-xs text-slate-400 mb-6 md:mb-0 md:text-sm md:text-slateGray max-w-sm leading-relaxed">
-              Clear answers to the most common questions about our search process and placement guarantees.
+              {faqSubtitle}
             </p>
           </div>
 
           {/* Right Column: Interactive Accordion List */}
-          <div className="faq-list-container lg:col-span-7 divide-y divide-slateCard border-b border-slateCard">
-            {faqList.map((item, index) => {
+          <div className="faq-list-container lg:col-span-7 w-full divide-y divide-slate-800/80 border-b border-slate-800/80">
+            {itemsToRender.map((item, index) => {
               const isOpen = openIndex === index;
               return (
-                <div key={item.id || index} className="faq-row py-4 border-b border-slate-800/60 md:py-6">
+                <div key={item.id || index} className="faq-row py-4 border-b border-slate-800/80 md:py-6">
                   <button
                     onClick={() => toggleFaq(index)}
                     className="w-full flex items-center justify-between text-left group focus:outline-none cursor-pointer"

@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useUI } from '../context/UIContext';
-import saharaMarkImg from '../assets/sahara-mark.png';
+import { useCMS } from '../context/CMSContext';
+import saharaMarkImg from '../assets/sahara-mark.webp';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,32 +11,50 @@ gsap.registerPlugin(ScrollTrigger);
 // 01 — DISCOVER at 180° (9 o'clock / left)
 // 02 — CONNECT at 300° (2 o'clock / top-right)
 // 03 — GROW at 60° (4 o'clock / bottom-right)
-const STATIONS = [
+const DEFAULT_STATIONS = [
   {
     step: '01',
     title: 'DISCOVER',
-    description: 'Understand the hiring need.',
+    description: 'Define role scoping & technical specs.',
     angle: 180,
     isRight: false,
   },
   {
     step: '02',
     title: 'CONNECT',
-    description: 'Find the right talent.',
+    description: 'Source & vet high-impact candidates.',
     angle: 300,
     isRight: true,
   },
   {
     step: '03',
-    title: 'GROW',
-    description: 'Build stronger teams.',
+    title: 'SCALE',
+    description: 'Deploy specialized talent with 90-day continuity.',
     angle: 60,
     isRight: true,
   },
 ];
 
 export default function Calculator({ onNavigateContact, onProceedToContact }) {
-  const { openModal } = useUI();
+  const { content, settings } = useCMS();
+  const calcData = content?.home?.calculator || {};
+  const eyebrow = calcData.eyebrow || 'SAHARA STAFFING INC. / TALENT SOLUTIONS';
+  const headline = calcData.headline || 'Talent Solutions That Move Business Forward.';
+  const highlightWord = calcData.highlightWord || 'Move';
+  const subtitle =
+    calcData.subtitle ||
+    'The specialized talent and executive leadership behind every great enterprise. We partner with ambitious organizations to deliver precision staffing built to scale.';
+  const ctaBtn = (Array.isArray(calcData.buttons) && calcData.buttons.find((b) => b?.enabled !== false)) || {
+    label: 'Request Talent ->',
+  };
+  const ctaLabel = (ctaBtn.label || 'Request Talent ->').replace(/\s*(→|->|&rarr;)\s*$/, '').trim();
+  const STATIONS = DEFAULT_STATIONS.map((s, idx) => ({
+    ...s,
+    step: calcData.stations?.[idx]?.step || s.step,
+    title: calcData.stations?.[idx]?.title || s.title,
+    description: calcData.stations?.[idx]?.description || s.description,
+  }));
+  const markLogo = settings?.brandMarkUrl || saharaMarkImg;
   const sectionRef = useRef(null);
   const orbitContainerRef = useRef(null);
   const logoWrapperRef = useRef(null);
@@ -195,8 +213,8 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
       onNavigateContact();
     } else if (onProceedToContact) {
       onProceedToContact();
-    } else if (openModal) {
-      openModal('Employer Hiring Inquiries: Sahara Staffing Inc.');
+    } else {
+      window.location.hash = 'contact';
     }
   };
 
@@ -204,31 +222,37 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
     <section
       ref={sectionRef}
       id="staffing-momentum"
-      className="rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-10 px-5 md:py-16 lg:py-20 md:px-10 lg:px-14 select-none relative"
+      className="hidden md:block rounded-[24px] sm:rounded-[36px] lg:rounded-[44px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)] py-10 px-5 md:py-16 lg:py-20 md:px-8 lg:px-12 select-none relative"
     >
-      <div className="max-w-[1280px] mx-auto px-0 md:px-10 lg:px-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+      <div className="max-w-[1360px] mx-auto px-0">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* =================================================================== */}
           {/* 1. LEFT COLUMN: EDITORIAL STAFFING NARRATIVE                        */}
           {/* =================================================================== */}
-          <div className="lg:col-span-6 space-y-4 md:space-y-6 text-center md:text-left">
+          <div className="lg:col-span-5 space-y-4 md:space-y-6 text-center md:text-left lg:pr-6">
             {/* Eyebrow */}
             <div>
               <span className="text-xs font-sans font-semibold tracking-wider uppercase text-[#E69D2B] md:text-[#B87314] block">
-                SAHARA STAFFING INC. / TALENT SOLUTIONS
+                {eyebrow}
               </span>
             </div>
 
             {/* Headline */}
-            <h2 className="text-xl sm:text-2xl md:text-4xl lg:text-[48px] font-bold tracking-tight text-white md:text-[#0B0F17] leading-tight md:leading-[1.12] font-sans mt-1">
-              Talent That <span className="text-[#E69D2B] md:text-[#B87314]">Moves</span>
-              <br className="hidden sm:inline" /> Business Forward.
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white md:text-[#0B0F17] leading-tight font-sans mt-1 max-w-lg">
+              {highlightWord && headline.includes(highlightWord) ? (
+                <>
+                  {headline.split(highlightWord)[0]}
+                  <span className="text-[#E69D2B] md:text-[#B87314]">{highlightWord}</span>
+                  {headline.split(highlightWord).slice(1).join(highlightWord)}
+                </>
+              ) : (
+                headline
+              )}
             </h2>
 
             {/* Supporting Paragraph */}
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 md:text-slate-600 font-normal leading-relaxed max-w-sm mx-auto md:max-w-lg md:mx-0 font-sans">
-              The people behind every great business. We connect ambitious teams with talent built
-              to move them forward.
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-slate-400 md:text-slate-600 font-normal leading-relaxed max-w-sm mx-auto md:max-w-md md:mx-0 font-sans">
+              {subtitle}
             </p>
 
             {/* Primary CTA */}
@@ -238,7 +262,7 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
                 onClick={handleCtaClick}
                 className="w-full py-3.5 px-6 bg-[#E69D2B] text-[#0B0F17] font-bold text-sm rounded-xl shadow-lg hover:bg-[#d89020] flex items-center justify-center gap-2 md:w-auto md:bg-[#0B0F17] md:hover:bg-[#1E293B] md:text-white md:rounded-full md:px-8 md:py-4 md:text-base transition-all duration-200 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 active:scale-95"
               >
-                <span>Find Your Talent</span>
+                <span>{ctaLabel}</span>
                 <ArrowRight className="w-4 h-4 text-[#0B0F17] md:text-[#F5A623] transition-transform duration-200 group-hover:translate-x-1" />
               </button>
             </div>
@@ -247,12 +271,12 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
           {/* =================================================================== */}
           {/* 2. RIGHT COLUMN: INTERACTIVE FLOATING SAHARA ORBIT (Desktop Only)   */}
           {/* =================================================================== */}
-          <div className="hidden md:flex lg:col-span-6 flex-col items-center lg:items-end">
+          <div className="hidden md:flex lg:col-span-7 flex-col items-center lg:items-end lg:pr-4">
             <div
               ref={orbitContainerRef}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              className="relative w-52 h-52 mx-auto sm:w-[380px] sm:h-[380px] lg:w-[420px] lg:h-[420px] flex items-center justify-center will-change-transform shrink-0 opacity-100 transform-none"
+              className="relative w-52 h-52 sm:w-[380px] sm:h-[380px] lg:w-[400px] lg:h-[400px] flex items-center justify-center will-change-transform shrink-0 opacity-100 transform-none"
             >
               {/* Concentric Architectural SVG Tracks */}
               <svg
@@ -321,8 +345,10 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   <img
-                    src={saharaMarkImg}
-                    alt="Sahara Staffing Inc."
+                    src={markLogo}
+                    alt={settings?.companyName || 'Sahara Staffing Inc.'}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-contain pointer-events-none select-none drop-shadow"
                     draggable={false}
                   />
