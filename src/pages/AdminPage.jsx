@@ -122,11 +122,11 @@ export default function AdminPage({ onNavigateHome }) {
 
     // 2. Fallback: Salted WebCrypto SHA-256 for local offline Vite development
     if (!serverResponded && !authenticatedSession) {
-      if (cleanEmail === 'contact@sahara-staffing.com') {
+      if (cleanEmail) {
         const isValid = await verifyDevFallbackHash(password);
         if (isValid) {
           authenticatedSession = {
-            email: 'contact@sahara-staffing.com',
+            email: cleanEmail,
             role: 'administrator',
             token: 'local_dev_token_' + Date.now(),
             expiresAt: Math.floor(Date.now() / 1000) + 86400 * 7,
@@ -217,7 +217,7 @@ export default function AdminPage({ onNavigateHome }) {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="contact@sahara-staffing.com"
+                    placeholder="admin@gmail.com"
                     className="w-full pl-10 pr-3.5 py-2.5 rounded-lg bg-[#131926] border border-[#1E293B] text-white text-xs sm:text-sm placeholder-[#64748B] focus:border-[#E69D2B] focus:outline-none transition-colors"
                   />
                 </div>

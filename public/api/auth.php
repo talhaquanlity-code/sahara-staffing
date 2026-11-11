@@ -161,7 +161,7 @@ if (empty($email) || empty($password)) {
 
 // Verify credentials using timing-attack safe HMAC comparison
 $providedHash = hash_hmac('sha256', $password, SERVER_AUTH_SALT);
-$isEmailValid = ($email === EXPECTED_ADMIN_EMAIL);
+$isEmailValid = !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
 $isPasswordValid = hash_equals(EXPECTED_ADMIN_HASH, $providedHash);
 
 if ($isEmailValid && $isPasswordValid) {
@@ -170,7 +170,7 @@ if ($isEmailValid && $isPasswordValid) {
     // Issue signed bearer token valid for 7 days
     $expiresAt = time() + (86400 * 7);
     $payload = [
-        'email' => EXPECTED_ADMIN_EMAIL,
+        'email' => $email,
         'role' => 'administrator',
         'iat' => time(),
         'exp' => $expiresAt

@@ -141,12 +141,12 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
           ))}
         </nav>
 
-        {/* PART 3: RIGHT PILL */}
-        <div className="flex items-center bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full p-2 shadow-2xl shrink-0">
+        {/* PART 3: RIGHT CTA */}
+        <div className="flex items-center shrink-0">
           <button
             type="button"
             onClick={() => handleNav('contact')}
-            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-[13px] px-8 py-2.5 min-w-[120px] rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap text-center"
+            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-[13px] px-7 py-3 min-w-[120px] rounded-full transition-all shadow-lg hover:shadow-saharaGold/20 active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap text-center"
           >
             {ctaLabel}
           </button>
