@@ -74,7 +74,7 @@ export default function NextGenPayment() {
             <div className="flex flex-wrap items-center gap-3 mt-7">
               <button
                 onClick={() => {
-                  window.location.hash = 'contact';
+                  (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
                 }}
                 className="btn-shimmer bg-obsidian hover:bg-slateCard text-crispWhite text-xs sm:text-sm font-medium px-6 py-3.5 rounded-full inline-flex items-center gap-2 transition-all shadow-md active:scale-95 group"
               >
@@ -129,7 +129,7 @@ export default function NextGenPayment() {
             <div className="pt-6">
               <button
                 onClick={() => {
-                  window.location.hash = 'contact';
+                  (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
                 }}
                 className="btn-shimmer bg-obsidian hover:bg-slateCard text-crispWhite text-xs font-medium px-5 py-3 rounded-full inline-flex items-center gap-2 transition-all shadow-sm active:scale-95"
               >

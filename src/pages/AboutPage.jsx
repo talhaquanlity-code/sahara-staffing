@@ -561,11 +561,11 @@ export default function AboutPage({ onNavigateContact, onNavigateServices }) {
   const navigateDestination = (destination) => {
     if (destination === '/services' || destination === 'services') {
       if (onNavigateServices) onNavigateServices();
-      else window.location.hash = 'services';
+      else (window.history.pushState({}, '', '/services'), window.dispatchEvent(new PopStateEvent('popstate')));
       return;
     }
     if (onNavigateContact) onNavigateContact();
-    else window.location.hash = 'contact';
+    else (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
   };
 
   const heroTitleParts = splitHeadlineHighlight(

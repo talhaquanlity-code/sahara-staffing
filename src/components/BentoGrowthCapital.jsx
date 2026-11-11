@@ -264,7 +264,7 @@ export default function BentoGrowthCapital({ onNavigateService, onNavigateContac
     if (onNavigateService) {
       onNavigateService('services');
     } else {
-      window.location.hash = 'services';
+      (window.history.pushState({}, '', '/services'), window.dispatchEvent(new PopStateEvent('popstate')));
     }
   };
 
@@ -274,7 +274,7 @@ export default function BentoGrowthCapital({ onNavigateService, onNavigateContac
     } else if (onNavigateContact) {
       onNavigateContact();
     } else {
-      window.location.hash = 'services';
+      (window.history.pushState({}, '', '/services'), window.dispatchEvent(new PopStateEvent('popstate')));
     }
   };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Linkedin, Twitter, Instagram, Mail, Github, ArrowRight } from 'lucide-react';
 import { useUI } from '../context/UIContext';
 import { useCMS } from '../context/CMSContext';
@@ -72,23 +73,18 @@ export default function Footer({ onNavigate }) {
     }
   };
 
+  const handleRouteClick = (e, route) => {
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate(route);
+    }
+  };
+
   const navLinks = [
-    {
-      label: 'Home',
-      onClick: () => (onNavigate ? onNavigate('home') : (window.location.hash = 'home')),
-    },
-    {
-      label: 'About Us',
-      onClick: () => (onNavigate ? onNavigate('about') : (window.location.hash = 'about')),
-    },
-    {
-      label: 'Services',
-      onClick: () => (onNavigate ? onNavigate('services') : (window.location.hash = 'services')),
-    },
-    {
-      label: 'Contact',
-      onClick: () => (onNavigate ? onNavigate('contact') : (window.location.hash = 'contact')),
-    },
+    { label: 'Home', to: '/', route: 'home' },
+    { label: 'About Us', to: '/about', route: 'about' },
+    { label: 'Services', to: '/services', route: 'services' },
+    { label: 'Contact', to: '/contact', route: 'contact' },
   ];
 
   return (
@@ -101,9 +97,9 @@ export default function Footer({ onNavigate }) {
         <div className="block md:hidden text-center space-y-3.5">
           {/* Brand Logo */}
           <div className="flex justify-center">
-            <button
-              type="button"
-              onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
+            <Link
+              to="/"
+              onClick={(e) => handleRouteClick(e, 'home')}
               className="inline-block cursor-pointer focus:outline-none"
               aria-label={`${companyName} Home`}
             >
@@ -114,42 +110,23 @@ export default function Footer({ onNavigate }) {
                 decoding="async"
                 className="h-6 w-auto object-contain"
               />
-            </button>
+            </Link>
           </div>
 
           {/* Single-Row Horizontal Navigation */}
           <nav className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs font-medium text-white/85">
-            <button
-              type="button"
-              onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
-              className="hover:text-[#E69D2B] transition-colors cursor-pointer"
-            >
-              Home
-            </button>
-            <span className="text-white/20">•</span>
-            <button
-              type="button"
-              onClick={() => (onNavigate ? onNavigate('about') : (window.location.hash = 'about'))}
-              className="hover:text-[#E69D2B] transition-colors cursor-pointer"
-            >
-              About Us
-            </button>
-            <span className="text-white/20">•</span>
-            <button
-              type="button"
-              onClick={() => (onNavigate ? onNavigate('services') : (window.location.hash = 'services'))}
-              className="hover:text-[#E69D2B] transition-colors cursor-pointer"
-            >
-              Services
-            </button>
-            <span className="text-white/20">•</span>
-            <button
-              type="button"
-              onClick={() => (onNavigate ? onNavigate('contact') : (window.location.hash = 'contact'))}
-              className="hover:text-[#E69D2B] transition-colors cursor-pointer"
-            >
-              Contact
-            </button>
+            {navLinks.map((item, idx) => (
+              <React.Fragment key={item.route}>
+                {idx > 0 && <span className="text-white/20">•</span>}
+                <Link
+                  to={item.to}
+                  onClick={(e) => handleRouteClick(e, item.route)}
+                  className="hover:text-[#E69D2B] transition-colors cursor-pointer"
+                >
+                  {item.label}
+                </Link>
+              </React.Fragment>
+            ))}
           </nav>
 
           {/* Social Icons in Clean Horizontal Row */}
@@ -214,9 +191,9 @@ export default function Footer({ onNavigate }) {
             {/* Left Brand Block */}
             <div className="lg:col-span-5 space-y-3 sm:space-y-3.5">
               {/* Real Official Sahara Staffing Logo */}
-              <button
-                type="button"
-                onClick={() => (onNavigate ? onNavigate('home') : (window.location.hash = 'home'))}
+              <Link
+                to="/"
+                onClick={(e) => handleRouteClick(e, 'home')}
                 className="inline-block group cursor-pointer focus:outline-none text-left"
                 aria-label={`${companyName} Home`}
               >
@@ -227,7 +204,7 @@ export default function Footer({ onNavigate }) {
                   decoding="async"
                   className="h-7 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]"
                 />
-              </button>
+              </Link>
 
               {/* Brand Tagline */}
               <p className="text-[12px] sm:text-[13px] text-[#94A3B8]/75 leading-[1.65] max-w-[330px] font-normal tracking-[-0.01em]">
@@ -235,47 +212,38 @@ export default function Footer({ onNavigate }) {
               </p>
 
               <div className="pt-1 flex flex-wrap items-center gap-x-3.5 gap-y-2">
-                <button
-                  type="button"
-                  onClick={() => (onNavigate ? onNavigate('services') : (window.location.hash = 'services'))}
+                <Link
+                  to="/services"
+                  onClick={(e) => handleRouteClick(e, 'services')}
                   className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12px] font-medium text-[#E69D2B] hover:text-[#F6C467] hover:underline transition-colors group tracking-wide focus:outline-none cursor-pointer"
                 >
                   <span>{ctaExploreLabel}</span>
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                </button>
+                </Link>
                 <span className="text-white/20 hidden sm:inline">•</span>
-                <button
-                  type="button"
-                  onClick={() => (onNavigate ? onNavigate('about') : (window.location.hash = 'about'))}
+                <Link
+                  to="/about"
+                  onClick={(e) => handleRouteClick(e, 'about')}
                   className="inline-flex items-center gap-1.5 text-[11.5px] sm:text-[12px] font-medium text-white/70 hover:text-[#E69D2B] hover:underline transition-colors group tracking-wide focus:outline-none cursor-pointer"
                 >
                   <span>About Sahara</span>
                   <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                </button>
+                </Link>
               </div>
             </div>
 
             {/* Right Navigation Links (Top-Right) */}
             <div className="lg:col-span-7 flex flex-wrap items-center justify-start lg:justify-end gap-x-6 sm:gap-x-9 gap-y-2.5 text-[12.5px] sm:text-[13px] font-normal text-white/80 self-start pt-1 sm:pt-1.5">
-              {navLinks.map((item) =>
-                item.onClick ? (
-                  <button
-                    key={item.label}
-                    onClick={item.onClick}
-                    className="hover:text-[#E69D2B] transition-colors focus:outline-none cursor-pointer"
-                  >
-                    {item.label}
-                  </button>
-                ) : (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="hover:text-[#E69D2B] transition-colors"
-                  >
-                    {item.label}
-                  </a>
-                )
-              )}
+              {navLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  onClick={(e) => handleRouteClick(e, item.route)}
+                  className="hover:text-[#E69D2B] transition-colors focus:outline-none cursor-pointer"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -313,7 +281,10 @@ export default function Footer({ onNavigate }) {
                     } catch {}
                     window.dispatchEvent(new CustomEvent('sahara:admin-login-redirect'));
                     if (onNavigate) onNavigate('admin');
-                    else window.location.hash = 'admin';
+                    else {
+                      window.history.pushState({}, '', '/admin');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                    }
                   }}
                   title="Admin Portal"
                   className="text-[#64748B]/50 hover:text-[#E69D2B] transition-colors p-0.5 cursor-pointer"

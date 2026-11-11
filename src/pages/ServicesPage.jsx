@@ -446,14 +446,14 @@ export default function ServicesPage({ onNavigateContact, onNavigate }) {
     } else if (onNavigate) {
       onNavigate('contact');
     } else {
-      window.location.hash = 'contact';
+      (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
     }
   };
 
   const handleDestination = (destination, contextLabel) => {
     if (destination === '/about' || destination === 'about') {
       if (onNavigate) onNavigate('about');
-      else window.location.hash = 'about';
+      else (window.history.pushState({}, '', '/about'), window.dispatchEvent(new PopStateEvent('popstate')));
       return;
     }
     if (destination === '/services' || destination === 'services') {

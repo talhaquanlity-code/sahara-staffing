@@ -139,7 +139,7 @@ export default function TalentPool() {
             {/* Top-Right Quick CTA Pill */}
             <button
               onClick={() => {
-                window.location.hash = 'contact';
+                (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
               }}
               className="absolute top-6 right-6 z-20 w-9 h-9 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-white flex items-center justify-center hover:bg-[#E69D2B] hover:text-[#0B0F17] transition-all duration-200 cursor-pointer shadow-md"
               title="Inquire About Practice"

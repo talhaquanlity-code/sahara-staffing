@@ -214,7 +214,7 @@ export default function Calculator({ onNavigateContact, onProceedToContact }) {
     } else if (onProceedToContact) {
       onProceedToContact();
     } else {
-      window.location.hash = 'contact';
+      (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
     }
   };
 

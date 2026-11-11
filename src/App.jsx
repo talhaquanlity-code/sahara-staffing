@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { UIProvider } from './context/UIContext';
@@ -153,29 +154,46 @@ function LuxuryCursor() {
   );
 }
 
+const ROUTE_PATHS = {
+  home: '/',
+  about: '/about',
+  services: '/services',
+  'executive-search': '/services',
+  contact: '/contact',
+  admin: '/admin',
+};
+
 function AppContent() {
   const { settings } = useCMS();
   const { lenis, resetScrollToTop } = useScroll();
-  const [currentRoute, setCurrentRoute] = useState('home'); // 'home' | 'services' | 'about' | 'contact' | 'admin'
+  const routerNavigate = useNavigate();
+  const location = useLocation();
   const [contactPrefill, setContactPrefill] = useState(null);
   const [adminLoginNonce, setAdminLoginNonce] = useState(0);
   const [routeVisitNonce, setRouteVisitNonce] = useState(0);
-  const activeRouteRef = useRef('home');
 
-  // Sync route with URL hash for bookmarking & browser back/forward support
+  const pathname = location.pathname.toLowerCase();
+  const currentRoute = pathname.startsWith('/about')
+    ? 'about'
+    : pathname.startsWith('/services') || pathname.startsWith('/executive-search')
+    ? 'services'
+    : pathname.startsWith('/contact')
+    ? 'contact'
+    : pathname.startsWith('/admin')
+    ? 'admin'
+    : 'home';
+
+  // Redirect any legacy /#about or /#admin hash links to clean path URLs
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '').toLowerCase();
-      if (['home', 'services', 'about', 'contact', 'admin'].includes(hash)) {
-        if (hash !== activeRouteRef.current) {
-          activeRouteRef.current = hash;
-          resetScrollToTop();
-          setCurrentRoute(hash);
-          setRouteVisitNonce((prev) => prev + 1);
-        }
-      }
-    };
+    const cleanHash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+    if (['home', 'services', 'about', 'contact', 'admin'].includes(cleanHash)) {
+      const targetPath = ROUTE_PATHS[cleanHash] || '/';
+      routerNavigate(targetPath, { replace: true });
+    }
+  }, [location.hash, routerNavigate]);
 
+  // Listen for custom admin login redirect events
+  useEffect(() => {
     const handleAdminLoginRedirect = () => {
       try {
         sessionStorage.removeItem('sahara_admin_session_v2');
@@ -183,14 +201,11 @@ function AppContent() {
       setAdminLoginNonce((prev) => prev + 1);
     };
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('sahara:admin-login-redirect', handleAdminLoginRedirect);
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('sahara:admin-login-redirect', handleAdminLoginRedirect);
     };
-  }, [resetScrollToTop]);
+  }, []);
 
   // Ensure every route entry snaps Lenis + browser scroll to top (1st section)
   // and refreshes GSAP ScrollTrigger bounds cleanly once the new page DOM mounts.
@@ -221,13 +236,13 @@ function AppContent() {
     if (prefill) {
       setContactPrefill(prefill);
     }
-    activeRouteRef.current = route;
+    const normalized = String(route || 'home').replace(/^#\/?/, '').toLowerCase();
+    const targetPath = normalized.startsWith('/')
+      ? normalized
+      : ROUTE_PATHS[normalized] || '/';
     resetScrollToTop();
-    setCurrentRoute(route);
+    routerNavigate(targetPath);
     setRouteVisitNonce((prev) => prev + 1);
-    if (window.location.hash.replace('#', '').toLowerCase() !== route) {
-      window.location.hash = route;
-    }
   };
 
   // Quick keyboard shortcut to access Admin Portal Login Page:
@@ -332,153 +347,176 @@ function AppContent() {
           </div>
         )}
 
-      {/* ========================================================================= */}
-      {/* ROUTE 1: HOMEPAGE                                                         */}
-      {/* ========================================================================= */}
-      {currentRoute === 'home' && (
-        <React.Fragment key={`home-${routeVisitNonce}`}>
-          {/* 1. Hero Section (Immersive Full-Bleed Cinematic Experience) */}
-          <Hero
-            onNavigate={navigate}
-            onNavigateContact={() => navigate('contact')}
-            onNavigateServices={() => navigate('services')}
-            currentRoute={currentRoute}
-          />
-
-          {/* ===================================================================== */}
-          {/* ARCHITECTURAL BENTO CANVAS (Warm Stone Gutter with Rounded Cards)      */}
-          {/* ===================================================================== */}
-          <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
-            {/* 1. Executive Social Proof & Partner Marquee (White Tone Detached Rounded Card) */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <SocialProofMarquee />
-            </section>
-
-            {/* 2. Bento Services Grid (Staffing Services Gallery) */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#FAF9F6] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <BentoGrowthCapital
-                onNavigateService={(slug) => navigate('services')}
+      <Routes>
+        {/* ======================================================================= */}
+        {/* ROUTE 1: HOMEPAGE (/)                                                   */}
+        {/* ======================================================================= */}
+        <Route
+          path="/"
+          element={
+            <React.Fragment key={`home-${routeVisitNonce}`}>
+              {/* 1. Hero Section (Immersive Full-Bleed Cinematic Experience) */}
+              <Hero
+                onNavigate={navigate}
                 onNavigateContact={() => navigate('contact')}
+                onNavigateServices={() => navigate('services')}
+                currentRoute={currentRoute}
               />
-            </section>
-          </main>
 
-          {/* ===================================================================== */}
-          {/* 3. RECRUITMENT JOURNEY: FROM NEED TO THE RIGHT PEOPLE                 */}
-          {/* (Full-Width Cinematic GSAP Story Stage)                              */}
-          {/* ===================================================================== */}
-          <VettingProcess
-            onNavigateContact={() => navigate('contact')}
-            onNavigateServices={() => navigate('services')}
-          />
+              {/* ================================================================= */}
+              {/* ARCHITECTURAL BENTO CANVAS (Warm Stone Gutter with Rounded Cards) */}
+              {/* ================================================================= */}
+              <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
+                {/* 1. Executive Social Proof & Partner Marquee */}
+                <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <SocialProofMarquee />
+                </section>
 
-          {/* ===================================================================== */}
-          {/* ARCHITECTURAL BENTO CANVAS — LOWER BLOCK                             */}
-          {/* ===================================================================== */}
-          <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
+                {/* 2. Bento Services Grid (Staffing Services Gallery) */}
+                <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#FAF9F6] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <BentoGrowthCapital
+                    onNavigateService={() => navigate('services')}
+                    onNavigateContact={() => navigate('contact')}
+                  />
+                </section>
+              </main>
 
-            {/* 4. Staffing Value & Interactive Sahara Orbit (Hidden on mobile to purge redundant standalone CTA box) */}
-            <section className="hidden md:block rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <Calculator
+              {/* ================================================================= */}
+              {/* 3. RECRUITMENT JOURNEY: FROM NEED TO THE RIGHT PEOPLE             */}
+              {/* ================================================================= */}
+              <VettingProcess
                 onNavigateContact={() => navigate('contact')}
-                onProceedToContact={(data) => navigate('contact', data)}
+                onNavigateServices={() => navigate('services')}
               />
-            </section>
 
-            {/* 5. Client Perspectives / Stories */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#FAF9F6] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <Testimonials />
-            </section>
+              {/* ================================================================= */}
+              {/* ARCHITECTURAL BENTO CANVAS — LOWER BLOCK                          */}
+              {/* ================================================================= */}
+              <main className="relative z-10 px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col gap-3.5 sm:gap-5 lg:gap-6 bg-[#EBE7DE]">
+                {/* 4. Staffing Value & Interactive Sahara Orbit */}
+                <section className="hidden md:block rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#0E1420] md:bg-white border border-slate-800 md:border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <Calculator
+                    onNavigateContact={() => navigate('contact')}
+                    onProceedToContact={(data) => navigate('contact', data)}
+                  />
+                </section>
 
-            {/* 6. Frequently Asked Questions (FAQs) */}
-            <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <FAQ />
-            </section>
+                {/* 5. Client Perspectives / Stories */}
+                <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-[#FAF9F6] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <Testimonials />
+                </section>
 
-            {/* 7. Speak to Staffing Experts CTA Block */}
-            <section className="relative rounded-2xl sm:rounded-[20px] overflow-hidden bg-gradient-to-b from-white via-white to-[#FCEFD2] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
-              <div className="animate-breathe absolute bottom-0 inset-x-0 h-[720px] bg-gradient-to-t from-saharaGold/30 via-saharaGold/10 to-transparent pointer-events-none" />
-              <SpeakToExperts onNavigateContact={() => navigate('contact')} />
-            </section>
+                {/* 6. Frequently Asked Questions (FAQs) */}
+                <section className="rounded-2xl sm:rounded-[20px] overflow-hidden bg-white border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <FAQ />
+                </section>
 
-            {/* 8. Global Footer */}
-            <Footer onNavigate={navigate} />
-          </main>
-        </React.Fragment>
-      )}
+                {/* 7. Speak to Staffing Experts CTA Block */}
+                <section className="relative rounded-2xl sm:rounded-[20px] overflow-hidden bg-gradient-to-b from-white via-white to-[#FCEFD2] border border-[#DDD7CC] shadow-[0_4px_24px_rgba(11,15,23,0.03)]">
+                  <div className="animate-breathe absolute bottom-0 inset-x-0 h-[720px] bg-gradient-to-t from-saharaGold/30 via-saharaGold/10 to-transparent pointer-events-none" />
+                  <SpeakToExperts onNavigateContact={() => navigate('contact')} />
+                </section>
 
-      {/* ========================================================================= */}
-      {/* ROUTE 2: SERVICES PAGE                                                    */}
-      {/* ========================================================================= */}
-      {currentRoute === 'services' && (
-        <div
-          key={`services-${routeVisitNonce}`}
-          className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
-        >
-          <Header onNavigate={navigate} currentRoute={currentRoute} />
-          <ServicesPage
-            onNavigateContact={(prefill) => navigate('contact', prefill)}
-            onNavigate={navigate}
-          />
-          <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
-            <Footer onNavigate={navigate} />
-          </div>
-        </div>
-      )}
+                {/* 8. Global Footer */}
+                <Footer onNavigate={navigate} />
+              </main>
+            </React.Fragment>
+          }
+        />
 
-      {/* ========================================================================= */}
-      {/* ROUTE 3: ABOUT PAGE                                                       */}
-      {/* ========================================================================= */}
-      {currentRoute === 'about' && (
-        <div
-          key={`about-${routeVisitNonce}`}
-          className="min-h-screen bg-[#0B0F17] flex flex-col justify-between"
-        >
-          <Header onNavigate={navigate} currentRoute={currentRoute} />
-          <AboutPage
-            onNavigateContact={() => navigate('contact')}
-            onNavigateServices={() => navigate('services')}
-          />
-          <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
-            <Footer onNavigate={navigate} />
-          </div>
-        </div>
-      )}
+        <Route path="/home" element={<Navigate to="/" replace />} />
 
-      {/* ========================================================================= */}
-      {/* ROUTE 4: CONTACT PAGE                                                     */}
-      {/* ========================================================================= */}
-      {currentRoute === 'contact' && (
-        <div
-          key={`contact-${routeVisitNonce}`}
-          className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
-        >
-          <Header onNavigate={navigate} currentRoute={currentRoute} />
-          <ContactPage prefillData={contactPrefill} />
-          <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
-            <Footer onNavigate={navigate} />
-          </div>
-        </div>
-      )}
+        {/* ======================================================================= */}
+        {/* ROUTE 2: SERVICES PAGE (/services)                                      */}
+        {/* ======================================================================= */}
+        <Route
+          path="/services"
+          element={
+            <div
+              key={`services-${routeVisitNonce}`}
+              className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
+            >
+              <Header onNavigate={navigate} currentRoute={currentRoute} />
+              <ServicesPage
+                onNavigateContact={(prefill) => navigate('contact', prefill)}
+                onNavigate={navigate}
+              />
+              <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
+                <Footer onNavigate={navigate} />
+              </div>
+            </div>
+          }
+        />
 
-      {/* ========================================================================= */}
-      {/* ROUTE 5: ADMIN PORTAL & EXECUTIVE DASHBOARD                               */}
-      {/* ========================================================================= */}
-      {currentRoute === 'admin' && (
-        <AdminPage key={adminLoginNonce} onNavigateHome={() => navigate('home')} />
-      )}
+        <Route path="/executive-search" element={<Navigate to="/services" replace />} />
+
+        {/* ======================================================================= */}
+        {/* ROUTE 3: ABOUT PAGE (/about)                                            */}
+        {/* ======================================================================= */}
+        <Route
+          path="/about"
+          element={
+            <div
+              key={`about-${routeVisitNonce}`}
+              className="min-h-screen bg-[#0B0F17] flex flex-col justify-between"
+            >
+              <Header onNavigate={navigate} currentRoute={currentRoute} />
+              <AboutPage
+                onNavigateContact={() => navigate('contact')}
+                onNavigateServices={() => navigate('services')}
+              />
+              <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
+                <Footer onNavigate={navigate} />
+              </div>
+            </div>
+          }
+        />
+
+        {/* ======================================================================= */}
+        {/* ROUTE 4: CONTACT PAGE (/contact)                                        */}
+        {/* ======================================================================= */}
+        <Route
+          path="/contact"
+          element={
+            <div
+              key={`contact-${routeVisitNonce}`}
+              className="min-h-screen bg-[#F8F6F1] flex flex-col justify-between"
+            >
+              <Header onNavigate={navigate} currentRoute={currentRoute} />
+              <ContactPage prefillData={contactPrefill} />
+              <div className="px-3 sm:px-5 lg:px-7 py-4 sm:py-6 bg-[#EBE7DE]">
+                <Footer onNavigate={navigate} />
+              </div>
+            </div>
+          }
+        />
+
+        {/* ======================================================================= */}
+        {/* ROUTE 5: ADMIN PORTAL & EXECUTIVE DASHBOARD (/admin)                    */}
+        {/* ======================================================================= */}
+        <Route
+          path="/admin"
+          element={
+            <AdminPage key={adminLoginNonce} onNavigateHome={() => navigate('home')} />
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 }
 
 export default function App() {
   return (
-    <CMSProvider>
-      <UIProvider>
-        <ScrollProvider>
-          <AppContent />
-        </ScrollProvider>
-      </UIProvider>
-    </CMSProvider>
+    <BrowserRouter>
+      <CMSProvider>
+        <UIProvider>
+          <ScrollProvider>
+            <AppContent />
+          </ScrollProvider>
+        </UIProvider>
+      </CMSProvider>
+    </BrowserRouter>
   );
 }

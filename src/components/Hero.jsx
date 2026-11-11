@@ -384,7 +384,7 @@ export default function Hero({ onNavigate, onNavigateContact, onNavigateServices
             } else if (onNavigateContact) {
               onNavigateContact();
             } else {
-              window.location.hash = 'contact';
+              (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
             }
           };
 

@@ -60,7 +60,7 @@ export default function Articles() {
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
           onClick={() => {
-            window.location.hash = 'services';
+            (window.history.pushState({}, '', '/services'), window.dispatchEvent(new PopStateEvent('popstate')));
           }}
           className="group inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/90 hover:bg-white text-xs sm:text-sm font-bold text-[#0B0F17] shadow-sm hover:shadow-md border border-slate-200 transition-all duration-300 shrink-0 self-start sm:self-auto"
         >
@@ -96,7 +96,7 @@ export default function Articles() {
             whileHover={{ y: -8 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             onClick={() => {
-              window.location.hash = 'services';
+              (window.history.pushState({}, '', '/services'), window.dispatchEvent(new PopStateEvent('popstate')));
             }}
             className="article-card will-change-transform group cursor-pointer rounded-[28px] overflow-hidden relative aspect-[4/3.2] bg-[#0B0F17] shadow-lg hover:shadow-2xl border border-slate-200/40 select-none flex flex-col justify-between"
           >

@@ -90,7 +90,7 @@ export default function ConversionCta({ onNavigateContact, onNavigateServices })
           <button
             onClick={() => {
               if (onNavigateContact) onNavigateContact();
-              else window.location.hash = 'contact';
+              else (window.history.pushState({}, '', '/contact'), window.dispatchEvent(new PopStateEvent('popstate')));
             }}
             className="btn-shimmer w-full sm:w-auto min-h-[48px] justify-center bg-[#0B0F17] hover:bg-[#1E293B] text-white font-bold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-full inline-flex items-center gap-2.5 shadow-xl transition-all duration-200 active:scale-95 cursor-pointer"
           >
