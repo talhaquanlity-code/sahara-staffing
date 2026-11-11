@@ -95,6 +95,10 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+if (typeof window !== 'undefined') {
+  console.log('%cdesigned & developed by Talha Saqib', 'font-size: 10px; color: #888888;');
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>

@@ -16,7 +16,7 @@ export const INITIAL_CMS_CONTENT = {
       { id: 'services', label: 'Services' },
       { id: 'contact', label: 'Contact' },
     ],
-    ctaLabel: 'Join',
+    ctaLabel: 'Join us',
   },
 
   // =========================================================================
@@ -1008,7 +1008,7 @@ function migrateLegacyBentoImages(content) {
     const hasLegacyStaffingLinks =
       Array.isArray(next.navbar.links) &&
       next.navbar.links.some((l) => l?.id === 'executive-search' || l?.label === 'Staffing Services');
-    const isLegacyCta = ['Request Talent', 'Get Started'].includes(next.navbar.ctaLabel);
+    const isLegacyCta = ['Request Talent', 'Get Started', 'Join'].includes(next.navbar.ctaLabel);
     if (hasLegacyStaffingLinks || isLegacyCta) {
       next.navbar = {
         ...next.navbar,
@@ -1022,7 +1022,7 @@ function migrateLegacyBentoImages(content) {
               ],
             }
           : {}),
-        ...(isLegacyCta ? { ctaLabel: 'Join' } : {}),
+        ...(isLegacyCta ? { ctaLabel: 'Join us' } : {}),
       };
     }
   }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useCMS } from '../context/CMSContext';
 import logoImg from '../assets/sahara-logo.webp';
 
@@ -19,7 +19,7 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
           { id: 'services', label: 'Services' },
           { id: 'contact', label: 'Contact' },
         ];
-  const ctaLabel = navConfig.ctaLabel || 'Join';
+  const ctaLabel = navConfig.ctaLabel || 'Join us';
 
   // Other than homepage, navbar has fixed floating positioning.
   // On homepage, obeys global settings.stickyNavbar toggle (defaults to false / non-sticky)
@@ -37,15 +37,6 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
     } else {
       window.location.hash = targetRoute;
     }
-  };
-
-  const handleAdminLoginRedirect = () => {
-    try {
-      sessionStorage.removeItem('sahara_admin_session_v2');
-    } catch {}
-    setMobileMenuOpen(false);
-    window.dispatchEvent(new CustomEvent('sahara:admin-login-redirect'));
-    handleNav('admin');
   };
 
   return (
@@ -78,21 +69,12 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
           />
         </button>
 
-        {/* Right Actions: Account Icon | Get Started | Hamburger Toggle */}
+        {/* Right Actions: CTA | Hamburger Toggle */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             type="button"
-            onClick={handleAdminLoginRedirect}
-            aria-label="Admin Portal Login"
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white/80 hover:text-saharaGold transition-colors cursor-pointer focus:outline-none"
-          >
-            <User className="w-3.5 h-3.5" strokeWidth={1.75} />
-          </button>
-
-          <button
-            type="button"
             onClick={() => handleNav('contact')}
-            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-xs px-3 py-1.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap"
+            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-xs px-4 py-1.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap"
           >
             {ctaLabel}
           </button>
@@ -160,20 +142,11 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
         </nav>
 
         {/* PART 3: RIGHT PILL */}
-        <div className="flex items-center gap-2 bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full p-2 pl-4 shadow-2xl shrink-0">
-          <button
-            type="button"
-            onClick={handleAdminLoginRedirect}
-            aria-label="Admin Portal Login"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white/80 hover:text-saharaGold transition-colors cursor-pointer focus:outline-none"
-          >
-            <User className="w-4 h-4" strokeWidth={1.75} />
-          </button>
-
+        <div className="flex items-center bg-[#0B0F17]/85 backdrop-blur-xl border border-white/10 rounded-full p-2 shadow-2xl shrink-0">
           <button
             type="button"
             onClick={() => handleNav('contact')}
-            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-[13px] px-5 py-2.5 rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap"
+            className="bg-saharaGold hover:bg-saharaGoldLight text-obsidian font-semibold text-[13px] px-8 py-2.5 min-w-[120px] rounded-full transition-all shadow-md active:scale-95 cursor-pointer focus:outline-none whitespace-nowrap text-center"
           >
             {ctaLabel}
           </button>
@@ -205,14 +178,6 @@ export default function Header({ onNavigate, currentRoute = 'home' }) {
           ))}
 
           <div className="flex flex-col gap-2 pt-2">
-            <button
-              type="button"
-              onClick={handleAdminLoginRedirect}
-              className="w-full py-2.5 rounded-full border border-white/20 text-white text-xs font-semibold hover:border-saharaGold transition-colors cursor-pointer flex items-center justify-center gap-2"
-            >
-              <User className="w-3.5 h-3.5" strokeWidth={1.75} />
-              <span>Login</span>
-            </button>
             <button
               type="button"
               onClick={() => {

@@ -1255,7 +1255,7 @@ export default function CMSWorkspace({
                         </label>
                         <input
                           type="text"
-                          value={draftContent.navbar?.ctaLabel || 'Join'}
+                          value={draftContent.navbar?.ctaLabel || 'Join us'}
                           onChange={(e) => updateDraft('navbar', { ...(draftContent.navbar || {}), ctaLabel: e.target.value })}
                           className="w-full px-3 py-2 rounded-lg bg-[#131926] border border-[#1E293B] text-[#E69D2B] font-semibold focus:border-[#E69D2B] focus:outline-none"
                         />
