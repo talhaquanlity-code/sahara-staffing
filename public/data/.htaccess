@@ -1,0 +1,40 @@
+# ==============================================================================
+# SAHARA STAFFING INC. — SECURE DATA DIRECTORY ACCESS CONTROL
+# Blocks direct public access to candidate submission logs, audit logs, and rate limiters
+# ==============================================================================
+
+# Disable directory listing
+Options -Indexes
+
+# Block public access to submissions logs, rate limiters, and any log/audit files
+<FilesMatch "(submissions\.log|\.rate_limits\.json|\.log$|\.jsonl$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Specifically protect submissions.log
+<Files "submissions.log">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>
+
+# Specifically protect .rate_limits.json
+<Files ".rate_limits.json">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</Files>

@@ -1,7 +1,7 @@
 <?php
 /**
  * SAHARA STAFFING INC. — GODADDY CMS PERSISTENCE ENDPOINT (/api/save-content.php)
- * Handles incoming JSON payload from Executive Admin Customizer and writes to /data/content.json.
+ * Authenticates admin bearer token and writes published CMS state to /data/content.json.
  */
 
 error_reporting(0);
@@ -26,7 +26,7 @@ if (!is_dir($dataDir)) {
 $dataFile = $dataDir . '/content.json';
 $mirrorFile = $dataDir . '/site-content.json';
 
-// Handle GET request to read content
+// Handle GET request to read content (Public read-only for live website)
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (file_exists($dataFile)) {
         header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -41,8 +41,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit;
 }
 
-// Handle POST request to save content
+// ============================================================================
+// TOKEN VERIFICATION HELPER (POST REQUESTS REQUIRE VALID ADMIN SESSION)
+// ============================================================================
+define('SERVER_JWT_SECRET', 'sahara_admin_jwt_secret_token_key_77192834718293');
+
+function verifyAdminAuthorization() {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? ($_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
+    if (empty($authHeader) && function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $authHeader = $headers['Authorization'] ?? ($headers['authorization'] ?? '');
+    }
+
+    if (empty($authHeader)) {
+        return null;
+    }
+
+    $token = '';
+    if (preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+        $token = trim($matches[1]);
+    }
+
+    if (empty($token) || strpos($token, '.') === false) {
+        return null;
+    }
+
+    list($encodedPayload, $signature) = explode('.', $token, 2);
+    $expectedSig = hash_hmac('sha256', $encodedPayload, SERVER_JWT_SECRET);
+
+    if (!hash_equals($expectedSig, $signature)) {
+        return null;
+    }
+
+    $remainder = strlen($encodedPayload) % 4;
+    if ($remainder) {
+        $encodedPayload .= str_repeat('=', 4 - $remainder);
+    }
+    $decodedJson = base64_decode(strtr($encodedPayload, '-_', '+/'));
+    $payload = json_decode($decodedJson, true);
+
+    if (!is_array($payload) || !isset($payload['exp']) || $payload['exp'] < time()) {
+        return null;
+    }
+
+    return $payload;
+}
+
+// Handle POST request to save content (SECURED)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $admin = verifyAdminAuthorization();
+    if (!$admin) {
+        http_response_code(401);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Unauthorized: Invalid or expired administrator credentials. Access denied.'
+        ]);
+        exit;
+    }
+
     $rawInput = file_get_contents('php://input');
     
     if (empty($rawInput)) {
@@ -66,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Attach timestamp metadata
     $decoded['_last_published_at'] = date('c');
-    $decoded['_published_by'] = 'contact@sahara-staffing.com';
+    $decoded['_published_by'] = $admin['email'] ?? 'contact@sahara-staffing.com';
 
     $jsonToWrite = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     
@@ -87,7 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'success' => true,
         'message' => 'Site Content Successfully Published & Live Worldwide!',
         'bytes_written' => $writeResult,
-        'timestamp' => date('c')
+        'timestamp' => date('c'),
+        'published_by' => $decoded['_published_by']
     ]);
     exit;
 }

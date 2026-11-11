@@ -21,13 +21,34 @@ import CMSWorkspace from '../components/admin/CMSWorkspace';
 import SettingsWorkspace from '../components/admin/SettingsWorkspace';
 
 const SESSION_KEY = 'sahara_admin_session_v2';
+const CLIENT_DEV_HASH = 'b07d69f98558ef0bd011f05e9cc629cbf06035c591314623e2986c521da5d7a1';
+const CLIENT_DEV_SALT = 'sahara_staffing_secure_salt_2026';
+
+async function verifyDevFallbackHash(pass) {
+  try {
+    const enc = new TextEncoder();
+    const data = enc.encode(CLIENT_DEV_SALT + pass);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    return hashHex === CLIENT_DEV_HASH;
+  } catch {
+    return false;
+  }
+}
 
 export default function AdminPage({ onNavigateHome }) {
   // Session initialization from sessionStorage (closed with browser tab)
   const [session, setSession] = useState(() => {
     try {
       const saved = sessionStorage.getItem(SESSION_KEY);
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      if (parsed?.expiresAt && Math.floor(Date.now() / 1000) > parsed.expiresAt) {
+        sessionStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+      return parsed;
     } catch {
       return null;
     }
@@ -45,7 +66,7 @@ export default function AdminPage({ onNavigateHome }) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [authError, setAuthError] = useState(null);
 
-  // Handle Login with Hardened Credentials
+  // Handle Login with Secure Server-Side HMAC Verification
   const handleLogin = async (e) => {
     e.preventDefault();
     const cleanEmail = email.trim().toLowerCase();
@@ -57,20 +78,71 @@ export default function AdminPage({ onNavigateHome }) {
     setIsAuthenticating(true);
     setAuthError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    const payload = { action: 'login', email: cleanEmail, password };
+    let authenticatedSession = null;
+    let serverResponded = false;
 
-    if (cleanEmail === 'contact@sahara-staffing.com' && password === 'Sahara@123') {
-      const newSession = {
-        email: 'contact@sahara-staffing.com',
-        role: 'administrator',
-        mode: 'production_cms',
-        timestamp: new Date().toISOString(),
-      };
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
-      setSession(newSession);
+    // 1. Primary: Server-side HMAC auth endpoint (GoDaddy / Apache / PHP)
+    try {
+      let res = await fetch('/api/auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok && res.status === 404) {
+        res = await fetch('/data/auth.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        serverResponded = true;
+        const data = await res.json();
+        if (res.ok && data.success) {
+          authenticatedSession = {
+            email: data.user?.email || cleanEmail,
+            role: data.user?.role || 'administrator',
+            token: data.token,
+            expiresAt: data.expiresAt,
+            timestamp: new Date().toISOString(),
+          };
+        } else {
+          setAuthError(data.error || 'Invalid administrator credentials. Access denied.');
+          setIsAuthenticating(false);
+          return;
+        }
+      }
+    } catch {
+      // Server offline or local Vite dev server without PHP runtime
+    }
+
+    // 2. Fallback: Salted WebCrypto SHA-256 for local offline Vite development
+    if (!serverResponded && !authenticatedSession) {
+      if (cleanEmail === 'contact@sahara-staffing.com') {
+        const isValid = await verifyDevFallbackHash(password);
+        if (isValid) {
+          authenticatedSession = {
+            email: 'contact@sahara-staffing.com',
+            role: 'administrator',
+            token: 'local_dev_token_' + Date.now(),
+            expiresAt: Math.floor(Date.now() / 1000) + 86400 * 7,
+            timestamp: new Date().toISOString(),
+          };
+        }
+      }
+    }
+
+    if (authenticatedSession) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(authenticatedSession));
+      setSession(authenticatedSession);
     } else {
       setAuthError('Invalid administrator credentials. Access denied.');
     }
+
     setIsAuthenticating(false);
   };
 

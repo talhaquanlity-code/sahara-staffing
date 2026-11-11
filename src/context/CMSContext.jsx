@@ -1212,16 +1212,31 @@ export function CMSProvider({ children }) {
       if (overrideSettings) setSettings(settingsPayload);
       setPublishedContent(payload);
 
+      // Retrieve admin bearer token for secured save endpoint
+      let adminToken = '';
+      try {
+        const savedSession = sessionStorage.getItem('sahara_admin_session_v2');
+        if (savedSession) {
+          const parsed = JSON.parse(savedSession);
+          adminToken = parsed?.token || '';
+        }
+      } catch {}
+
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+      };
+
       try {
         let response = await fetch('/api/save-content.php', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({ content: payload, settings: settingsPayload }),
         });
         if (!response.ok) {
           response = await fetch('/data/save-content.php', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: authHeaders,
             body: JSON.stringify({ content: payload, settings: settingsPayload }),
           });
         }
